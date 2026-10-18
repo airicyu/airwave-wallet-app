@@ -21,7 +21,7 @@ No Flutter or Dart application code.
 | MWA wallet endpoint | `com.solanamobile:mobile-wallet-adapter-walletlib` 2.x | Spec wallet role; local association |
 | Solana bytes / base58 | `com.solanamobile:web3-solana` and `io.github.funkatronics:multimult` as walletlib requires | Pubkey and transaction bytes |
 | Vault at rest | AndroidX Security encrypted file | Wraps that one JSON file with the device keystore. It does not replace the password box |
-| Password KDF | `com.lambdapioneer.argon2kt:argon2kt` (Argon2id) plus JDK AES-GCM | The JSON blob is the password box. The password is not stored |
+| Password KDF | `org.bouncycastle:bcprov-jdk18on` Argon2id plus JDK AES-GCM | The JSON blob is the password box. Bouncy Castle runs in `testDebugUnitTest` on the JVM. `argon2kt` needs Android JNI and cannot be the unit-test KDF |
 
 Pin versions in `android/app/build.gradle.kts` when the module is created. Record the pins in `reasoning.md` if they change.
 

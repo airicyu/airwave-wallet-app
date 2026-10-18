@@ -24,11 +24,15 @@ Persist a pending approval. Hard-code a password. Use `double` for lamports. Imp
 
 ## Done this session
 
-Tech design written. Design review: no open HIGH; M1–M6 closed.
+Track A: `android/` builds. `testDebugUnitTest` covers vault seal/open. `assembleDebug` succeeds.
+
+Track B: Compose screens for setup, unlock, lead, generate, home.
+
+Track C: `LocalAssociation` starts walletlib `LocalWebSocketServerScenario` for authorize and sign-messages. `sign_transactions` declines immediately. Sign-and-send declines until a transaction parser and RPC submit exist. Device hand-test A–D not run.
 
 ## Next session
 
-Track A: create `android/` (`com.airwave.wallet`) and vault unit tests.
+Finish sign-and-send (parse system transfer, fee as BigInteger, submit to the public RPC), then run INDEX hand-test A–D on an Android device.
 
 ## Paste-ready
 

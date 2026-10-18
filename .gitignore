@@ -40,9 +40,19 @@ app.*.symbols
 app.*.map.json
 
 # Android Studio will place build artifacts here
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/local.properties
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/.cxx/
+/android/**/.externalNativeBuild/
+*.apk
+*.aab
+*.keystore
+*.jks
 
 # Widget Preview related
 .widget_preview/

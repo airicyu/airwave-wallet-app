@@ -17,6 +17,6 @@ A generated burner after an **app password** is set, wallet home with widget, As
 | `mobile-wallet-adapter-walletlib` | Wallet-side MWA session, association, and RPC methods |
 | `web3-solana` and `multimult` | Public keys and transaction bytes the wallet library expects |
 | AndroidX Security encrypted file | Wraps the one vault file with the device keystore |
-| `com.lambdapioneer.argon2kt:argon2kt` plus JDK AES-GCM | Password box inside that file. Argon2id derives the key; AES-GCM seals the keypair. AndroidX does not replace this box |
+| `org.bouncycastle:bcprov-jdk18on:1.78.1` | Argon2id password box and Ed25519. Replaces `argon2kt` so `testDebugUnitTest` can run without Android JNI |
 
 Versions are pinned in Gradle when `android/` is created.

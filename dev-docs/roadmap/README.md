@@ -15,7 +15,7 @@ The Chrome extension roadmap in `airicyu/airwave-wallet` does not apply here.
 
 | Version | Status | Summary |
 |---------|--------|---------|
-| [0.1.0](./0.1.0/INDEX.md) | draft | Native Android MVP: app password, generate burner, home + widget, empty tabs, MWA |
+| [0.1.0](./0.1.0/INDEX.md) | shipped | Native Android MVP: app password, generate burner, home + widget, empty tabs, MWA |
 
 **Patch** (`0.1.1`, …) = bugfix for the current minor only. **Minor** (`0.2.0`, …) = new scheduled features.
 

@@ -1,6 +1,6 @@
 # 0.1.0 — MVP
 
-- **Status:** `draft`
+- **Status:** `shipped`
 - **Parent:** (none)
 - **Changelog:** [`changelog.md`](../../../changelog.md) under `0.1.0 (unreleased)`
 
