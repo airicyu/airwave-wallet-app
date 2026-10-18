@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Airwave 0.1.0 — design demo</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --surface: #171c24;
+    --surface-2: #1e2530;
+    --line: #2c3544;
+    --text: #e8edf5;
+    --muted: #93a0b4;
+    --accent: #7eb6ff;
+    --danger: #ff8b8b;
+    --ok: #8fd4a8;
+    --warn: #f0c36a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #07090c;
+    color: var(--text);
+    font: 15px/1.4 system-ui, sans-serif;
+  }
+  header.bar {
+    padding: 16px 20px 8px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  header.bar h1 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+  header.bar p { margin: 0; color: var(--muted); font-size: 13px; }
+  .layout {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 20px 40px;
+  }
+  nav.screens {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 220px;
+  }
+  nav.screens button {
+    text-align: left;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+  nav.screens button[aria-current="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .phone {
+    width: 390px;
+    height: 780px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .status {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+  .screen.on { display: flex; }
+  .pad { padding: 8px 20px 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
+  h2 { font-size: 22px; margin: 8px 0 0; font-weight: 650; }
+  .hint { color: var(--muted); margin: 0; font-size: 14px; }
+  label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
+  input, textarea {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    font: inherit;
+  }
+  textarea { min-height: 88px; resize: none; }
+  .error { color: var(--danger); font-size: 13px; margin: 0; }
+  .grow { flex: 1; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  button.btn {
+    border: 0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font: inherit;
+    font-weight: 600;
+    cursor: default;
+  }
+  button.primary { background: var(--accent); color: #0b1220; width: 100%; }
+  button.ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--line);
+    flex: 1;
+  }
+  button.lock {
+    background: transparent;
+    color: var(--muted);
+    border: 0;
+    min-height: 44px;
+    min-width: 44px;
+    font-weight: 600;
+  }
+  .widget {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px 14px 10px;
+  }
+  .widget .k { font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+  .addr-row { display: flex; align-items: center; gap: 8px; }
+  .addr {
+    font-family: ui-monospace, monospace;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+  button.icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+    cursor: default;
+  }
+  .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-align: center;
+    padding: 24px;
+  }
+  nav.tabs {
+    display: flex;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+  nav.tabs button {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    padding: 14px 8px 18px;
+    font: inherit;
+    cursor: pointer;
+  }
+  nav.tabs button[aria-current="true"] { color: var(--accent); font-weight: 650; }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .card dt { color: var(--muted); font-size: 12px; }
+  .card dd { margin: 2px 0 10px; }
+  .card dd:last-child { margin-bottom: 0; }
+  .mono {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .msg {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+  .fee { color: var(--warn); }
+</style>
+</head>
+<body>
+<header class="bar">
+  <h1>Airwave 0.1.0 design demo</h1>
+  <p>Sketch only. Paths match <code>dev-docs/roadmap/0.1.0/docs/workflow.md</code>. Not the shipped UI.</p>
+</header>
+<div class="layout">
+  <nav class="screens" aria-label="Screens">
+    <button type="button" data-screen="setup" aria-current="true">Set app password</button>
+    <button type="button" data-screen="unlock">Unlock</button>
+    <button type="button" data-screen="unlock-error">Unlock — wrong password</button>
+    <button type="button" data-screen="lead">Home — no account yet</button>
+    <button type="button" data-screen="generate">Generate burner</button>
+    <button type="button" data-screen="assets">Home — Assets</button>
+    <button type="button" data-screen="activity">Home — Activity</button>
+    <button type="button" data-screen="authorize">MWA — Connect</button>
+    <button type="button" data-screen="sign-msg">MWA — Sign message</button>
+    <button type="button" data-screen="sign-send">MWA — Sign and send</button>
+  </nav>
+
+  <div class="phone" id="phone">
+    <div class="status"><span>9:41</span><span>Airwave</span></div>
+
+    <section class="screen on" id="setup">
+      <div class="pad">
+        <h2>Airwave</h2>
+        <p class="hint">Set a password to lock this wallet.</p>
+        <label>Password
+          <input type="password" readonly aria-label="Password" />
+        </label>
+        <label>Re-enter
+          <input type="password" readonly aria-label="Re-enter" />
+        </label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">Get started</button>
+      </div>
+    </section>
+
+    <section class="screen" id="lead">
+      <div class="pad">
+        <div class="top">
+          <h2>Airwave</h2>
+          <button class="lock" type="button">Lock</button>
+        </div>
+        <p class="hint">No wallet account yet.</p>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">Create burner wallet</button>
+      </div>
+    </section>
+
+    <section class="screen" id="generate">
+      <div class="pad">
+        <div class="top">
+          <h2>Create burner wallet</h2>
+        </div>
+        <p class="hint">A new key on this device. The secret is not shown.</p>
+        <div class="widget">
+          <p class="k">Solana address</p>
+          <div class="addr-row">
+            <div class="addr">7xKXtg2C…osgAsU</div>
+            <button class="icon" type="button" aria-label="Copy address">⧉</button>
+          </div>
+        </div>
+        <button class="btn ghost" type="button" style="flex:none">Roll again</button>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">Generate</button>
+      </div>
+    </section>
+
+    <section class="screen" id="unlock">
+      <div class="pad">
+        <h2>Unlock</h2>
+        <p class="hint">Wallet locked.</p>
+        <label>Wallet password
+          <input type="password" readonly aria-label="Wallet password" />
+        </label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">Unlock</button>
+      </div>
+    </section>
+
+    <section class="screen" id="unlock-error">
+      <div class="pad">
+        <h2>Unlock</h2>
+        <p class="hint">Wallet locked.</p>
+        <label>Wallet password
+          <input type="password" readonly value="••••" aria-label="Wallet password" />
+        </label>
+        <p class="error">Wrong password.</p>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">Unlock</button>
+      </div>
+    </section>
+
+    <section class="screen" id="assets">
+      <div class="pad">
+        <div class="top">
+          <h2>Assets</h2>
+          <button class="lock" type="button">Lock</button>
+        </div>
+        <div class="widget">
+          <p class="k">Wallet</p>
+          <div class="addr-row">
+            <div class="addr" title="7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU">7xKXtg2C…osgAsU</div>
+            <button class="icon" type="button" aria-label="Copy address">⧉</button>
+          </div>
+        </div>
+        <div class="empty">No assets yet.</div>
+      </div>
+      <nav class="tabs" aria-label="Home">
+        <button type="button" aria-current="true" data-screen="assets">Assets</button>
+        <button type="button" data-screen="activity">Activity</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="activity">
+      <div class="pad">
+        <div class="top">
+          <h2>Activity</h2>
+          <button class="lock" type="button">Lock</button>
+        </div>
+        <div class="widget">
+          <p class="k">Wallet</p>
+          <div class="addr-row">
+            <div class="addr">7xKXtg2C…osgAsU</div>
+            <button class="icon" type="button" aria-label="Copy address">⧉</button>
+          </div>
+        </div>
+        <div class="empty">No activity yet.</div>
+      </div>
+      <nav class="tabs" aria-label="Home">
+        <button type="button" data-screen="assets">Assets</button>
+        <button type="button" aria-current="true" data-screen="activity">Activity</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="authorize">
+      <div class="pad">
+        <div class="top">
+          <h2>Connect</h2>
+          <button class="lock" type="button">Lock</button>
+        </div>
+        <p class="hint">Example dApp wants this wallet account.</p>
+        <dl class="card">
+          <dt>App</dt>
+          <dd>Example dApp</dd>
+          <dt>Site</dt>
+          <dd class="mono">https://example-dapp.sol</dd>
+          <dt>Chain</dt>
+          <dd>solana:devnet</dd>
+          <dt>Account</dt>
+          <dd class="mono">7xKXtg2C…osgAsU</dd>
+        </dl>
+        <div class="grow"></div>
+        <div class="row">
+          <button class="btn ghost" type="button">Reject</button>
+          <button class="btn primary" type="button" style="width:auto;flex:1">Approve</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="sign-msg">
+      <div class="pad">
+        <div class="top">
+          <h2>Sign message</h2>
+          <button class="lock" type="button">Lock</button>
+        </div>
+        <p class="hint">Example dApp asks this account to sign.</p>
+        <dl class="card">
+          <dt>App</dt>
+          <dd>Example dApp</dd>
+          <dt>Account</dt>
+          <dd class="mono">7xKXtg2C…osgAsU</dd>
+          <dt>Message</dt>
+          <dd><p class="msg">Sign in to Example dApp
+Nonce: 4f2c…a91</p></dd>
+        </dl>
+        <div class="grow"></div>
+        <div class="row">
+          <button class="btn ghost" type="button">Reject</button>
+          <button class="btn primary" type="button" style="width:auto;flex:1">Approve</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="sign-send">
+      <div class="pad">
+        <div class="top">
+          <h2>Sign and send</h2>
+          <button class="lock" type="button">Lock</button>
+        </div>
+        <p class="hint">Example dApp asks this account to sign and submit.</p>
+        <dl class="card">
+          <dt>App</dt>
+          <dd>Example dApp</dd>
+          <dt>Chain</dt>
+          <dd>solana:devnet</dd>
+          <dt>From</dt>
+          <dd class="mono">7xKXtg2C…osgAsU</dd>
+          <dt>To</dt>
+          <dd class="mono">9cY2mN4p…kL3wQe</dd>
+          <dt>Send</dt>
+          <dd>0.01 SOL</dd>
+          <dt>Fee</dt>
+          <dd class="fee">5000 lamports</dd>
+          <dt>Instruction</dt>
+          <dd>System transfer</dd>
+        </dl>
+        <div class="grow"></div>
+        <div class="row">
+          <button class="btn ghost" type="button">Reject</button>
+          <button class="btn primary" type="button" style="width:auto;flex:1">Approve</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+  const buttons = document.querySelectorAll("[data-screen]");
+  function show(id) {
+    document.querySelectorAll(".screen").forEach((el) => el.classList.toggle("on", el.id === id));
+    document.querySelectorAll("nav.screens button").forEach((b) => {
+      b.setAttribute("aria-current", b.dataset.screen === id ? "true" : "false");
+    });
+  }
+  buttons.forEach((b) => b.addEventListener("click", () => show(b.dataset.screen)));
+</script>
+</body>
+</html>

@@ -6,4 +6,4 @@
 
 ## 0.1.0 (unreleased)
 
-MVP: import burner wallet; wallet home with wallet widget; Assets and Activity tabs (no tab content yet); dApp can connect.
+MVP: app password, then generate a burner wallet; wallet home with wallet widget; Assets and Activity tabs (no tab content yet); MWA connect and sign.

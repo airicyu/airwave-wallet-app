@@ -1,7 +1,22 @@
 # 0.1.0 — reasoning
 
-*(Placeholder — clean start.)*
+## MVP
 
-**Why this MVP:** one importable burner wallet, a recognizable home with wallet widget, tab shell for Assets and Activity without content work yet, and connect so dApps can attach — before balances, history, or signing.
+A generated burner after an **app password** is set, wallet home with widget, Assets/Activity tab shells (no content), and an MWA wallet endpoint — before balances, activity history, or import.
 
-Details belong in [`INDEX.md`](../INDEX.md) and [`how.md`](./how.md) as they are decided.
+## Why native Android
+
+1. **0.1.0 ship target** — one mobile OS for acceptance; iOS and desktop deferred.
+2. **MWA, not a private scheme** — Solana Mobile’s wallet–dApp standard on Android is Mobile Wallet Adapter (association URI `solana-wallet:`, then WebSocket). Mandatory wallet features in spec 2.x are `solana:signMessages` and `solana:signAndSendTransaction`, after `authorize`. Phantom/Solflare-style custom deeplinks are a different, non-official path and are out of scope.
+3. **Why these engineering defaults** — Deprecated `sign_transactions` is omitted so there is one signing path (`sign_and_send_transactions`). Submit uses Solana’s public cluster RPCs because 0.1.0 has no RPC settings screen. A user-configured RPC can replace that later without changing the approval UI.
+
+## Dependencies (why)
+
+| Package | Reason |
+|---------|--------|
+| `mobile-wallet-adapter-walletlib` | Wallet-side MWA session, association, and RPC methods |
+| `web3-solana` and `multimult` | Public keys and transaction bytes the wallet library expects |
+| AndroidX Security encrypted file | Wraps the one vault file with the device keystore |
+| `com.lambdapioneer.argon2kt:argon2kt` plus JDK AES-GCM | Password box inside that file. Argon2id derives the key; AES-GCM seals the keypair. AndroidX does not replace this box |
+
+Versions are pinned in Gradle when `android/` is created.

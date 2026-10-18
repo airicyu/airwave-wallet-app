@@ -14,7 +14,7 @@ Feature ideas: [`dev-docs/roadmap/backlog/INDEX.md`](dev-docs/roadmap/backlog/IN
 
 | Path | Role |
 |------|------|
-| Application code | Path and stack named in the active version's INDEX / `how.md` (none for 0.1.0 yet) |
+| [`android/`](android/) | **Native Android** (Kotlin / Compose for 0.1.0; scaffold when INDEX is `in progress`) |
 | [`dev-docs/`](dev-docs/) | Engineering contracts, roadmap, domain |
 | [`docs/`](docs/) | User-facing docs |
 | [`docs/`](docs/README.md) | User docs (guide, features, legal) |

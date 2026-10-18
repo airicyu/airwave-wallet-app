@@ -2,7 +2,7 @@
 
 Non-custodial Solana wallet app. **Separate** from the Chrome extension [`airicyu/airwave-wallet`](https://github.com/airicyu/airwave-wallet).
 
-**0.1.0 (draft)** — MVP only: import burner wallet; wallet home with wallet widget; Assets and Activity tabs (empty); dApp connect. No application code in repo yet.
+**0.1.0 (draft)** — **Native Android** MVP: app password, then generate a burner; wallet home with wallet widget; Assets and Activity tabs (empty); MWA. `android/` not scaffolded yet.
 
 | | |
 |---|---|

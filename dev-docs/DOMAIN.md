@@ -66,14 +66,14 @@ Do not use: …      (easy to confuse, or retired)
 
 - **Chinese:** 錢包密碼
 - **English:** wallet password
-- **Definition:** The user password that encrypts the vault. It is not an on-chain password. Forgetting it means the existing vault cannot be decrypted.
+- **Definition:** The password that encrypts the app vault. It is not an on-chain password and not a per-account password. Forgetting it means the vault cannot be decrypted.
 - **Do not use:** as a recovery phrase
 
 ### Wallet account
 
 - **Chinese:** 錢包帳戶
 - **English:** wallet account
-- **Definition:** One on-device account the user treats as theirs (e.g. an imported burner). The **wallet widget** on home represents this account. It is not the address string by itself, and it is not a list row that can be switched until an INDEX says so.
+- **Definition:** One on-device account the user treats as theirs. In 0.1.0 it is a generated burner. The **wallet widget** on home represents this account. It is not the address string by itself, and it is not a list row that can be switched until an INDEX says so.
 - **Code:** TBD per version INDEX (session vs durable store).
 - **Alias:** account
 - **Do not use:** combined wallet, member address, main wallet, connected site

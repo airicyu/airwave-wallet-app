@@ -10,6 +10,7 @@ Only a file named `dev-docs/roadmap/X.Y.Z/INDEX.md` is that version’s contract
 | [roadmap/](./roadmap/README.md) | Version contracts (INDEX / Track / acceptance) |
 | [design-principles.md](./design-principles.md) | Screen rules. INDEX wins when it is explicit |
 | [DOMAIN.md](./DOMAIN.md) | Cross-version account / address terms. A version INDEX may override and must write back here |
+| [research/](./research/mwa-android.md) | Background notes (not a version contract) |
 
 Unscheduled ideas: [roadmap/backlog/INDEX.md](./roadmap/backlog/INDEX.md).
 
