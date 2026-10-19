@@ -32,6 +32,7 @@ draft  (INDEX, reasoning, how)
 | Gate | When | Skip? |
 |------|------|-------|
 | **Design review** | `INDEX` is `draft` and `reasoning` and `how` are readable | No. A tiny doc typo can be one paragraph, but the file must exist |
+| **Design demo** | `INDEX` links `dev-docs/design-demos/wallet-*.html` and UI ships on Android | Demo must show **mobile-native** chrome before implementation; workflow in [`design-demos/README.md`](../design-demos/README.md) |
 | **Implementation review** | All Tracks for the version are done, or the human asks for a review | No, unless the version changes no code (docs only) |
 | **Security review** | The version touches the vault, session, pending approval, or request routing | May be a section inside the implementation review. Use a dedicated pass when the diff is large |
 

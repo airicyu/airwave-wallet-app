@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="false"
@@ -18,7 +19,10 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="solana-wallet" android:pathPrefix="/v1/associate/local" />
+                <data
+                    android:scheme="solana-wallet"
+                    android:pathPrefix="/v1/associate/local"
+                    tools:ignore="AppLinkUrlError" />
             </intent-filter>
         </activity>
     </application>

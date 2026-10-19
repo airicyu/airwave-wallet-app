@@ -19,6 +19,7 @@ Feature ideas: [`dev-docs/roadmap/backlog/INDEX.md`](dev-docs/roadmap/backlog/IN
 | [`docs/`](docs/) | User-facing docs |
 | [`docs/`](docs/README.md) | User docs (guide, features, legal) |
 | [`dev-docs/`](dev-docs/README.md) | Engineering docs: contracts, screen rules, domain terms, local setup |
+| [`dev-docs/design-demos/`](dev-docs/design-demos/README.md) | HTML phone sketches (Android visual contract; see README workflow) |
 | [`changelog.md`](changelog.md) / [`version.md`](version.md) | Ship log and current version |
 | [`.agents/skills/version-delivery/`](.agents/skills/version-delivery/SKILL.md) | Deliver one roadmap version |
 

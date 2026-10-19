@@ -33,6 +33,31 @@ object BurnerKeys {
     fun short(address: String): String =
         if (address.length <= 12) address else address.take(8) + "…" + address.takeLast(6)
 
+    fun base58Decode(text: String): ByteArray {
+        val input = text.trim()
+        if (input.isEmpty()) return byteArrayOf()
+        var zeros = 0
+        while (zeros < input.length && input[zeros] == '1') zeros++
+        val bytes = IntArray(input.length)
+        var length = 0
+        for (i in zeros until input.length) {
+            val digit = alphabet.indexOf(input[i])
+            if (digit < 0) throw IllegalArgumentException("invalid base58")
+            var carry = digit
+            var j = 0
+            while (j < length || carry != 0) {
+                carry += 58 * bytes[j]
+                bytes[j] = carry % 256
+                carry /= 256
+                j++
+            }
+            length = j
+        }
+        return ByteArray(zeros + length) { i ->
+            if (i < zeros) 0 else bytes[length - 1 - (i - zeros)].toByte()
+        }
+    }
+
     fun base58(data: ByteArray): String {
         var zeros = 0
         while (zeros < data.size && data[zeros] == 0.toByte()) zeros++

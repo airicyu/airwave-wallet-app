@@ -1,31 +1,35 @@
 # Design principles
 
-Screen rules for the mobile wallet app (native Android for 0.1.0). An INDEX overrides this file when it says so.
+Screen rules for the mobile wallet app (native Android for 0.1.0+). A version **INDEX** overrides this file when it says so.
 
-The Chrome extension's popup rules (fixed 384px shell, CSS classes, hamburger order) live in that repo. Do not copy them onto a phone or desktop window.
+The Chrome extension popup rules (fixed 384px shell, CSS classes) live in that repo. Do not copy that chrome onto a phone layout.
 
-## 1. Approval
+## Visual contract (design demos)
 
-Before the user approves, show the context, the expected effects, the fee, and the instructions as clearly as practical. Optional AI may explain a transaction. It never signs and never unlocks the vault.
+For versions that link an HTML file under [`design-demos/`](design-demos/README.md):
 
-## 2. Icon-only controls
+- That file is the **Android visual contract** (layout, menu chrome, tabs, Back, theme tokens on phone).
+- Extension popup code supplies **IA, copy, and token values**—not popup pixel layout.
+- Change the demo **before** (or in the same Track as) Compose when mobile chrome or spacing changes; see the workflow in [`design-demos/README.md`](design-demos/README.md).
+- **Only content inside the phone frame** is shipped copy and controls. Designer notes beside the mockup are **not** user-visible text.
 
-A control whose only content is an icon does not also show a text label that repeats the icon. The accessible name is the action (for example Copy address). The hit target is at least 44 logical pixels. A control that has a visible label is not an icon-only control.
+**0.2.0:** [`wallet-020.html`](design-demos/wallet-020.html) — full-width **menu top sheet** under the status bar, Material-style **bottom tabs**, blue accent menu icon on Home; **Unlock** matches extension `.unlock-screen` (layered radials + brand mark).
 
-## 3. Long strings
+## Back navigation
 
-A single-line address, signature, or origin ellipsizes. Copy places the full string on the clipboard. Do not shrink the type size to fit a long string. Do not stretch a button to the full width unless it is the primary action.
+Every **secondary surface** must give an obvious way to go back. A secondary surface is any full-screen or modal layer that is not the primary **Home** hub (Assets / Activity with bottom tabs).
 
-## 4. Widget ownership
+| Surface | Back control | Behavior |
+|---------|----------------|----------|
+| **Home** | None required | Menu opens from the top bar; tabs stay on Home. |
+| **Hamburger menu** (modal sheet) | **Back** top-leading | Dismisses the menu and returns to whatever was underneath (Home or a pushed subpage). |
+| **Pushed subpages** (Network, Settings hub, settings children, empty menu placeholders, etc.) | **Back** top-leading | Pops one level on the in-app stack (subpage → Home, or settings child → Settings hub). |
+| **MWA approval** | Reject (and Lock) | Not a settings-style back stack; use explicit approve / reject actions. |
 
-The parent creates the child and disposes it. A widget that belongs to one approval does not survive that approval. Do not keep a signing child alive across routes by holding it above the screen that owns the request.
+Conventions:
 
-## 5. Copy
+- Put **Back** at the **top-leading** corner (minimum 44×44 dp touch target). A chevron / arrow icon is preferred on phone; the accessible name is the localized **Back** string (`menu.back` in 0.2.0).
+- Do not rely on the system gesture alone; always show in-app Back (or equivalent) on secondary surfaces.
+- Opening the hamburger from a subpage is allowed; **Back** on the menu sheet closes only the menu, not the subpage underneath.
 
-Errors and empty states are one short sentence. Buttons are verbs (Save, Cancel, Lock). Do not use "please" or a feature essay.
-
-## 6. Do not
-
-- Persist an in-flight approval so it comes back after a restart.
-- Put the fee or the destination only behind a disclosure on an approve screen when the app already knows them.
-- Lay the screen out as a Chrome extension popup.
+Status-bar and navigation-bar **safe areas** apply to menu sheets and subpage top bars so controls do not overlap system time, notifications, or gesture bars.

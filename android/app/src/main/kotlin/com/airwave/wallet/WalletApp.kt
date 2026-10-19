@@ -3,48 +3,72 @@ package com.airwave.wallet
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.airwave.wallet.R
+import com.airwave.wallet.theme.AirwaveColors
+import com.airwave.wallet.theme.AirwaveTheme
+import com.airwave.wallet.ui.AirwavePrimaryButton
+import com.airwave.wallet.ui.AirwaveUnlockBackdrop
+import com.airwave.wallet.ui.HomeShell
+import com.airwave.wallet.ui.airwaveUnlockFieldColors
 import com.airwave.wallet.vault.BurnerKeys
 
 @Composable
 fun WalletApp(model: WalletModel) {
-    MaterialTheme(colorScheme = darkColorScheme()) {
-        Surface(modifier = Modifier.fillMaxSize()) {
+    AirwaveTheme {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { model.bumpUserActivity() })
+                },
+            color = AirwaveColors.Bg,
+        ) {
             when (model.route) {
                 Route.Setup -> SetupScreen(model)
                 Route.Unlock -> UnlockScreen(model)
                 Route.Lead -> LeadScreen(model)
                 Route.Generate -> GenerateScreen(model)
-                Route.Home -> HomeScreen(model)
+                Route.Home -> HomeShell(model)
                 Route.Approval -> ApprovalScreen(model)
             }
         }
@@ -52,61 +76,124 @@ fun WalletApp(model: WalletModel) {
 }
 
 @Composable
+private fun BrandMarkImage() {
+    Image(
+        painterResource(R.drawable.brand_mark),
+        contentDescription = null,
+        modifier = Modifier.size(64.dp),
+        contentScale = ContentScale.Fit,
+    )
+}
+
+@Composable
 private fun SetupScreen(model: WalletModel) {
     var password by rememberSaveable { mutableStateOf("") }
     var again by rememberSaveable { mutableStateOf("") }
-    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Airwave", style = MaterialTheme.typography.headlineMedium)
-        Text("Set a password to lock this wallet.")
-        OutlinedTextField(
-            password,
-            { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        )
-        OutlinedTextField(
-            again,
-            { again = it },
-            label = { Text("Re-enter") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        )
-        model.error?.let { Text(it) }
-        Button(onClick = { model.setup(password, again) }, modifier = Modifier.fillMaxWidth()) { Text("Get started") }
+    val fieldColors = airwaveUnlockFieldColors()
+    Box(Modifier.fillMaxSize()) {
+        AirwaveUnlockBackdrop(centerContent = false) {
+            BrandMarkImage()
+            Spacer(Modifier.height(18.dp))
+            Text(
+                "Airwave",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = AirwaveColors.Text,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                model.t("setup.lead"),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = AirwaveColors.Text,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(16.dp))
+            OutlinedTextField(
+                password,
+                { password = it },
+                placeholder = { Text(model.t("setup.password")) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = fieldColors,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+            )
+            Spacer(Modifier.height(10.dp))
+            OutlinedTextField(
+                again,
+                { again = it },
+                placeholder = { Text(model.t("setup.reenter")) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = fieldColors,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+            )
+            model.error?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(it, color = AirwaveColors.Danger, modifier = Modifier.fillMaxWidth())
+            }
+            Spacer(Modifier.height(10.dp))
+            AirwavePrimaryButton(model.t("setup.submit"), { model.setup(password, again) })
+        }
     }
 }
 
 @Composable
 private fun UnlockScreen(model: WalletModel) {
     var password by rememberSaveable { mutableStateOf("") }
-    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Unlock", style = MaterialTheme.typography.headlineMedium)
-        Text("Wallet locked.")
-        OutlinedTextField(
-            password,
-            { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        )
-        model.error?.let { Text(it) }
-        Button(onClick = { model.unlock(password) }, modifier = Modifier.fillMaxWidth()) { Text("Unlock") }
+    val fieldColors = airwaveUnlockFieldColors()
+    Box(Modifier.fillMaxSize()) {
+        AirwaveUnlockBackdrop {
+            BrandMarkImage()
+            Spacer(Modifier.height(18.dp))
+            Text(
+                "Airwave",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = AirwaveColors.Text,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                model.t("unlock.lead"),
+                style = MaterialTheme.typography.bodyMedium,
+                color = AirwaveColors.TextMuted,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(22.dp))
+            OutlinedTextField(
+                password,
+                { password = it },
+                placeholder = { Text(model.t("unlock.password")) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = fieldColors,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+            )
+            model.error?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(it, color = AirwaveColors.Danger, modifier = Modifier.fillMaxWidth())
+            }
+            Spacer(Modifier.height(10.dp))
+            AirwavePrimaryButton(model.t("unlock.submit"), { model.unlock(password) })
+        }
     }
 }
 
 @Composable
 private fun LeadScreen(model: WalletModel) {
     Column(Modifier.padding(20.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Airwave", style = MaterialTheme.typography.headlineMedium)
-            TextButton(onClick = { model.lock() }) { Text("Lock") }
-        }
-        Text("No wallet account yet.")
-        Button(onClick = { model.startGenerate() }, modifier = Modifier.fillMaxWidth()) { Text("Create burner wallet") }
+        Text("Airwave", style = MaterialTheme.typography.headlineMedium, color = AirwaveColors.Text)
+        Text("No wallet account yet.", color = AirwaveColors.TextMuted)
+        AirwavePrimaryButton("Create burner wallet", { model.startGenerate() })
     }
 }
 
@@ -114,56 +201,38 @@ private fun LeadScreen(model: WalletModel) {
 private fun GenerateScreen(model: WalletModel) {
     val address = model.preview?.address.orEmpty()
     Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Create burner wallet", style = MaterialTheme.typography.headlineMedium)
-        Text("A new key on this device. The secret is not shown.")
-        Text("Solana address")
+        Text("Create burner wallet", style = MaterialTheme.typography.headlineMedium, color = AirwaveColors.Text)
+        Text("A new key on this device. The secret is not shown.", color = AirwaveColors.TextMuted)
+        Text("Solana address", color = AirwaveColors.TextMuted)
         Row {
-            Text(BurnerKeys.short(address), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text(BurnerKeys.short(address), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f), color = AirwaveColors.Text)
             CopyButton(address)
         }
         OutlinedButton(onClick = { model.roll() }) { Text("Roll again") }
-        Button(onClick = { model.commitGenerate() }, modifier = Modifier.fillMaxWidth()) { Text("Generate") }
-    }
-}
-
-@Composable
-private fun HomeScreen(model: WalletModel) {
-    Column(Modifier.fillMaxSize()) {
-        Column(Modifier.padding(20.dp).weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(if (model.tab == Tab.Assets) "Assets" else "Activity", style = MaterialTheme.typography.headlineMedium)
-                TextButton(onClick = { model.lock() }) { Text("Lock") }
-            }
-            val address = model.address.orEmpty()
-            Text("Wallet")
-            Row {
-                Text(BurnerKeys.short(address), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                CopyButton(address)
-            }
-            Text(if (model.tab == Tab.Assets) "No assets yet." else "No activity yet.")
-        }
-        NavigationBar {
-            NavigationBarItem(model.tab == Tab.Assets, { model.tab = Tab.Assets }, icon = {}, label = { Text("Assets") })
-            NavigationBarItem(model.tab == Tab.Activity, { model.tab = Tab.Activity }, icon = {}, label = { Text("Activity") })
-        }
+        AirwavePrimaryButton("Generate", { model.commitGenerate() })
     }
 }
 
 @Composable
 private fun ApprovalScreen(model: WalletModel) {
     val pending = model.pending
-    Column(Modifier.padding(20.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.padding(20.dp).fillMaxSize().background(AirwaveColors.Bg), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(pending?.title ?: "", style = MaterialTheme.typography.headlineMedium)
-            TextButton(onClick = { model.lock() }) { Text("Lock") }
+            Text(pending?.title ?: "", style = MaterialTheme.typography.headlineMedium, color = AirwaveColors.Text)
+            TextButton(onClick = { model.lock() }) { Text("Lock", color = AirwaveColors.Accent) }
         }
         pending?.lines?.forEach { (label, value) ->
-            Text(label)
-            Text(value)
+            Text(label, color = AirwaveColors.TextMuted)
+            Text(value, color = AirwaveColors.Text)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { model.reject() }, modifier = Modifier.weight(1f)) { Text("Reject") }
-            Button(onClick = { model.approve() }, modifier = Modifier.weight(1f)) { Text("Approve") }
+            OutlinedButton(onClick = { model.reject() }, modifier = Modifier.weight(1f), enabled = !model.approving) { Text("Reject") }
+            AirwavePrimaryButton(
+                "Approve",
+                { model.approve() },
+                modifier = Modifier.weight(1f),
+                enabled = !model.approving,
+            )
         }
     }
 }
@@ -177,5 +246,5 @@ private fun CopyButton(text: String) {
             clipboard.setPrimaryClip(ClipData.newPlainText("address", text))
         },
         modifier = Modifier.semantics { contentDescription = "Copy address" },
-    ) { Text("Copy") }
+    ) { Text("Copy", color = AirwaveColors.Accent) }
 }

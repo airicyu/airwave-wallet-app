@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import com.airwave.wallet.solana.LegacyTransaction
+import com.airwave.wallet.solana.SolanaJsonRpc
 import com.airwave.wallet.vault.BurnerKeys
 import com.solana.mobilewalletadapter.walletlib.association.LocalAssociationUri
 import com.solana.mobilewalletadapter.walletlib.authorization.AuthIssuerConfig
@@ -18,11 +20,14 @@ import com.solana.mobilewalletadapter.walletlib.scenario.SignAndSendTransactions
 import com.solana.mobilewalletadapter.walletlib.scenario.SignMessagesRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.SignTransactionsRequest
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
+import java.util.concurrent.Executors
+
 class LocalAssociation(
     private val context: Context,
     private val model: WalletModel,
 ) {
     private val main = Handler(Looper.getMainLooper())
+    private val worker = Executors.newSingleThreadExecutor()
     private var scenario: LocalWebSocketServerScenario? = null
 
     fun start(uri: Uri) {
@@ -58,18 +63,21 @@ class LocalAssociation(
                                 "Chain" to chain,
                                 "Account" to BurnerKeys.short(model.address ?: ""),
                             ),
-                            sign = { seed -> publicKey(seed) },
-                            onResult = { ok, bytes ->
-                                if (!ok || bytes == null) request.completeWithDecline()
-                                else {
-                                    val account = AuthorizedAccount(
-                                        bytes,
-                                        BurnerKeys.base58(bytes),
-                                        null,
-                                        arrayOf("solana:mainnet", "solana:devnet", "solana:testnet"),
-                                        arrayOf("solana:signMessages", "solana:signAndSendTransaction"),
-                                    )
-                                    request.completeWithAuthorize(account, null, null, null)
+                            approve = { seed -> ApprovalResult.Bytes(publicKey(seed)) },
+                            finish = { result ->
+                                when (result) {
+                                    is ApprovalResult.Bytes -> {
+                                        val bytes = result.value
+                                        val account = AuthorizedAccount(
+                                            bytes,
+                                            BurnerKeys.base58(bytes),
+                                            null,
+                                            arrayOf("solana:mainnet", "solana:devnet", "solana:testnet"),
+                                            arrayOf("solana:signMessages", "solana:signAndSendTransaction"),
+                                        )
+                                        request.completeWithAuthorize(account, null, null, null)
+                                    }
+                                    else -> request.completeWithDecline()
                                 }
                             },
                         ),
@@ -96,13 +104,16 @@ class LocalAssociation(
                                 "Account" to BurnerKeys.short(model.address ?: ""),
                                 "Message" to message,
                             ),
-                            sign = { seed ->
+                            approve = { seed ->
                                 val payload = request.payloads.first()
-                                BurnerKeys.sign(seed, payload)
+                                val sig = BurnerKeys.sign(seed, payload)
+                                ApprovalResult.Bytes(sig)
                             },
-                            onResult = { ok, bytes ->
-                                if (!ok || bytes == null) request.completeWithDecline()
-                                else request.completeWithSignedPayloads(arrayOf(bytes))
+                            finish = { result ->
+                                when (result) {
+                                    is ApprovalResult.Bytes -> request.completeWithSignedPayloads(arrayOf(result.value))
+                                    else -> request.completeWithDecline()
+                                }
                             },
                         ),
                     )
@@ -111,11 +122,50 @@ class LocalAssociation(
 
             override fun onSignAndSendTransactionsRequest(request: SignAndSendTransactionsRequest) {
                 val chain = request.chain ?: request.cluster
-                if (rpcFor(chain) == null) {
+                val rpcUrl = model.rpcForSubmit(chain)
+                if (rpcUrl == null) {
                     request.completeWithDecline()
                     return
                 }
-                request.completeWithDecline()
+                val payload = request.payloads.firstOrNull() ?: run {
+                    request.completeWithDecline()
+                    return
+                }
+                worker.execute {
+                    val summary = LegacyTransaction.summarize(payload)
+                    val txB64 = LegacyTransaction.base64Wire(payload)
+                    val fee = SolanaJsonRpc.estimateFeeLamports(rpcUrl, txB64)
+                    val lines = buildList {
+                        add("App" to (request.identityName ?: ""))
+                        add("Chain" to (chain ?: ""))
+                        summary?.instructionNames?.forEach { name ->
+                            add("Instruction" to name)
+                        }
+                        summary?.destination?.let { add("Destination" to it) }
+                        summary?.amountLamports?.let { add("Amount" to "$it lamports") }
+                        fee?.let { add("Fee" to "$it lamports") }
+                    }
+                    val hasTransfer = summary?.instructionNames?.contains("Transfer") == true
+                    if (hasTransfer && (summary?.destination == null || summary.amountLamports == null || fee == null)) {
+                        main.post { request.completeWithDecline() }
+                        return@execute
+                    }
+                    main.post {
+                        model.offer(
+                            Pending(
+                                title = "Sign and send",
+                                lines = lines,
+                                approve = { secret -> model.signAndSend(payload, rpcUrl, secret) },
+                                finish = { result ->
+                                    when (result) {
+                                        is ApprovalResult.Signatures -> request.completeWithSignatures(result.value)
+                                        else -> request.completeWithDecline()
+                                    }
+                                },
+                            ),
+                        )
+                    }
+                }
             }
 
             override fun onDeauthorizedEvent(event: DeauthorizedEvent) {
@@ -129,10 +179,4 @@ class LocalAssociation(
     private fun publicKey(seed: ByteArray): ByteArray =
         Ed25519PrivateKeyParameters(seed, 0).generatePublicKey().encoded
 
-    private fun rpcFor(chain: String?): String? = when (chain) {
-        "solana:mainnet", "mainnet-beta" -> "https://api.mainnet-beta.solana.com"
-        "solana:devnet", "devnet" -> "https://api.devnet.solana.com"
-        "solana:testnet", "testnet" -> "https://api.testnet.solana.com"
-        else -> null
-    }
 }
