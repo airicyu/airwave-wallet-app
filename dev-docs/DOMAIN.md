@@ -73,8 +73,8 @@ Do not use: …      (easy to confuse, or retired)
 
 - **Chinese:** 錢包帳戶
 - **English:** wallet account
-- **Definition:** One on-device account the user treats as theirs. In 0.1.0 it is a generated burner. The **wallet widget** on home represents this account. It is not the address string by itself, and it is not a list row that can be switched until an INDEX says so.
-- **Code:** TBD per version INDEX (session vs durable store).
+- **Definition:** One on-device account the user treats as theirs. From 0.4.0 the vault holds a list of accounts; settings remember which id is **active**. Home assets and signing follow the active account. Kinds: **seed** (BIP39 mnemonic), **burner** (random 32-byte), **secret** (imported key), **watch** (address only, cannot sign).
+- **Code:** Plaintext `accounts` array inside `airwave.vault.v1`; `activeAccountId` in `airwave.settings.v1`.
 - **Alias:** account
 - **Do not use:** combined wallet, member address, main wallet, connected site
 

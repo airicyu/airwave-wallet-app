@@ -34,21 +34,37 @@ A contract is complete only when an agent with no chat can answer:
 
 1. What is in, what is out
 2. Which types, storage keys, and screens
-3. What the acceptance checks are
-4. What the next session should change first
+3. What each shipped screen looks like (not only what it does)
+4. What the acceptance checks are
+5. What the next session should change first
 
 If any answer depends on "we said so in chat," it is not written yet.
+
+### Screen spec (not functions only)
+
+If this version ships UI, **Decided** must describe the phone-frame layout in complete sentences. Linking a design-demo HTML is not a spec.
+
+Copy from the **phone frame** of the HTML the INDEX names (and from that screen's Ship notes). For each shipped screen write:
+
+- How many rows or blocks, and in what order
+- Title and subtitle (or equivalent) for each row, in the three locales this app ships
+- Which glyph: vector XML copied from web `StrokeIcon` / `TokenTrust` path `d` values, not Material Icons, not a Compose `Canvas` invention, not PNG for those glyphs
+- Navigation of the chooser (one import row then a sub-chooser, if that is what the frame shows)
+
+Do not ship a settings-style list of verbs when the frame shows icon + title + subtitle. Vault, RPC, and MWA sentences do not replace those layout sentences.
+
+Web `airicyu/airwave-wallet` supplies IA, copy, and SVG `d` values. It does **not** supply popup pixel layout. The Android visual contract is the demo phone frame, written into this INDEX.
 
 ---
 
 ## 2. Language
 
-**Reply to the user in Traditional Chinese.** **Docs default to English**, unless the user or a spec says otherwise.
+**Reply to the user in Traditional Chinese.**
 
-- `INDEX.md`, `reasoning.md`, `how.md`, `HANDOFF.md`, and other roadmap prose except reviews: **English**.
-- `docs/design-review.md` and `docs/implementation-review.md`: **Traditional Chinese**, as [`.agents/skills/version-delivery/`](../../.agents/skills/version-delivery/SKILL.md) specifies.
-- Identifiers, paths, commands, JSON keys, enums: **English**.
-- After a version is `shipped`, leave its wording. Do not rewrite it for a later language rule.
+- **Version docs** under `dev-docs/roadmap/X.Y.Z/` (`INDEX.md`, `reasoning.md`, `how.md`, `HANDOFF.md`, `docs/design-review.md`, `docs/implementation-review.md`): **Traditional Chinese**. The reader is the user reviewing the version.
+- Identifiers, paths, commands, JSON keys, enums, drawable names: **English**.
+- Other engineering docs (`code-design.md`, `DOMAIN.md` body except term names, `design-principles.md`) stay **English** unless the user says otherwise.
+- After a version is `shipped`, leave its wording. Do not rewrite it for a later language rule. Versions still `draft` / `in progress` / `done` follow this section.
 - Domain term **names** stay Chinese. See [DOMAIN.md](../DOMAIN.md).
 
 ---
@@ -79,12 +95,12 @@ These apply until a version's `INDEX.md` explicitly overrides one. Do not break 
 
 ## 5. Acceptance checks
 
-Each version's `INDEX.md` must list **hand-test** steps that a human can run. "Works in dev" is not a check.
+Each version's `INDEX.md` must list **hand-test** steps that a human can run. "Works in dev" is not a check. A flow that only proves storage or signing, and never names the on-screen chrome, is not enough.
 
 At least:
 
-* Which screen to open, and on which device (`flutter devices`)
-* What the UI should show
+* Which screen to open, and on which device
+* What the UI should show, matching the Decided screen spec (row count, icons, titles, subtitles)
 * What must still be true (for example, killing the app does not resurrect a pending approval)
 
 `flutter analyze` and `flutter test` are available. The INDEX names which commands that version requires. Do not treat the scaffold widget test as proof of a wallet flow.

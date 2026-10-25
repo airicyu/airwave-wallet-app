@@ -13,7 +13,7 @@ android {
         minSdk 26
         targetSdk 35
         versionCode 1
-        versionName "0.2.0"
+        versionName "0.4.0"
     }
 
     buildFeatures {
@@ -45,4 +45,5 @@ dependencies {
     implementation "com.solanamobile:web3-solana:0.2.5"
     implementation "io.github.funkatronics:multimult:0.2.2"
     testImplementation "junit:junit:4.13.2"
+    testImplementation "androidx.test:core:1.6.1"
 }

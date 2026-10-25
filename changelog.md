@@ -2,7 +2,15 @@
 
 ## Next
 
-(No unversioned changes. The list is [`dev-docs/roadmap/unversioned.md`](dev-docs/roadmap/unversioned.md). After a batch is assigned to a version, move the sentence under that version's heading and leave this section empty.)
+（空）
+
+## 0.4.0 — 2026-10-26
+
+Multi-account vault: 12-word seed, burner, import mnemonic or secret, watch-only; switch active account from the list or the home pill. Add-account chooser and inner screens match the overall-v1 phone frames. Combined row is visible and does not create an account. Displayed addresses are first 4 + `…` + last 4. Verified token shield uses the web TokenTrust vector on a rounded fill, with organic-score badge on the shield.
+
+## 0.3.0 — 2026-10-26
+
+Home Assets lists native SOL, SPL Token, and Token-2022 for the active address. Jupiter supplies name, icon, and verified shield to the left of the token icon. Mainnet with no RPC shows the Helius guide instead of a public node. Activity stays empty.
 
 ## 0.2.0 — 2026-10-20
 

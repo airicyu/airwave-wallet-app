@@ -1,4 +1,4 @@
-# wallet-overall-v1 vs web wallet — review (2026-10-24)
+# wallet-overall-v1 vs web wallet — review (2026-10-24; 0.52.0 pass 2026-10-25)
 
 Sources: `captures/` + `DEMO-UI-NOTES.md` + `airwave-ext/.../popup/` (StrokeIcon, TokenTrust, RpcGuide, close-empty `#3ddc84`, base.css tokens).  
 Design: `wallet-overall-v1.html` + `icons/`.
@@ -34,13 +34,14 @@ Method: fixed `class="screen on"`; headless Chrome phone crops; visual compare t
 | A14 | approve-sign-tx-fail | Layout OK but not pixel-matched to capture 13 density | Blockhash fail box + AI low + fee | med |
 | A15 | connect-dapp | App mark is letter「J」card (OK-ish); rail simplified | Similar in demo; fine-tune spacing vs capture 03 | low |
 | A16 | menu-sheet | Menu icon set close to StrokeIcon but not byte-identical weights/sizes | IconAccounts/Book/Network/Settings/Globe/Info/Lock at web sizes | low |
-| A17 | settings-hub | Hub list is **invented IA** (語言/RPC/API/AI/CU/鎖定) | Web settings are separate screens from overflow, not this hub | med — see C1 |
+| A17 | settings-hub | Hub list once lagged web; **0.52.0** added Debug mode row | Web `SettingsHub` has locale/RPC/keys/txAi/CU/lock/**debug** | low — hub IA confirmed on web; summaries still mobile-flavored |
 | A18 | send / send-pick | Mostly aligned; pick-row dots vs web radio cards | Capture 07/15 | low |
 | A19 | network | Simple radio list vs web selectable cards with blue border | Capture 22 | low |
 | A20 | onboarding | No FirstRunBrand wave logo block | Web RpcGuide/onboarding brand header | med |
 | A21 | home-assets | No sidebar brand row「Airwave Wallet」(popup/sidebar chrome) | Extension-only; mobile has status bar instead | low — arguably B |
 | A22 | accounts | Watch/signing icons sit without filled circle chrome sometimes used on web avatar | `paintAccountKindMark` uses `--fill` circle — we match; fine-tune size | low |
 | A23 | combined expand | Share rows indent/`JCLh…` style approximate | Web nested share under expanded SOL | low |
+| A24 | accounts subtree | Was only list＋chooser＋aggregate-create | Web full add-* / account-* stack | high | **fixed** (2026-10-25) |
 
 ---
 
@@ -104,3 +105,6 @@ Windows sync target (this pass):
 - 2026-10-24：AI 分析對齊 web `tx-ai` 單列卡（bot＋標籤＋風險指數＋藍圓報告鈕；去掉卡內展開／雙行標題）。
 - 2026-10-24：Eric 決定拿掉 Home 頂欄 scan／展開 icon（無 sidebar／popup）；`wallet-overall-v1.html` 已刪 3 處。
 - **2026-10-24:** `home-assets-combined` expand／breakdown 對齊 web `HomeTokenList`（`row-expand-btn` + shortAddr＋％＋bar；非帳戶名橫列）。
+- **2026-10-25:** Align overall-v1 to web **0.52.0** — add-account chooser confirmed icon＋subtitle; RPC Helius copy confirmed; added `settings-debug` + hub「Debug mode 設定」; READMEs note 0.52.0.
+- **2026-10-25 (later):** Accounts subtree screens added to overall-v1 (`add-generate-seed` … `account-reveal-key`); aggregate create aligned to web manage layout (main-pick／grip／trash／+); accounts list shows combined card with switch.
+  - Skipped: import-seed **pick-index** step (only words step); address-book (`address-cards*`) — not under Accounts priority; non-combined manage delete-confirm as its own screen (reveal covered).

@@ -9,6 +9,7 @@ The Chrome extension popup rules (fixed 384px shell, CSS classes) live in that r
 For versions that link an HTML file under [`design-demos/`](design-demos/README.md):
 
 - That file is the **Android visual contract** (layout, menu chrome, tabs, Back, theme tokens on phone).
+- The version **INDEX must copy** the phone-frame structure into Decided (rows, glyphs, titles, subtitles). A link to the HTML without those sentences is not a spec. Function-only Tracks are not enough when the version ships a screen. See [roadmap/GUIDELINES.md](roadmap/GUIDELINES.md) Screen spec.
 - Extension popup code supplies **IA, copy, and token values**—not popup pixel layout.
 - Change the demo **before** (or in the same Track as) Compose when mobile chrome or spacing changes; see the workflow in [`design-demos/README.md`](design-demos/README.md).
 - **Only content inside the phone frame** is shipped copy and controls. Designer notes beside the mockup are **not** user-visible text.
@@ -39,3 +40,13 @@ Status-bar and navigation-bar **safe areas** apply to menu sheets and subpage to
 - Jupiter / verified **green shield is leftmost**, before the token icon (same as web).
 - Mobile demo icons must reuse **web `StrokeIcon` paths** + real token PNGs (Jupiter / token-list); do not invent letter-circle placeholders.
 - Do **not** place the shield next to the token name: scam tokens can embed a shield emoji in the symbol/name to spoof verification (Eric 2026-10-24).
+
+## Android icons (web paths, not Material, not Canvas)
+
+Chrome glyphs that exist in extension `wallet/src/popup/components/StrokeIcon.tsx` or `TokenTrust` in `HomeTokenList.tsx` are copied into `android/app/src/main/res/drawable/` as **vector XML** with the same SVG `d` values. Do not invent a Compose `Canvas` polygon. Do not substitute `Icons.Default.*` when a StrokeIcon exists. Do not export PNG for those glyphs.
+
+- One-color strokes (`stroke="currentColor"`): vector uses `android:strokeColor="#FFFFFFFF"` and Compose `Icon` `tint` supplies the theme color.
+- Two-color `TokenTrust`: drawable `ic_token_trust_verified.xml`. Shield fill is `AirwaveColors.Ok` (`#4ECB8D`). Check stroke is `#0F1419`. Draw with `tint = Color.Unspecified`.
+- Token logos stay https bitmaps from Jupiter / the token list. They are not drawables and not letter circles.
+
+A later version that adds refresh, recycle, copy, back, accounts, book, network, settings, globe, info, lock, key, eye, or external copies that StrokeIcon into a new vector in the same folder, then uses `painterResource`. Menu chrome still on Material icons until a version that touches that bar copies the matching StrokeIcon.

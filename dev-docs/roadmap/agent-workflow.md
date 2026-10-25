@@ -52,16 +52,18 @@ Write to `dev-docs/roadmap/X.Y.Z/docs/design-review.md` in Traditional Chinese.
 2. **Acceptance.** Can every checkbox in `INDEX` be performed by a human? Any "and so on"?
 3. **Scope.** Does `how.md` smuggle in work that `INDEX` puts out of scope?
 4. **Widget ownership.** For a new screen block or a new state object, which widget creates it, which widget disposes it, and does it survive the parent rebuild? See [design-principles.md](../design-principles.md).
-5. **Architecture.** Pending approvals, the durable store, custody, and request results must match [GUIDELINES.md](GUIDELINES.md) section 4, or `INDEX` must name the exception.
-6. **Overlap.** If this repeats an earlier version, say whether it replaces that path or runs in parallel.
-7. **Hand-test.** Are the device steps one path, not "test everything"?
+5. **Screen spec.** Open the phone frame of every demo screen the INDEX names. If Decided has vault/RPC/MWA sentences but not row count, glyphs, titles, and subtitles, that is **High**. Linking the HTML is not enough. Do not mark layout as Low “match chrome at implementation.”
+6. **Architecture.** Pending approvals, the durable store, custody, and request results must match [GUIDELINES.md](GUIDELINES.md) section 4, or `INDEX` must name the exception.
+7. **Overlap.** If this repeats an earlier version, say whether it replaces that path or runs in parallel.
+8. **Hand-test.** Are the device steps one path, not "test everything"? Do they name what the screen must look like?
 
 ### Do not
 
 * Invent a new feature.
 * Review unwritten code.
 * Approve with "LGTM" and no file.
-* Import a Chrome extension screen because that repo already shipped it.
+* Import a Chrome extension **popup layout** because that repo already shipped it. Copying StrokeIcon path `d` values and IA/copy that the Android phone frame already shows is required, not a ban.
+* Approve a function-only INDEX when this version ships screens.
 
 ### Output shape
 
@@ -104,13 +106,14 @@ A single-screen patch can be one Track. Still write the heading so the review kn
 
 ## 5. Implementation review
 
-**Question:** does the code match `how.md`, and did it violate the architecture bans?
+**Question:** does the code match `how.md` **and** the INDEX screen spec (phone frame), and did it violate the architecture bans?
 
 Write to `docs/implementation-review.md` in Traditional Chinese.
 
 ### Look for
 
 1. Walk `how.md` and mark each step done, missing, or different. Differences go back into `how.md` or become findings.
+1a. Open the named demo phone frame. A working flow whose layout is a plain list instead of the specified icon + title + subtitle (or other named chrome) is **High**, even if vault and MWA pass.
 2. **Pending.** Is the payload only in memory? Does killing the app fail it instead of restoring it?
 3. **Storage.** Does UI state follow the one durable store named in the contract?
 4. **Custody.** No hard-coded password. No plaintext key in preferences, logs, or fixtures.

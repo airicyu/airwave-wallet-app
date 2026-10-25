@@ -8,4 +8,4 @@ After the user assigns the batch, move the items into that version's INDEX and c
 
 ## Current
 
-(none)
+None.

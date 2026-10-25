@@ -2,7 +2,7 @@
 
 Non-custodial Solana wallet app. **Separate** from the Chrome extension [`airicyu/airwave-wallet`](https://github.com/airicyu/airwave-wallet).
 
-**Native Android** wallet: app password, burner wallet, home with Assets/Activity tabs, hamburger menu, settings, network/RPC, and Mobile Wallet Adapter. Current version is in [`version.md`](version.md).
+**Native Android** wallet: app password, multi-account vault, home Assets with token balances, hamburger menu, settings, network/RPC, and Mobile Wallet Adapter. Current version is in [`version.md`](version.md).
 
 | | |
 |---|---|
@@ -15,4 +15,4 @@ Non-custodial Solana wallet app. **Separate** from the Chrome extension [`airicy
 
 ## Develop
 
-See [`dev-docs/setup.md`](dev-docs/setup.md). Latest contract: [`dev-docs/roadmap/0.2.0/INDEX.md`](dev-docs/roadmap/0.2.0/INDEX.md).
+See [`dev-docs/setup.md`](dev-docs/setup.md). Latest contract: [`dev-docs/roadmap/0.4.0/INDEX.md`](dev-docs/roadmap/0.4.0/INDEX.md).

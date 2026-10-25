@@ -1,12 +1,12 @@
 # Airwave Wallet App — agent guide
 
-This repo is the **Airwave wallet app**. **0.1.0** is roadmap **draft** — MVP scope only in [`dev-docs/roadmap/0.1.0/INDEX.md`](dev-docs/roadmap/0.1.0/INDEX.md); no application code until the contract is filled in. Separate from the Chrome extension repo `airicyu/airwave-wallet`. Do not implement extension code here, and do not apply that repo's roadmap.
+This repo is the **Airwave wallet app**. **0.1.0** through **0.4.0** are `shipped`. Work proceeds **one named version at a time**. Do not open the next version unless the user names it. Separate from the Chrome extension repo `airicyu/airwave-wallet`. Do not implement extension code here, and do not apply that repo's roadmap.
 
 Feature ideas: [`dev-docs/roadmap/backlog/INDEX.md`](dev-docs/roadmap/backlog/INDEX.md).
 
 **Replies to the user are Traditional Chinese written prose.** Proper names, paths, APIs, and file names stay in English.
 
-**Documents default to English** unless the user says otherwise, or a spec already requires another language. After a version is `shipped`, leave its docs as they were written. Domain entries keep their Chinese term names. Design-review and implementation-review files are Traditional Chinese; see [`.agents/skills/version-delivery/SKILL.md`](.agents/skills/version-delivery/SKILL.md).
+**Documents default to English**, except **`dev-docs/roadmap/` version contracts and reviews are Traditional Chinese** (INDEX、how、reasoning、HANDOFF、design-review、implementation-review). Paths, type names, JSON keys, and commands stay English. After a version is `shipped`, leave its docs as they were written. Domain entries keep their Chinese term names. See [`.agents/skills/version-delivery/SKILL.md`](.agents/skills/version-delivery/SKILL.md).
 
 ---
 
@@ -29,12 +29,12 @@ Feature ideas: [`dev-docs/roadmap/backlog/INDEX.md`](dev-docs/roadmap/backlog/IN
 
 | Situation | Read |
 |-----------|------|
-| Implementing a scheduled version | That version's `dev-docs/roadmap/X.Y.Z/INDEX.md` and its links. Follow [`dev-docs/roadmap/GUIDELINES.md`](dev-docs/roadmap/GUIDELINES.md) and [`dev-docs/roadmap/agent-workflow.md`](dev-docs/roadmap/agent-workflow.md). Screen behavior also follows [`dev-docs/design-principles.md`](dev-docs/design-principles.md) unless that INDEX says otherwise |
+| Implementing a scheduled version | That version's `dev-docs/roadmap/X.Y.Z/INDEX.md` and its links. Follow [`dev-docs/roadmap/GUIDELINES.md`](dev-docs/roadmap/GUIDELINES.md) (including **Screen spec**: copy the phone frame into Decided; do not spec functions and ignore UI), [`dev-docs/roadmap/agent-workflow.md`](dev-docs/roadmap/agent-workflow.md), and [`dev-docs/code-design.md`](dev-docs/code-design.md). Screen behavior also follows [`dev-docs/design-principles.md`](dev-docs/design-principles.md) unless that INDEX says otherwise |
 | User names a version or `/version-delivery` | [`.agents/skills/version-delivery/SKILL.md`](.agents/skills/version-delivery/SKILL.md) |
 | Consistent screen behavior | [`dev-docs/design-principles.md`](dev-docs/design-principles.md) |
 | Account, address, vault wording | [`dev-docs/DOMAIN.md`](dev-docs/DOMAIN.md). If that version's INDEX overrides a term in plain sentences, the INDEX wins and DOMAIN is updated to match |
 
-**Priority:** a version INDEX decision > GUIDELINES architecture bans > [`dev-docs/design-principles.md`](dev-docs/design-principles.md) (screens only).
+**Priority:** a version INDEX decision > GUIDELINES architecture bans > [`dev-docs/design-principles.md`](dev-docs/design-principles.md) (screens only) and [`dev-docs/code-design.md`](dev-docs/code-design.md) (file shape). Sequence: [`dev-docs/roadmap/README.md`](dev-docs/roadmap/README.md) table; only the version the user named.
 
 ---
 

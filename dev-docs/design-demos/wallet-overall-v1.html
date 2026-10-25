@@ -310,6 +310,27 @@
   }
   .hub-label { font-weight: 600; }
   .hub-summary { font-size: 0.78rem; color: var(--text-dim); flex-shrink: 0; }
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; border: 1px solid var(--stroke); border-radius: var(--radius);
+    background: var(--bg-elevated);
+  }
+  .toggle-row .name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+  .switch {
+    flex-shrink: 0; box-sizing: border-box; width: 42px; height: 24px; margin: 0; padding: 0;
+    border: 1px solid var(--stroke); border-radius: 999px; background: var(--fill);
+    position: relative; cursor: default; appearance: none; -webkit-appearance: none;
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--text-muted);
+  }
+  .switch[aria-checked="true"] {
+    border-color: color-mix(in srgb, var(--ok) 45%, var(--stroke));
+    background: color-mix(in srgb, var(--ok) 18%, var(--fill));
+  }
+  .switch[aria-checked="true"]::after { left: 20px; background: var(--ok); }
+
   .pick-list { display: flex; flex-direction: column; gap: 8px; }
   .pick-row {
     display: flex; align-items: center; gap: 10px; padding: 14px;
@@ -337,17 +358,59 @@
   .chooser-row .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   
   .acct-card.active { border-color: var(--accent); }
-  .acct-card .ad-row { display: flex; align-items: center; gap: 6px; }
-  .acct-card .ad-row .ad { flex: 1; min-width: 0; }
-  .acct-card .copy-addr { color: var(--text-muted); display: inline-flex; border: 0; background: transparent; padding: 0; cursor: default; }
-
+  /* Match web .account-addr-row + CopyIconButton.ghost-inline */
+  .ad-row,
+  .addr-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 1px;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .ad-row .ad,
+  .addr-row-pk {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .addr-row-pk { font-size: 13px; color: var(--text); }
+  button.copy-addr {
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    line-height: 0;
+  }
+  button.copy-addr svg { display: block; width: 14px; height: 14px; }
+  button.copy-addr.copy-ok { color: var(--ok, #4ecb8d); }
+  .member-copy .ad-row { width: auto; }
+  .member-row { flex-wrap: nowrap; }
   .acct-card {
     display: flex; align-items: center; gap: 10px; padding: 12px;
     border: 1px solid var(--stroke); border-radius: var(--radius-sm); background: var(--fill);
   }
   .acct-card .meta { flex: 1; min-width: 0; }
   .acct-card .nm { font-weight: 650; display: flex; align-items: center; gap: 8px; }
-  .acct-card .ad { font-family: var(--mono); font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .acct-card .ad { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
   .badge-current {
     font-size: 0.68rem; color: var(--accent); border: 1px solid var(--accent-dim);
     border-radius: 999px; padding: 2px 8px; font-weight: 600;
@@ -480,13 +543,91 @@
   .screen-remarks .remark strong { color: var(--text); font-weight: 600; }
   .screen-remarks ul { margin: 0 0 10px; padding-left: 18px; }
   .screen-remarks li { margin: 0 0 4px; }
+
+  /* Accounts sub-pages (web 0.52 accounts / onboarding) */
+  .kind-list { display: flex; flex-direction: column; gap: 8px; }
+  .kind-btn {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--stroke);
+    background: var(--fill); color: var(--text); font: inherit; font-weight: 650; cursor: default; text-align: left;
+  }
+  .kind-chev { color: var(--text-muted); font-size: 18px; line-height: 1; }
+  .draft-toolbar { display: flex; justify-content: flex-end; margin: 4px 0 10px; }
+  .dice-btn {
+    width: 45px;
+    height: 45px;
+    border: 2px solid #9945ff;
+    border-radius: 50%;
+    background: transparent;
+    color: #b794f6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: default;
+    flex-shrink: 0;
+  }
+  .dice-btn svg {
+    width: 34px;
+    height: 34px;
+    display: block;
+  }
+  .dice-btn svg .die-face { fill: currentColor; stroke: none; }
+  .dice-btn svg .die-face-top { opacity: 0.1; }
+  .dice-btn svg .die-face-left { opacity: 0.16; }
+  .dice-btn svg .die-face-right { opacity: 0.26; }
+  .dice-btn svg .die-edge {
+    stroke: currentColor; stroke-width: 0.72; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .dice-btn svg .die-pip { fill: currentColor; }
+  
+  .seed-warn { margin: 0 0 8px; font-size: 12px; color: var(--danger, #f07178); }
+  .muted-hint { margin: 0 0 10px; font-size: 12px; color: var(--text-muted); }
+  .pk-label { margin: 12px 0 6px; font-size: 12px; color: var(--text-muted); }
+  .word-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  }
+  .word-ro {
+    display: flex; align-items: center; gap: 6px; padding: 8px 8px;
+    border: 1px solid var(--stroke); border-radius: 8px; background: var(--fill); min-width: 0;
+  }
+  .word-ro-n { font-size: 11px; color: var(--text-dim); width: 14px; flex-shrink: 0; }
+  .word-ro-w { font-size: 12px; font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 1.2em; }
+  .fmt { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+  .fmt-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); }
+  .manage-actions { display: flex; flex-direction: column; gap: 8px; }
+  .manage-action-row {
+    display: flex; align-items: center; width: 100%; padding: 14px 16px; border-radius: 12px;
+    border: 1px solid var(--stroke); background: var(--fill); color: var(--text);
+    font: inherit; font-weight: 650; cursor: default; text-align: left;
+  }
+  .manage-action-row:disabled { opacity: 0.45; }
+  .main-wallet { margin: 12px 0; }
+  .main-wallet-label { font-size: 12px; color: var(--text-muted); font-weight: 650; margin-bottom: 8px; }
+  .main-pick {
+    width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--stroke);
+    background: transparent; color: transparent; display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; padding: 0; cursor: default;
+  }
+  .main-pick.on { border-color: var(--accent); background: var(--accent); color: #0b1220; }
+  .member-row .member-copy { flex: 1; min-width: 0; }
+  .member-row .member-copy .nm { font-weight: 650; font-size: 13px; }
+  .member-kind { width: 18px; display: inline-flex; color: #D08B5B; flex-shrink: 0; }
+  .secret-card {
+    border: 1px solid var(--stroke); border-radius: 12px; background: var(--fill);
+    padding: 16px; margin-bottom: 12px;
+  }
+  .secret-mask { font-family: var(--mono); letter-spacing: 2px; color: var(--text-muted); }
+  .icon-reveal { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; width: auto; padding: 12px 18px; }
+
 </style>
 </head>
 <body>
 
 <header class="bar">
   <h1>Airwave Wallet — overall mobile design v1</h1>
-  <p>手機稿；chrome／綠盾／token logo 對齊 web 0.51（StrokeIcon + Jupiter／token-list），非手畫字母 icon。左側切畫面；右欄 designer notes。<strong>手機畫面內禁止放說明字／實作提示</strong>（會被當成 ship UI）；只寫會上線的文案。</p>
+  <p>手機稿；chrome／綠盾／token logo 對齊 web 0.52.0（StrokeIcon + Jupiter／token-list；add-account chooser／RPC Helius／Debug mode），非手畫字母 icon。左側切畫面；右欄 designer notes。<strong>手機畫面內禁止放說明字／實作提示</strong>（會被當成 ship UI）；只寫會上線的文案。</p>
 </header>
 <div class="layout">
   <nav class="screens" aria-label="Screens">
@@ -506,10 +647,104 @@
     <div class="nav-group">Accounts</div>
     <button type="button" data-screen="accounts">帳戶列表</button>
     <button type="button" data-screen="add-account">新增帳戶</button>
+    <button type="button" data-screen="add-generate-seed">建立助記詞錢包</button>
+    <button type="button" data-screen="add-generate">建立拋棄式錢包</button>
+    <button type="button" data-screen="add-import">匯入（子選單）</button>
+    <button type="button" data-screen="add-import-seed">匯入助記詞</button>
+    <button type="button" data-screen="add-import-secret">匯入密鑰</button>
+    <button type="button" data-screen="add-watch">觀察帳戶</button>
+    <button type="button" data-screen="add-combined">建立聚合（chooser）</button>
+    <button type="button" data-screen="add-combined-add">聚合 — 加入成員</button>
+    <button type="button" data-screen="add-combined-paste">聚合 — 貼上地址</button>
+    <button type="button" data-screen="add-combined-local">聚合 — 本機帳戶</button>
+    <button type="button" data-screen="account-rename">重新命名</button>
+    <button type="button" data-screen="account-switch">切換主錢包</button>
+    <button type="button" data-screen="account-manage">管理聚合</button>
+    <button type="button" data-screen="account-manage-add">管理 — 加入成員</button>
+    <button type="button" data-screen="account-manage-paste">管理 — 貼上地址</button>
+    <button type="button" data-screen="account-manage-local">管理 — 本機帳戶</button>
+    <button type="button" data-screen="account-member-rename">成員重新命名</button>
+    <button type="button" data-screen="account-reveal-key">顯示私鑰</button>
     <button type="button" data-screen="aggregate-create">建立聚合帳戶</button>
     <div class="nav-group">Network / Settings</div>
+    <div class="remark" data-screen="account-reveal-key">
+      <p><strong>Ship:</strong> 帳戶 manage → 顯示私鑰：遮罩＋錢包密碼＋眼睛送出。對齊 web <code>account-reveal-key</code>。</p>
+      <p><strong>Do not ship:</strong> 真實私鑰明文進稿。</p>
+    </div>
+
+    <div class="remark" data-screen="account-member-rename">
+      <p><strong>Ship:</strong> 外部成員選填名稱（本地帳戶用其 label，無 rename 鈕）。</p>
+    </div>
+
+    <div class="remark" data-screen="account-manage-local">
+      <p><strong>Ship:</strong> 從本機帳戶加入成員。</p>
+    </div>
+
+    <div class="remark" data-screen="account-manage-paste">
+      <p><strong>Ship:</strong> 貼單一成員地址。</p>
+    </div>
+
+    <div class="remark" data-screen="account-manage-add">
+      <p><strong>Ship:</strong> 管理流加入成員：地址｜本機帳戶。</p>
+    </div>
+
+    <div class="remark" data-screen="account-manage">
+      <p><strong>Ship:</strong> 管理聚合：主錢包卡＋成員可編輯（選主／拖曳／刪／+／外部成員可 rename）。</p>
+      <p><strong>Note:</strong> 非聚合帳戶的 manage（顯示私鑰／移除）見 <code>account-reveal-key</code>；本頁畫 combined。</p>
+    </div>
+
+    <div class="remark" data-screen="account-switch">
+      <p><strong>Ship:</strong> 聚合「切換主錢包」：同 manage 布局但無 +／trash／rename（editing=false）。</p>
+    </div>
+
+    <div class="remark" data-screen="account-rename">
+      <p><strong>Ship:</strong> 截斷地址提示＋名稱欄＋確認。</p>
+    </div>
+
+    <div class="remark" data-screen="add-combined-local">
+      <p><strong>Ship:</strong> 本機簽名／觀察帳戶列表；已加入列 disabled。</p>
+    </div>
+
+    <div class="remark" data-screen="add-combined-paste">
+      <p><strong>Ship:</strong> 可貼多行地址；確認回到建立頁。</p>
+    </div>
+
+    <div class="remark" data-screen="add-combined-add">
+      <p><strong>Ship:</strong> 加入成員二選一：地址｜本機帳戶。</p>
+    </div>
+
+    <div class="remark" data-screen="add-combined">
+      <p><strong>Ship:</strong> chooser → 建立聚合；布局同 <code>aggregate-create</code>／web manage create。</p>
+    </div>
+
+    <div class="remark" data-screen="add-watch">
+      <p><strong>Ship:</strong> 名稱＋地址欄、建立 CTA。</p>
+    </div>
+
+    <div class="remark" data-screen="add-import-secret">
+      <p><strong>Ship:</strong> 名稱、密鑰 textarea、格式提示點、匯入 CTA。</p>
+    </div>
+
+    <div class="remark" data-screen="add-import-seed">
+      <p><strong>Ship:</strong> 12／24 詞輸入格 → 下一步；後續選帳戶索引另頁（本稿只畫 words 步）。</p>
+    </div>
+
+    <div class="remark" data-screen="add-import">
+      <p><strong>Ship:</strong> Import 子選單：標題＋chevron only（助記詞／密鑰）。不要 icon＋副標。</p>
+    </div>
+
+    <div class="remark" data-screen="add-generate">
+      <p><strong>Ship:</strong> 拋棄式：名稱、骰子、公鍵預覽、產生 CTA（無助記詞格）。</p>
+    </div>
+
+    <div class="remark" data-screen="add-generate-seed">
+      <p><strong>Ship:</strong> 名稱（選填）、助記詞警告、骰子再產生、12 詞唯讀格、公鍵列、建立 CTA。對齊 web 0.41 draft UX。</p>
+      <p><strong>Do not ship:</strong> 真實助記詞；demo 用假字。</p>
+    </div>
+
     <button type="button" data-screen="network">網路</button>
     <button type="button" data-screen="settings-hub">設定 hub</button>
+    <button type="button" data-screen="settings-debug">Debug mode 設定</button>
     <div class="nav-group">dApp / Approval</div>
     <button type="button" data-screen="connect-dapp">連線 dApp</button>
     <button type="button" data-screen="approve-sign-tx">簽署交易</button>
@@ -883,6 +1118,13 @@
             <button class="icon-btn-sm" type="button" aria-label="更多"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
           </div>
           <div class="acct-card">
+            <span class="acct-avatar kind-combined" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="8" width="12" height="10" rx="2"/><rect x="8" y="5" width="12" height="10" rx="2"/></svg></span>
+            <div class="meta"><div class="nm">combined</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+            <button class="icon-btn-sm" type="button" aria-label="切換主錢包"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg></button>
+            <button class="icon-btn-sm" type="button" aria-label="編輯"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+            <button class="icon-btn-sm" type="button" aria-label="更多"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+          </div>
+          <div class="acct-card">
             <span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
             <div class="meta"><div class="nm">watch 2</div><div class="ad-row"><div class="ad">buwa…9XsS</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
             <button class="icon-btn-sm" type="button" aria-label="編輯"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
@@ -909,28 +1151,413 @@
       </div>
     </section>
 
-    <section class="screen" id="aggregate-create">
+        <section class="screen" id="aggregate-create">
       <div class="pad">
         <div class="sub-top">
           <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
           <div class="title">聚合錢包帳戶</div>
-          <button class="icon-btn-ghost muted" type="button" aria-label="更多"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+          <span style="width:44px"></span>
         </div>
-        <label class="field">名稱<input type="text" readonly value="combined" /></label>
-        <div>
-          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">主錢包</h3></div>
-          <div class="acct-card"><span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span><div class="meta"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div></div>
+        <label class="field">名稱<input type="text" readonly value="combined" placeholder="選填" /></label>
+        <div class="main-wallet">
+          <div class="main-wallet-label">主錢包</div>
+          <div class="acct-card">
+            <span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <div class="meta"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+          </div>
         </div>
         <div>
-          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">成員</h3><button class="icon-btn-sm accent" type="button" aria-label="新增成員"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">成員</h3><button class="icon-btn-sm accent" type="button" aria-label="加入"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
           <div class="token-list">
-            <div class="member-row"><span class="drag">⠿</span><span style="flex:1"><span class="pick-title">demo</span> · <span class="pick-sum">JCLh…1KWj</span></span><button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div>
-            <div class="member-row"><span class="drag">⠿</span><span style="flex:1"><span class="pick-title">Account 2</span> · <span class="pick-sum">3uEc…5nfn</span></span><button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div>
-            <div class="member-row"><span class="drag">⠿</span><span style="flex:1"><span class="pick-title">watch 1</span> · <span class="pick-sum">7CoH…c2yh</span></span><button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">demo</div><div class="ad-row"><div class="ad">JCLh…1KWj</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">Account 2</div><div class="ad-row"><div class="ad">3uEc…5nfn</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick on" aria-pressed="true" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"></span>
+              <div class="member-copy"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              <button class="icon-btn-sm" type="button" aria-label="重新命名"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
           </div>
         </div>
         <div class="grow"></div>
         <button class="btn primary" type="button">建立聚合錢包帳戶</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-generate-seed">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">助記詞錢包</div>
+          <span style="width:44px"></span>
+        </div>
+        <label class="field">名稱<input type="text" readonly placeholder="選填" /></label>
+        <p class="seed-warn">離開後無法再顯示助記詞</p>
+        <div class="draft-toolbar"><button class="dice-btn" type="button" title="再產生一組" aria-label="再產生一組"><svg viewBox="3.4 2.4 17.2 19.2" aria-hidden="true"><path class="die-face die-face-top" d="M12 4 18.93 8 12 12 5.07 8Z"/><path class="die-face die-face-left" d="M5.07 8 12 12 12 20 5.07 16Z"/><path class="die-face die-face-right" d="M12 12 18.93 8 18.93 16 12 20Z"/><path class="die-edge" d="M12 4 18.93 8 18.93 16 12 20 5.07 16 5.07 8Z M5.07 8 12 12 18.93 8 M12 12v8"/><circle class="die-pip" cx="9.78" cy="6.72" r="0.58"/><circle class="die-pip" cx="14.22" cy="9.28" r="0.58"/><circle class="die-pip" cx="8.54" cy="14" r="0.58"/><circle class="die-pip" cx="16.78" cy="11.72" r="0.58"/><circle class="die-pip" cx="15.47" cy="14" r="0.58"/><circle class="die-pip" cx="14.15" cy="16.28" r="0.58"/></svg></button></div>
+        <div class="word-grid"><div class="word-ro"><span class="word-ro-n">1</span><span class="word-ro-w">abandon</span></div><div class="word-ro"><span class="word-ro-n">2</span><span class="word-ro-w">ability</span></div><div class="word-ro"><span class="word-ro-n">3</span><span class="word-ro-w">able</span></div><div class="word-ro"><span class="word-ro-n">4</span><span class="word-ro-w">about</span></div><div class="word-ro"><span class="word-ro-n">5</span><span class="word-ro-w">above</span></div><div class="word-ro"><span class="word-ro-n">6</span><span class="word-ro-w">absent</span></div><div class="word-ro"><span class="word-ro-n">7</span><span class="word-ro-w">absorb</span></div><div class="word-ro"><span class="word-ro-n">8</span><span class="word-ro-w">abstract</span></div><div class="word-ro"><span class="word-ro-n">9</span><span class="word-ro-w">absurd</span></div><div class="word-ro"><span class="word-ro-n">10</span><span class="word-ro-w">abuse</span></div><div class="word-ro"><span class="word-ro-n">11</span><span class="word-ro-w">access</span></div><div class="word-ro"><span class="word-ro-n">12</span><span class="word-ro-w">accident</span></div></div>
+        <p class="pk-label">Solana 公鍵</p>
+        <div class="addr-row"><span class="addr-row-pk">JCLh…1KWj</span><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">建立</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-generate">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">拋棄式錢包</div>
+          <span style="width:44px"></span>
+        </div>
+        <label class="field">名稱<input type="text" readonly placeholder="選填" /></label>
+        <div class="draft-toolbar"><button class="dice-btn" type="button" title="再產生一組" aria-label="再產生一組"><svg viewBox="3.4 2.4 17.2 19.2" aria-hidden="true"><path class="die-face die-face-top" d="M12 4 18.93 8 12 12 5.07 8Z"/><path class="die-face die-face-left" d="M5.07 8 12 12 12 20 5.07 16Z"/><path class="die-face die-face-right" d="M12 12 18.93 8 18.93 16 12 20Z"/><path class="die-edge" d="M12 4 18.93 8 18.93 16 12 20 5.07 16 5.07 8Z M5.07 8 12 12 18.93 8 M12 12v8"/><circle class="die-pip" cx="9.78" cy="6.72" r="0.58"/><circle class="die-pip" cx="14.22" cy="9.28" r="0.58"/><circle class="die-pip" cx="8.54" cy="14" r="0.58"/><circle class="die-pip" cx="16.78" cy="11.72" r="0.58"/><circle class="die-pip" cx="15.47" cy="14" r="0.58"/><circle class="die-pip" cx="14.15" cy="16.28" r="0.58"/></svg></button></div>
+        <p class="pk-label">Solana 公鍵</p>
+        <div class="addr-row"><span class="addr-row-pk">3uEc…5nfn</span><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">產生</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-import">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">匯入錢包</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="kind-list">
+          <button type="button" class="kind-btn">助記詞<span class="kind-chev" aria-hidden="true">›</span></button>
+          <button type="button" class="kind-btn">密鑰<span class="kind-chev" aria-hidden="true">›</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="add-import-seed">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">助記詞</div>
+          <span style="width:44px"></span>
+        </div>
+        <p class="muted-hint">貼上或輸入 12／24 詞助記詞</p>
+        <div class="word-grid"><div class="word-ro"><span class="word-ro-n">1</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">2</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">3</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">4</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">5</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">6</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">7</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">8</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">9</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">10</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">11</span><span class="word-ro-w"></span></div><div class="word-ro"><span class="word-ro-n">12</span><span class="word-ro-w"></span></div></div>
+        <p class="muted-hint">已填 0／12</p>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">下一步</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-import-secret">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">密鑰</div>
+          <span style="width:44px"></span>
+        </div>
+        <label class="field">名稱<input type="text" readonly placeholder="選填" /></label>
+        <label class="field">密鑰<textarea class="mono" rows="4" readonly placeholder="base58 或 [193, 240, …]"></textarea></label>
+        <div class="fmt"><span class="fmt-dot"></span><span>base58 或 [bytes]</span></div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">匯入</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-watch">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">觀察帳戶</div>
+          <span style="width:44px"></span>
+        </div>
+        <label class="field">名稱<input type="text" readonly placeholder="選填" /></label>
+        <label class="field">地址<input type="text" readonly class="mono" placeholder="Solana 公鍵" /></label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">建立</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-combined">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">聚合錢包帳戶</div>
+          <span style="width:44px"></span>
+        </div>
+        <label class="field">名稱<input type="text" readonly value="combined" placeholder="選填" /></label>
+        <div class="main-wallet">
+          <div class="main-wallet-label">主錢包</div>
+          <div class="acct-card">
+            <span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <div class="meta"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">成員</h3><button class="icon-btn-sm accent" type="button" aria-label="加入"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+          <div class="token-list">
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">demo</div><div class="ad-row"><div class="ad">JCLh…1KWj</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">Account 2</div><div class="ad-row"><div class="ad">3uEc…5nfn</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick on" aria-pressed="true" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"></span>
+              <div class="member-copy"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              <button class="icon-btn-sm" type="button" aria-label="重新命名"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">建立聚合錢包帳戶</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-combined-add">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">加入</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="manage-actions">
+          <button type="button" class="manage-action-row">地址</button>
+          <button type="button" class="manage-action-row">本機帳戶</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="add-combined-paste">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">地址</div>
+          <span style="width:44px"></span>
+        </div>
+        <label class="field">地址<input type="text" readonly class="mono" placeholder="地址，或貼上多行" /></label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">確認</button>
+      </div>
+    </section>
+
+    <section class="screen" id="add-combined-local">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">本機帳戶</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="pick-list">
+          <button type="button" class="manage-action-row">demo · JCLh…1KWj</button>
+          <button type="button" class="manage-action-row">Account 2 · 3uEc…5nfn</button>
+          <button type="button" class="manage-action-row" disabled>watch 1 · 7CoH…c2yh · 已加入</button>
+          <button type="button" class="manage-action-row">watch 2 · buwa…9XsS</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="account-rename">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">名稱</div>
+          <span style="width:44px"></span>
+        </div>
+        <p class="muted-hint addr-hint">JCLh…1KWj</p>
+        <label class="field">名稱<input type="text" readonly value="demo" placeholder="新名稱" /></label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">確認</button>
+      </div>
+    </section>
+
+    <section class="screen" id="account-switch">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">切換主錢包</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="main-wallet">
+          <div class="main-wallet-label">主錢包</div>
+          <div class="acct-card">
+            <span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <div class="meta"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">成員</h3></div>
+          <div class="token-list">
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">demo</div><div class="ad-row"><div class="ad">JCLh…1KWj</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">Account 2</div><div class="ad-row"><div class="ad">3uEc…5nfn</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick on" aria-pressed="true" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"></span>
+              <div class="member-copy"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="account-manage">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">管理</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="main-wallet">
+          <div class="main-wallet-label">主錢包</div>
+          <div class="acct-card">
+            <span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <div class="meta"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">成員</h3><button class="icon-btn-sm accent" type="button" aria-label="加入"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+          <div class="token-list">
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">demo</div><div class="ad-row"><div class="ad">JCLh…1KWj</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick" aria-pressed="false" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <div class="member-copy"><div class="nm">Account 2</div><div class="ad-row"><div class="ad">3uEc…5nfn</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+            <div class="member-row">
+              <span class="drag" aria-hidden="true">⠿</span>
+              <button type="button" class="main-pick on" aria-pressed="true" aria-label="設為主錢包"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></button>
+              <span class="member-kind"></span>
+              <div class="member-copy"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+              <button class="icon-btn-sm" type="button" aria-label="重新命名"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+              <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="account-manage-add">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">加入</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="manage-actions">
+          <button type="button" class="manage-action-row">地址</button>
+          <button type="button" class="manage-action-row">本機帳戶</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="account-manage-paste">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">地址</div>
+          <span style="width:44px"></span>
+        </div>
+        <label class="field">地址<input type="text" readonly class="mono" placeholder="Solana 公鍵" /></label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">確認</button>
+      </div>
+    </section>
+
+    <section class="screen" id="account-manage-local">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">本機帳戶</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="pick-list">
+          <button type="button" class="manage-action-row">demo · JCLh…1KWj · 已加入</button>
+          <button type="button" class="manage-action-row">Account 2 · 3uEc…5nfn · 已加入</button>
+          <button type="button" class="manage-action-row" disabled>watch 1 · 7CoH…c2yh · 已加入</button>
+          <button type="button" class="manage-action-row">watch 2 · buwa…9XsS</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="account-member-rename">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">名稱</div>
+          <span style="width:44px"></span>
+        </div>
+        <p class="muted-hint addr-hint">7CoH…c2yh</p>
+        <label class="field">名稱<input type="text" readonly value="watch 1" /></label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">確認</button>
+      </div>
+    </section>
+
+    <section class="screen" id="account-reveal-key">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">顯示私鑰</div>
+          <span style="width:44px"></span>
+        </div>
+        <p class="muted-hint">demo · JCLh…1KWj</p>
+        <div class="secret-card"><div class="secret-mask">••••••••••••••••</div></div>
+        <label class="field">錢包密碼<input type="text" readonly placeholder="••••••••" /></label>
+        <button class="btn primary icon-reveal" type="button" aria-label="顯示私鑰"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
       </div>
     </section>
 
@@ -962,7 +1589,24 @@
           <li><button type="button" class="hub-row"><span class="hub-label">AI 設定</span><span class="hub-summary">開啟</span></button></li>
           <li><button type="button" class="hub-row"><span class="hub-label">預設 CU price</span><span class="hub-summary">25000</span></button></li>
           <li><button type="button" class="hub-row"><span class="hub-label">錢包鎖定</span><span class="hub-summary"></span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">Debug mode 設定</span><span class="hub-summary">啟用</span></button></li>
         </ul>
+      </div>
+    </section>
+
+    <section class="screen" id="settings-debug">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">Debug mode 設定</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="toggle-row">
+          <span class="name">Debug mode</span>
+          <button type="button" class="switch" role="switch" aria-checked="true" aria-label="Debug mode"></button>
+        </div>
+        <label class="field">Jupiter API URL<input type="text" readonly value="" placeholder="https://api.jup.ag" /></label>
+        <label class="field">OpenRouter base URL<input type="text" readonly value="" placeholder="https://openrouter.ai" /></label>
       </div>
     </section>
 
@@ -1095,7 +1739,7 @@
       <p><strong>Do not ship:</strong> 真實密碼；稿內僅遮罩。</p>
     </div>
     <div class="remark" data-screen="rpc-guide">
-      <p><strong>Ship:</strong> Mainnet 文案：向 Helius 申請 RPC endpoint（勿寫「免費」／API key，定價不能保證）；可點 https://www.helius.dev/；略過｜設定 RPC。</p>
+      <p><strong>Ship:</strong> 對齊 web 0.52.0 <code>rpcGuide.heliusLink</code>：向 Helius 申請 RPC endpoint（勿寫「免費」／申請 API key）；可點 https://www.helius.dev/；略過｜設定 RPC。</p>
       <p><strong>Do not ship:</strong> 真實 RPC URL／API key。</p>
       <ul><li><strong>Mobile:</strong> 首次 Mainnet 關鍵引導；與 Settings → RPC 銜接。</li></ul>
     </div>
@@ -1133,23 +1777,29 @@
       <p><strong>Ship:</strong> 錢包｜地址簿 tabs、聯絡人列（如 Bob）。</p>
     </div>
     <div class="remark" data-screen="accounts">
-      <p><strong>Ship:</strong> 使用中徽章、鑰匙／眼睛圖示、+／編輯／列選單。</p>
+      <p><strong>Ship:</strong> 使用中徽章、簽名／唯讀／聚合圖示；列上重新命名、聚合的切換主錢包、kebab→管理。</p>
       <p><strong>Do not ship:</strong> 完整公鑰；稿用截斷。</p>
     </div>
     <div class="remark" data-screen="add-account">
-      <p><strong>Ship:</strong> 五種建立／匯入／觀察／聚合選項（文案對齊 web）。</p>
-      <p><strong>Do not ship:</strong> 助記詞明文畫面。</p>
+      <p><strong>Ship:</strong> 對齊 web 0.52.0：五列 icon＋標題＋一行副標（pin／flame／download／eye／layers）。各列進入對應子頁（見左側 Accounts 群組）。</p>
+      <p><strong>Do not ship:</strong> 畫面內實作備註。</p>
     </div>
     <div class="remark" data-screen="aggregate-create">
-      <p><strong>Ship:</strong> 名稱、主錢包、成員勾選／拖曳／刪、建立 CTA。</p>
+      <p><strong>Ship:</strong> 與 web <code>add-combined</code> 同布局：名稱、主錢包卡、成員（圓點選主／grip／trash／+）、建立 CTA。左側另有 <code>add-combined</code> 入口。</p>
     </div>
     <div class="remark" data-screen="network">
       <p><strong>Ship:</strong> Devnet／Mainnet 單選卡。</p>
       <p><strong>Do not ship:</strong> RPC URL（在 Settings → RPC）。</p>
     </div>
     <div class="remark" data-screen="settings-hub">
-      <p><strong>Ship:</strong> hub 列標籤；細節頁以 wallet-020 為準。</p>
+      <p><strong>Ship:</strong> hub 列對齊 web 0.52.0（含 <code>Debug mode 設定</code>）；細節頁見 settings-debug／wallet-020。</p>
       <p><strong>Do not ship:</strong> API key 明文。</p>
+      <ul><li><strong>Mobile:</strong> hub IA 為手機捷徑；web 亦有 settings hub 列。</li></ul>
+    </div>
+    <div class="remark" data-screen="settings-debug">
+      <p><strong>Ship:</strong> Debug mode 總開關（產品預設關）；開啟後才顯示 Jupiter API URL、OpenRouter base URL 覆寫欄。空值＝內建 origin（placeholder）。關閉時忽略覆寫。</p>
+      <p><strong>Do not ship:</strong> 真實 vendor URL／金鑰；畫面內「與 web 一致」類備註。</p>
+      <ul><li><strong>Mobile:</strong> 稿展示開啟態以露出 URL 欄；hub summary 用「啟用」對應該態。</li></ul>
     </div>
     <div class="remark" data-screen="connect-dapp">
       <p><strong>Ship:</strong> 站點↔帳戶視覺連線、拒絕｜連線 sticky。</p>

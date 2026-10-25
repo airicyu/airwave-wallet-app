@@ -58,6 +58,7 @@ data class AirwaveSettings(
     val locale: LocaleTag = LocaleTag.En,
     val idleAutoLockEnabled: Boolean = true,
     val idleAutoLockMinutes: Int = 10,
+    val activeAccountId: String = "",
 ) {
     val heliusConfigured: Boolean
         get() = RpcResolver.isAllowedCustomUrl(heliusApiUrl.trim())
@@ -105,6 +106,7 @@ data class AirwaveSettings(
             .put("locale", locale.wire)
             .put("idleAutoLockEnabled", idleAutoLockEnabled)
             .put("idleAutoLockMinutes", idleAutoLockMinutes)
+            .put("activeAccountId", activeAccountId)
     }
 
     companion object {
@@ -161,6 +163,7 @@ data class AirwaveSettings(
                 locale = LocaleTag.fromWire(json.optString("locale", "en")),
                 idleAutoLockEnabled = json.optBoolean("idleAutoLockEnabled", true),
                 idleAutoLockMinutes = idleMinutes,
+                activeAccountId = json.optString("activeAccountId", ""),
             )
         }
 

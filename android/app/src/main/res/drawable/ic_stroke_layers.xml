@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- StrokeIcon IconLayers: two rounded rects -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M7,8H15A2,2 0,0 1,17 10V16A2,2 0,0 1,15 18H7A2,2 0,0 1,5 16V10A2,2 0,0 1,7 8Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M10,5H18A2,2 0,0 1,20 7V13A2,2 0,0 1,18 15H10A2,2 0,0 1,8 13V7A2,2 0,0 1,10 5Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

@@ -1,3 +1,7 @@
+/**
+ * Ed25519 burner key generation, Base58, and UI address shortening.
+ * Does not encrypt the vault or derive BIP39 paths.
+ */
 package com.airwave.wallet.vault
 
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
@@ -31,7 +35,7 @@ object BurnerKeys {
     }
 
     fun short(address: String): String =
-        if (address.length <= 12) address else address.take(8) + "…" + address.takeLast(6)
+        if (address.length <= 8) address else address.take(4) + "…" + address.takeLast(4)
 
     fun base58Decode(text: String): ByteArray {
         val input = text.trim()

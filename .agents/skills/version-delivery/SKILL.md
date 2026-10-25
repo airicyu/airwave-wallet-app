@@ -20,6 +20,10 @@ disable-model-invocation: true
 
 工作目錄是 **airwave-wallet-app 倉庫根**。不要改 Chrome extension 倉庫 `airicyu/airwave-wallet`。不要改上層 `docs/agent-roadmap/`（若存在）。
 
+## Design demo（畫面契約）
+
+本版有出貨畫面時，agent **必須**對照 [`dev-docs/design-demos/`](../../../dev-docs/design-demos/README.md) 裡 INDEX 點名的 HTML **電話框**（列／區塊順序、icon、標題與副標、底欄 CTA、導航）。寫 INDEX、設計審查、實作、實作審查都要拿電話框當 UI，不要只寫功能。只連 HTML 檔名不算規格；電話框沒畫的控制不要發明。INDEX 沒點名的 demo 畫面不是本版契約。chrome 對不齊電話框，設計／實作審查視為 **HIGH**。細節見 GUIDELINES **Screen spec**。
+
 ## 觸發與版本
 
 版本狀態以 [`dev-docs/roadmap/README.md`](../../../dev-docs/roadmap/README.md) 的表為準。切版細則在倉庫根 `AGENTS.md`。
