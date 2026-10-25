@@ -12,6 +12,7 @@ For versions that link an HTML file under [`design-demos/`](design-demos/README.
 - Extension popup code supplies **IA, copy, and token values**—not popup pixel layout.
 - Change the demo **before** (or in the same Track as) Compose when mobile chrome or spacing changes; see the workflow in [`design-demos/README.md`](design-demos/README.md).
 - **Only content inside the phone frame** is shipped copy and controls. Designer notes beside the mockup are **not** user-visible text.
+- **Never put instructional / designer / implementation notes inside the phone mock** (e.g. 「Receive 走 Home…」「與 web 一致」). Dev agents will treat them as on-screen requirements. Put those only in the right-hand Designer notes column or in `REVIEW-vs-web.md` / this file (Eric 2026-10-24).
 
 **0.2.0:** [`wallet-020.html`](design-demos/wallet-020.html) — full-width **menu top sheet** under the status bar, Material-style **bottom tabs**, blue accent menu icon on Home; **Unlock** matches extension `.unlock-screen` (layered radials + brand mark).
 
@@ -33,3 +34,8 @@ Conventions:
 - Opening the hamburger from a subpage is allowed; **Back** on the menu sheet closes only the menu, not the subpage underneath.
 
 Status-bar and navigation-bar **safe areas** apply to menu sheets and subpage top bars so controls do not overlap system time, notifications, or gesture bars.
+
+## Token trust shield placement
+- Jupiter / verified **green shield is leftmost**, before the token icon (same as web).
+- Mobile demo icons must reuse **web `StrokeIcon` paths** + real token PNGs (Jupiter / token-list); do not invent letter-circle placeholders.
+- Do **not** place the shield next to the token name: scam tokens can embed a shield emoji in the symbol/name to spoof verification (Eric 2026-10-24).

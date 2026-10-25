@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Airwave Wallet — overall mobile design v1</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --bg-elevated: #161c24;
+    --fill: #1e2630;
+    --stroke: #2a3542;
+    --stroke-soft: #222a34;
+    --text: #e8eef4;
+    --text-muted: #9aa7b4;
+    --text-dim: #6b7785;
+    --accent: #3d9cf0;
+    --accent-dim: #2a6ea8;
+    --danger: #c75050;
+    --ok: #4ecb8d;
+    --warn: #e8b84a;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: #07090c; color: var(--text);
+    font: 15px/1.45 "Segoe UI", "Microsoft JhengHei UI", "PingFang TC", "Noto Sans TC", sans-serif;
+  }
+  header.bar { padding: 16px 20px 8px; max-width: 1320px; margin: 0 auto; }
+  header.bar h1 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+  header.bar p { margin: 0; color: var(--text-muted); font-size: 13px; max-width: 72ch; }
+  header.bar a { color: var(--accent); }
+  .layout { display: flex; gap: 28px; align-items: flex-start; max-width: 1380px; margin: 0 auto; padding: 16px 20px 48px; }
+  nav.screens {
+    display: flex; flex-direction: column; gap: 4px; min-width: 250px;
+    max-height: calc(100vh - 80px); overflow: auto; position: sticky; top: 12px;
+  }
+  nav.screens .nav-group {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-dim); margin: 10px 0 4px 4px; font-weight: 650;
+  }
+  nav.screens .nav-group:first-child { margin-top: 0; }
+  nav.screens button {
+    text-align: left; background: transparent; color: var(--text);
+    border: 1px solid var(--stroke); border-radius: 8px; padding: 8px 10px;
+    cursor: pointer; font: inherit; font-size: 13px;
+  }
+  nav.screens button[aria-current="true"] { border-color: var(--accent); color: var(--accent); }
+  .phone {
+    width: 390px; height: 780px; background: var(--bg); border: 1px solid var(--stroke);
+    border-radius: 28px; overflow: hidden; display: flex; flex-direction: column;
+    position: relative; flex-shrink: 0;
+  }
+  .status {
+    height: 28px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px; font-size: 12px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .screen { display: none; flex: 1; flex-direction: column; min-height: 0; position: relative; }
+  .screen.on { display: flex; }
+  .pad { padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overflow: auto; }
+  .pad.tight { gap: 10px; }
+  .screen-stack { flex: 1; display: flex; flex-direction: column; min-height: 0; position: relative; }
+  .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; gap: 8px; }
+  .sub-top { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+  .sub-top .title { flex: 1; font-size: 16px; font-weight: 650; text-align: center; }
+  .icon-btn {
+    width: 44px; height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--stroke);
+    background: var(--bg-elevated); color: var(--text-muted); display: inline-flex;
+    align-items: center; justify-content: center; cursor: default; flex-shrink: 0;
+  }
+  .icon-btn-ghost {
+    width: 44px; height: 44px; border: none; background: transparent; color: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: default;
+  }
+  .icon-btn-ghost.muted { color: var(--text-muted); }
+  .icon-btn-sm {
+    width: 32px; height: 32px; border: none; background: transparent; color: var(--text-muted);
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: default;
+  }
+  .icon-btn-sm.accent { color: var(--accent); }
+  /* web .close-empty-btn.active */
+  .icon-btn-sm.reclaim { position: relative; color: #3ddc84; }
+  .rpc-guide-body { margin: 0; color: var(--text); font-size: 0.95rem; line-height: 1.5; }
+  .rpc-guide-link {
+    display: inline-block; margin: 12px 0 0; padding: 0; border: 0;
+    background: none; color: var(--accent); font: inherit; font-size: 0.9rem;
+    cursor: pointer; text-decoration: none; text-align: left;
+  }
+  /* Match web .bar-wallet / .bar-wallet-name (popup/styles/base.css) */
+  .acct-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--stroke); border-radius: 999px;
+    padding: 4px 6px 4px 4px; min-height: 36px; min-width: 0;
+    color: var(--text); font: inherit; cursor: pointer;
+  }
+  .acct-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--fill);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--text-muted); flex-shrink: 0;
+  }
+  .acct-avatar.kind-signing { color: #D08B5B; }
+  .acct-avatar.kind-readOnly { color: #6CB4E8; }
+  .acct-avatar.kind-combined { color: #c084fc; }
+  .acct-avatar.letter { background: var(--accent); color: #fff; }
+  .acct-name {
+    font-weight: 600; font-size: 0.82rem; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .acct-pill .copy { color: var(--text-muted); display: inline-flex; flex-shrink: 0; }
+  .home-actions { display: flex; align-items: center; gap: 2px; }
+  .sec-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; }
+  .sec-head h3 { margin: 0; font-size: 15px; font-weight: 650; }
+  .sec-tools { display: flex; align-items: center; gap: 2px; }
+  .token-list { display: flex; flex-direction: column; gap: 8px; }
+  .token-row {
+    display: flex; align-items: center; gap: 10px; padding: 12px;
+    border: 1px solid var(--stroke); border-radius: var(--radius-sm); background: var(--fill);
+  }
+  .token-icon {
+    width: 40px; height: 40px; border-radius: 50%; display: inline-flex;
+    align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+    flex-shrink: 0; overflow: hidden; background: var(--fill); color: var(--text-muted);
+  }
+  .token-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .token-meta { flex: 1; min-width: 0; }
+  .token-name-row { display: flex; align-items: center; gap: 6px; }
+  .token-name { font-weight: 650; font-size: 14px; }
+  /* Web TokenTrust (HomeTokenList + home.css) — shield LEFT of token icon */
+  .token-trust {
+    position: relative; width: 26px; height: 26px; border-radius: 7px;
+    display: grid; place-items: center; flex-shrink: 0; overflow: visible;
+  }
+  .token-trust--verified {
+    background: color-mix(in srgb, var(--ok) 18%, var(--bg-elevated));
+    color: var(--ok);
+  }
+  .token-trust--empty { background: transparent; }
+  .token-trust-score {
+    position: absolute; right: -2px; bottom: -2px; min-width: 13px; height: 11px;
+    padding: 0 3px; border-radius: 4px; font-size: 8px; font-weight: 700;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.04em; line-height: 11px;
+    text-align: center; pointer-events: none;
+    background: color-mix(in srgb, var(--ok) 16%, var(--bg));
+    color: var(--ok);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ok) 35%, var(--stroke));
+  }
+  .token-amt { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .token-usd { font-weight: 650; font-size: 14px; flex-shrink: 0; }
+  /* Web combined: token-block + row-expand-btn + member panel (HomeTokenList) */
+  .token-block {
+    list-style: none;
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius-sm);
+    background: var(--fill);
+    overflow: hidden;
+  }
+  .token-block .token-card {
+    display: flex; align-items: center; gap: 10px; padding: 12px;
+    border: none; border-radius: 0; background: transparent;
+  }
+  .row-expand-btn {
+    width: 34px; height: 34px; flex-shrink: 0; border: none;
+    border-radius: 8px; background: var(--bg); color: var(--text-muted);
+    padding: 0; display: inline-flex; align-items: center; justify-content: center;
+    cursor: default;
+  }
+  .row-expand-btn svg {
+    display: block; transform: rotate(-90deg); transition: transform 0.15s ease;
+  }
+  .row-expand-btn[aria-expanded="true"] svg { transform: rotate(0deg); }
+  .token-member-panel {
+    border-top: 1px solid var(--stroke-soft);
+    padding: 4px 10px 10px;
+  }
+  .token-member { padding: 8px 6px; min-width: 0; }
+  .token-member + .token-member { border-top: 1px solid var(--stroke-soft); }
+  .token-member-top {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; min-width: 0;
+  }
+  .token-member-addr {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.78rem; min-width: 0; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; color: var(--text);
+  }
+  .token-member-pct {
+    flex-shrink: 0; font-size: 0.78rem; font-weight: 600; color: var(--text);
+  }
+  .token-member-amt {
+    margin-top: 2px; font-size: 0.78rem; color: var(--text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .token-member-bar {
+    margin-top: 6px; height: 3px; border-radius: 99px;
+    background: var(--bg); overflow: hidden;
+  }
+  .token-member-bar i {
+    display: block; height: 100%; background: var(--accent); border-radius: 99px;
+  }
+  .reclaim-badge {
+    position: absolute; right: -1px; bottom: -1px; min-width: 14px; height: 14px;
+    padding: 0 3px; border-radius: 999px; border: 1px solid #1a3d2c;
+    background: #10261b; color: #d8ffe8; font-size: 9px; font-weight: 800;
+    line-height: 14px; text-align: center; font-variant-numeric: tabular-nums;
+    pointer-events: none;
+  }
+  .banner-warn {
+    background: color-mix(in srgb, var(--warn) 18%, var(--bg-elevated));
+    border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--stroke));
+    color: var(--warn); border-radius: var(--radius-sm); padding: 8px 12px;
+    font-size: 13px; font-weight: 650; text-align: center;
+  }
+  nav.tabs {
+    display: flex; flex-shrink: 0; border-top: 1px solid var(--stroke-soft);
+    background: var(--bg-elevated); padding: 0 0 4px;
+  }
+  nav.tabs .tab {
+    flex: 1; position: relative; background: transparent; border: 0; color: var(--text-muted);
+    padding: 12px 8px 10px; font: inherit; font-size: 13px; cursor: default;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  nav.tabs .tab[aria-current="true"] { color: var(--accent); font-weight: 650; }
+  nav.tabs .tab[aria-current="true"]::before {
+    content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 56px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent);
+  }
+  .home-gesture {
+    flex-shrink: 0; height: 20px; display: flex; align-items: center;
+    justify-content: center; background: var(--bg-elevated);
+  }
+  .home-gesture span { width: 96px; height: 4px; border-radius: 4px; background: rgba(232,238,244,0.35); }
+  .menu-scrim { position: absolute; inset: 0; background: rgba(15,20,25,0.72); z-index: 20; }
+  .menu-sheet {
+    position: absolute; left: 0; right: 0; top: 0; z-index: 30; display: flex; flex-direction: column;
+    background: var(--bg-elevated); border-radius: 0 0 16px 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45); overflow: hidden;
+  }
+  .menu-sheet-top { display: flex; align-items: center; min-height: 48px; padding: 0 4px; gap: 4px; }
+  .menu-sheet-top .title { flex: 1; text-align: center; font-size: 16px; font-weight: 650; }
+  .menu-sheet-top .spacer { width: 44px; flex-shrink: 0; }
+  .menu-sheet hr { border: 0; border-top: 1px solid var(--stroke-soft); margin: 0; }
+  .menu-item {
+    display: flex; align-items: center; gap: 12px; border: none; background: transparent;
+    color: var(--text); text-align: left; padding: 12px 16px; font: inherit; font-size: 15px;
+    cursor: default; min-height: 48px;
+  }
+  .menu-item svg { flex-shrink: 0; color: var(--text-muted); }
+  .act-list { display: flex; flex-direction: column; gap: 2px; }
+  .act-row {
+    display: flex; align-items: center; gap: 8px; padding: 10px 0;
+    border-bottom: 1px solid var(--stroke-soft);
+  }
+  .act-row:last-child { border-bottom: 0; }
+  .activity-icons {
+    display: flex; align-items: center; flex-shrink: 0;
+  }
+  .activity-icon {
+    width: 22px; height: 22px; border-radius: 50%; object-fit: cover;
+    background: var(--fill); border: 1px solid var(--bg-elevated);
+  }
+  .activity-icon + .activity-icon { margin-left: -6px; }
+  .activity-head { margin: 0 0 4px; font-size: 0.88rem; font-weight: 600; }
+  .act-icon-fallback {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--fill);
+    border: 1px solid var(--stroke); display: inline-flex; align-items: center;
+    justify-content: center; flex-shrink: 0; color: var(--text-muted);
+  }
+  .act-meta { flex: 1; min-width: 0; }
+  .act-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .act-title { font-weight: 650; font-size: 0.85rem; }
+  .act-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .act-time { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+  .act-link { color: var(--accent); display: inline-flex; flex-shrink: 0; }
+  .field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-muted); }
+  .field input, .field textarea {
+    background: var(--fill); color: var(--text); border: 1px solid var(--stroke);
+    border-radius: 10px; padding: 12px; font: inherit;
+  }
+  .field-row { display: flex; align-items: center; gap: 8px; }
+  .field-row input { flex: 1; min-width: 0; }
+  .chip {
+    border: 1px solid var(--stroke); background: var(--bg-elevated); color: var(--accent);
+    border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 12px; font-weight: 650;
+    cursor: default; flex-shrink: 0;
+  }
+  .balance-hero .k { font-size: 13px; color: var(--text-muted); margin: 0 0 4px; }
+  .balance-hero .v { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+  .btn { border: 0; border-radius: 12px; padding: 14px 16px; font: inherit; font-weight: 650; cursor: default; }
+  .btn.primary { background: var(--accent); color: #0b1220; width: 100%; }
+  .btn.ghost { background: var(--fill); color: var(--text); border: 1px solid var(--stroke); width: 100%; }
+  .btn-row {
+    display: flex; gap: 10px; padding: 12px 16px 8px; border-top: 1px solid var(--stroke-soft);
+    background: var(--bg-elevated); flex-shrink: 0;
+  }
+  .btn-row .btn { flex: 1; }
+  .sticky-cta { margin-top: auto; padding-top: 8px; flex-shrink: 0; }
+  .hub-list {
+    list-style: none; margin: 0; padding: 0; border: 1px solid var(--stroke);
+    border-radius: var(--radius); overflow: hidden; background: var(--bg-elevated);
+  }
+  .hub-list li { border-bottom: 1px solid var(--stroke-soft); }
+  .hub-list li:last-child { border-bottom: 0; }
+  .hub-row {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 14px; border: 0; background: transparent; color: var(--text);
+    font: inherit; font-size: 0.9rem; text-align: left; cursor: default;
+  }
+  .hub-label { font-weight: 600; }
+  .hub-summary { font-size: 0.78rem; color: var(--text-dim); flex-shrink: 0; }
+  .pick-list { display: flex; flex-direction: column; gap: 8px; }
+  .pick-row {
+    display: flex; align-items: center; gap: 10px; padding: 14px;
+    border: 1px solid var(--stroke); border-radius: var(--radius-sm); background: var(--bg-elevated);
+  }
+  .pick-row.on { border-color: var(--accent); }
+  .pick-row .dot {
+    width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--stroke); flex-shrink: 0;
+  }
+  .pick-row.on .dot { border-color: var(--accent); box-shadow: inset 0 0 0 3.5px var(--accent); }
+  .pick-title { font-weight: 650; font-size: 0.92rem; }
+  .pick-sum { font-size: 0.75rem; color: var(--text-dim); font-family: var(--mono); }
+  .chooser-list { display: flex; flex-direction: column; gap: 8px; }
+  .chooser-row {
+    display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--stroke);
+    border-radius: var(--radius); background: var(--bg-elevated); text-align: left; color: var(--text);
+    font: inherit; cursor: default; width: 100%;
+  }
+  .chooser-row .ico {
+    width: 36px; height: 36px; border-radius: 10px; background: var(--fill);
+    border: 1px solid var(--stroke); display: inline-flex; align-items: center;
+    justify-content: center; flex-shrink: 0; color: var(--text-muted);
+  }
+  .chooser-row .t { font-weight: 650; font-size: 14px; }
+  .chooser-row .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  
+  .acct-card.active { border-color: var(--accent); }
+  .acct-card .ad-row { display: flex; align-items: center; gap: 6px; }
+  .acct-card .ad-row .ad { flex: 1; min-width: 0; }
+  .acct-card .copy-addr { color: var(--text-muted); display: inline-flex; border: 0; background: transparent; padding: 0; cursor: default; }
+
+  .acct-card {
+    display: flex; align-items: center; gap: 10px; padding: 12px;
+    border: 1px solid var(--stroke); border-radius: var(--radius-sm); background: var(--fill);
+  }
+  .acct-card .meta { flex: 1; min-width: 0; }
+  .acct-card .nm { font-weight: 650; display: flex; align-items: center; gap: 8px; }
+  .acct-card .ad { font-family: var(--mono); font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .badge-current {
+    font-size: 0.68rem; color: var(--accent); border: 1px solid var(--accent-dim);
+    border-radius: 999px; padding: 2px 8px; font-weight: 600;
+  }
+  .seg-tabs {
+    display: flex; border: 1px solid var(--stroke); border-radius: 10px;
+    overflow: hidden; background: var(--bg-elevated);
+  }
+  .seg-tabs button {
+    flex: 1; border: 0; background: transparent; color: var(--text-muted);
+    padding: 10px; font: inherit; font-size: 13px; font-weight: 600; cursor: default;
+  }
+  .seg-tabs button.on { background: var(--fill); color: var(--accent); }
+  .token-detail-meta { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .token-detail-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.88rem; }
+  .token-detail-row .label { color: var(--text-muted); }
+  .token-detail-send { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px solid var(--stroke); border-radius: var(--radius-sm); background: transparent; color: var(--text); font: inherit; font-size: 0.88rem; cursor: default; margin-top: 8px; }
+  .token-hero { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 8px 8px; text-align: center; }
+  .token-hero .amt { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .token-hero .tag { font-size: 12px; color: var(--text-muted); border: 1px solid var(--stroke); border-radius: 999px; padding: 4px 10px; }
+  .cta-row { display: flex; gap: 10px; }
+  .cta-row .btn { flex: 1; }
+  .site-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+  .site-line code { font-family: var(--mono); color: var(--text); font-size: 12px; }
+  .connect-viz { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 24px 16px; flex: 1; justify-content: center; }
+  .connect-app {
+    width: 72px; height: 72px; border-radius: 16px; background: var(--fill);
+    border: 1px solid var(--stroke); display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; color: var(--text);
+  }
+  .connect-name { margin-top: 10px; font-weight: 650; font-size: 16px; }
+  .connect-url { font-size: 12px; color: var(--text-muted); font-family: var(--mono); }
+  .connect-rail { width: 2px; height: 36px; background: var(--stroke); position: relative; margin: 10px 0; }
+  .connect-rail::after {
+    content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  }
+  .connect-acct {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    border: 1px solid var(--stroke); border-radius: 999px; background: var(--fill);
+  }
+  .card { border: 1px solid var(--stroke); border-radius: var(--radius); background: var(--bg-elevated); padding: 12px 14px; }
+  .card h4 { margin: 0 0 8px; font-size: 13px; color: var(--text-muted); font-weight: 650; }
+  /* AI analysis — align web tx-ai.css (compact row; report opens overlay) */
+  .ai-card {
+    width: 100%; margin: 0 0 12px; padding: 10px 12px 8px;
+    border: 1px solid var(--stroke-soft); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); text-align: left;
+  }
+  .ai-row { display: flex; align-items: center; gap: 8px; min-height: 24px; }
+  .ai-mark { width: 18px; height: 18px; display: grid; place-items: center; flex: none; color: var(--text-muted); }
+  .ai-mark svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .ai-label { font-size: 0.88rem; font-weight: 600; }
+  .ai-result { margin-left: auto; font-size: 0.82rem; font-weight: 600; color: var(--text-dim); white-space: nowrap; }
+  .ai-card[data-level="low"] .ai-result { color: var(--ok); }
+  .ai-card[data-level="unknown"] .ai-result { color: var(--text-dim); }
+  .ai-report-btn {
+    flex: none; display: grid; place-items: center; width: 38px; height: 38px; margin-left: 8px; padding: 0;
+    border: none; border-radius: 50%; background: var(--accent); color: #061018; cursor: default;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 55%, #fff 12%), 0 3px 14px color-mix(in srgb, var(--accent) 48%, transparent);
+  }
+  .ai-report-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .delta-list { display: flex; flex-direction: column; gap: 8px; }
+  .delta-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    border-radius: var(--radius-sm); background: var(--fill); border: 1px solid var(--stroke-soft);
+  }
+  .delta-amt { font-weight: 700; font-size: 14px; margin-left: auto; }
+  .delta-amt.pos { color: var(--ok); }
+  .delta-amt.neg { color: var(--danger); }
+  .fee-row {
+    display: flex; justify-content: space-between; align-items: center; padding: 10px 12px;
+    border-radius: var(--radius-sm); background: var(--fill); border: 1px solid var(--stroke-soft); font-size: 13px;
+  }
+  .fee-row span:first-child { color: var(--text-muted); }
+  .fail-box {
+    border: 1px solid color-mix(in srgb, var(--danger) 50%, var(--stroke));
+    background: color-mix(in srgb, var(--danger) 12%, var(--bg-elevated));
+    border-radius: var(--radius-sm); padding: 12px;
+  }
+  .fail-box .ttl { color: var(--danger); font-weight: 700; margin: 0 0 4px; }
+  .fail-box code { font-family: var(--mono); font-size: 12px; color: var(--danger); }
+  .disclosure { display: flex; align-items: center; gap: 8px; padding: 10px 4px; color: var(--text-muted); font-size: 13px; }
+  .onboard { flex: 1; display: flex; flex-direction: column; padding: 24px 20px 28px; min-height: 0; }
+  .brand-row { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #14f195, #9945ff); }
+  .brand-name { font-weight: 700; font-size: 16px; }
+  .onboard h2 { margin: 0 0 16px; font-size: 20px; font-weight: 700; }
+  .lang-list { display: flex; flex-direction: column; gap: 8px; }
+  .lang-row {
+    display: flex; align-items: center; gap: 12px; padding: 14px;
+    border: 1px solid var(--stroke); border-radius: var(--radius); background: var(--bg-elevated);
+  }
+  .lang-row.on { border-color: var(--accent); }
+  .lang-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--stroke); display: inline-block; flex-shrink: 0; }
+  .lang-row.on .lang-dot { border-color: var(--accent); box-shadow: inset 0 0 0 3.5px var(--accent); }
+  .rpc-guide-card {
+    border: 1px solid var(--stroke); border-radius: var(--radius); background: var(--bg-elevated);
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .rpc-guide-card p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.55; }
+  .linkish { color: var(--accent); font-size: 13px; font-weight: 600; }
+  .reclaim-hero { text-align: center; padding: 12px 0 4px; }
+  .reclaim-hero .v { font-size: 28px; font-weight: 700; margin: 0; }
+  .reclaim-hero .s { font-size: 13px; color: var(--text-muted); margin: 6px 0 0; }
+  .fee-stack { display: flex; flex-direction: column; gap: 8px; }
+  .fee-stack .fee-row { background: var(--bg-elevated); }
+  .member-row {
+    display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+    border: 1px solid var(--stroke); border-radius: var(--radius-sm); background: var(--fill);
+  }
+  .drag { color: var(--text-dim); letter-spacing: -2px; font-size: 14px; }
+  .trash { color: var(--danger); border: none; background: transparent; cursor: default; padding: 4px; }
+  .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); text-align: center; padding: 24px; }
+  .hint { color: var(--text-muted); margin: 0; font-size: 13px; }
+  .grow { flex: 1; }
+  .screen-remarks {
+    flex: 1; min-width: 260px; max-width: 360px; border: 1px dashed var(--stroke);
+    border-radius: var(--radius); padding: 14px 16px; background: var(--bg-elevated);
+    position: sticky; top: 16px; max-height: calc(100vh - 40px); overflow: auto;
+  }
+  .screen-remarks .remarks-kicker {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--accent); margin: 0 0 10px; font-weight: 650;
+  }
+  .screen-remarks .remark { display: none; font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+  .screen-remarks .remark.on { display: block; }
+  .screen-remarks .remark p { margin: 0 0 10px; }
+  .screen-remarks .remark p:last-child { margin-bottom: 0; }
+  .screen-remarks .remark strong { color: var(--text); font-weight: 600; }
+  .screen-remarks ul { margin: 0 0 10px; padding-left: 18px; }
+  .screen-remarks li { margin: 0 0 4px; }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <h1>Airwave Wallet — overall mobile design v1</h1>
+  <p>手機稿；chrome／綠盾／token logo 對齊 web 0.51（StrokeIcon + Jupiter／token-list），非手畫字母 icon。左側切畫面；右欄 designer notes。<strong>手機畫面內禁止放說明字／實作提示</strong>（會被當成 ship UI）；只寫會上線的文案。</p>
+</header>
+<div class="layout">
+  <nav class="screens" aria-label="Screens">
+    <div class="nav-group">Onboarding</div>
+    <button type="button" data-screen="onboarding-language">Onboarding — 語系</button>
+    <button type="button" data-screen="onboarding-password">Onboarding — 密碼</button>
+    <button type="button" data-screen="rpc-guide">Mainnet RPC 引導</button>
+    <div class="nav-group">Home</div>
+    <button type="button" data-screen="home-assets" aria-current="true">Home — 資產 (demo)</button>
+    <button type="button" data-screen="home-assets-combined">Home — 資產 (combined)</button>
+    <button type="button" data-screen="home-activity">Home — 活動</button>
+    <button type="button" data-screen="menu-sheet">Menu top sheet</button>
+    <div class="nav-group">Token / Send</div>
+    <button type="button" data-screen="token-detail">Token 詳情 — Solana</button>
+    <button type="button" data-screen="send">送出 SOL</button>
+    <button type="button" data-screen="send-pick-address">選擇地址</button>
+    <div class="nav-group">Accounts</div>
+    <button type="button" data-screen="accounts">帳戶列表</button>
+    <button type="button" data-screen="add-account">新增帳戶</button>
+    <button type="button" data-screen="aggregate-create">建立聚合帳戶</button>
+    <div class="nav-group">Network / Settings</div>
+    <button type="button" data-screen="network">網路</button>
+    <button type="button" data-screen="settings-hub">設定 hub</button>
+    <div class="nav-group">dApp / Approval</div>
+    <button type="button" data-screen="connect-dapp">連線 dApp</button>
+    <button type="button" data-screen="approve-sign-tx">簽署交易</button>
+    <button type="button" data-screen="approve-sign-tx-fail">簽署交易 — 失敗態</button>
+    <button type="button" data-screen="confirm-reclaim">確認收回</button>
+  </nav>
+
+  <div class="phone" id="phone">
+    <div class="status"><span>9:41</span><span>Airwave</span></div>
+
+    <section class="screen" id="onboarding-language">
+      <div class="onboard">
+        <div class="brand-row"><div class="brand-mark" aria-hidden="true"></div><div class="brand-name">Airwave Wallet</div></div>
+        <h2>Choose your language</h2>
+        <div class="lang-list" role="radiogroup">
+          <div class="lang-row"><span class="lang-dot"></span> 繁體中文</div>
+          <div class="lang-row"><span class="lang-dot"></span> 简体中文</div>
+          <div class="lang-row on"><span class="lang-dot"></span> English</div>
+        </div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">Next</button>
+      </div>
+    </section>
+
+    <section class="screen" id="onboarding-password">
+      <div class="onboard">
+        <div class="brand-row"><div class="brand-mark" aria-hidden="true"></div><div class="brand-name">Airwave Wallet</div></div>
+        <h2>請設定用來鎖定錢包的密碼</h2>
+        <label class="field">密碼<input type="password" readonly value="••••••••" aria-label="密碼" /></label>
+        <label class="field">再次輸入<input type="password" readonly value="••••••••" aria-label="再次輸入" /></label>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">開始</button>
+      </div>
+    </section>
+
+    <section class="screen" id="rpc-guide">
+      <div class="pad">
+        <div class="sub-top"><span style="width:44px"></span><div class="title">設定 Mainnet RPC</div><span style="width:44px"></span></div>
+        <div class="rpc-guide-card">
+          <p class="rpc-guide-body">Mainnet 必須填你自己的 RPC，才能查餘額與送出。</p>
+          <a class="rpc-guide-link" href="https://www.helius.dev/" target="_blank" rel="noopener noreferrer">向 Helius 申請 RPC endpoint</a>
+        </div>
+        <div class="grow"></div>
+        <div class="cta-row">
+          <button class="btn ghost" type="button">略過</button>
+          <button class="btn primary" type="button">設定 RPC</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen on" id="home-assets">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-top:10px">
+          <div class="top">
+            <button type="button" class="acct-pill" aria-label="帳戶 demo">
+              <span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span>
+              <span class="copy" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
+            </button>
+            <div class="home-actions">
+              <button class="icon-btn-ghost" type="button" aria-label="選單"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="12" cy="19" r="1.75"/></svg></button>
+            </div>
+          </div>
+          <div class="sec-head">
+            <h3>資產</h3>
+            <div class="sec-tools">
+              <button class="icon-btn-sm" type="button" aria-label="重新整理"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+            </div>
+          </div>
+          <div class="token-list">
+            <div class="token-row">
+              <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div class="token-icon" aria-hidden="true"><img src="icons/sol.png" alt="" /></div>
+              <div class="token-meta">
+                <div class="token-name-row"><span class="token-name">Solana</span></div>
+                <div class="token-amt">0.10360615 SOL</div>
+              </div>
+              <span class="token-usd">$10.73</span>
+            </div>
+            <div class="token-row">
+              <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="token-trust-score">100</span></span>
+              <div class="token-icon" aria-hidden="true"><img src="icons/usdc.png" alt="" /></div>
+              <div class="token-meta">
+                <div class="token-name-row"><span class="token-name">USD Coin</span></div>
+                <div class="token-amt">3.566106 USDC</div>
+              </div>
+              <span class="token-usd">$3.56</span>
+            </div>
+          </div>
+        </div>
+        <nav class="tabs" aria-label="Home">
+          <button type="button" class="tab" aria-current="true">資產</button>
+          <button type="button" class="tab">活動</button>
+        </nav>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="home-assets-combined">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-top:10px">
+          <div class="top">
+            <button type="button" class="acct-pill" aria-label="帳戶 combined">
+              <span class="acct-avatar kind-combined" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="8" width="12" height="10" rx="2"/><rect x="8" y="5" width="12" height="10" rx="2"/></svg></span><span class="acct-name">combined</span>
+              <span class="copy" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
+            </button>
+            <div class="home-actions">
+              <button class="icon-btn-ghost" type="button" aria-label="選單"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="12" cy="19" r="1.75"/></svg></button>
+            </div>
+          </div>
+          <div class="sec-head">
+            <h3>資產</h3>
+            <div class="sec-tools">
+              <button class="icon-btn-sm reclaim" type="button" aria-label="收回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/><path d="m14 16-3 3 3 3"/><path d="M8.293 13.596 7.196 9.5 3.1 10.598"/><path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843"/><path d="m13.378 9.633 4.096 1.098 1.097-4.096"/></svg><span class="reclaim-badge">4</span></button>
+              <button class="icon-btn-sm" type="button" aria-label="重新整理"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+            </div>
+          </div>
+          <div class="token-list">
+            <div class="token-block is-expanded">
+              <div class="token-card">
+                <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div class="token-icon" aria-hidden="true"><img src="icons/sol.png" alt="" /></div>
+                <div class="token-meta">
+                  <div class="token-name-row"><span class="token-name">Solana</span></div>
+                  <div class="token-amt">0.27747207 SOL</div>
+                </div>
+                <span class="token-usd">$28.71</span>
+                <button type="button" class="row-expand-btn" aria-expanded="true" aria-label="收合分帳戶" title="收合分帳戶"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+              </div>
+              <div class="token-member-panel">
+                <div class="token-member">
+                  <div class="token-member-top">
+                    <span class="token-member-addr">JCLh…1KWj</span>
+                    <span class="token-member-pct">37%</span>
+                  </div>
+                  <div class="token-member-amt">0.1036 SOL</div>
+                  <div class="token-member-bar" aria-hidden="true"><i style="width:37%"></i></div>
+                </div>
+                <div class="token-member">
+                  <div class="token-member-top">
+                    <span class="token-member-addr">7CoH…c2yh</span>
+                    <span class="token-member-pct">63%</span>
+                  </div>
+                  <div class="token-member-amt">0.1738 SOL</div>
+                  <div class="token-member-bar" aria-hidden="true"><i style="width:63%"></i></div>
+                </div>
+              </div>
+            </div>
+            <div class="token-block">
+              <div class="token-card">
+                <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div class="token-icon" aria-hidden="true"><img src="icons/isc.png" alt="" /></div>
+                <div class="token-meta"><div class="token-name-row"><span class="token-name">International St…</span></div><div class="token-amt">1.000008 ISC</div></div>
+                <span class="token-usd">$2.16</span>
+                <button type="button" class="row-expand-btn" aria-expanded="false" aria-label="展開分帳戶" title="展開分帳戶"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+              </div>
+            </div>
+            <div class="token-block">
+              <div class="token-card">
+                <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="token-trust-score">100</span></span>
+                <div class="token-icon" aria-hidden="true"><img src="icons/usdc.png" alt="" /></div>
+                <div class="token-meta"><div class="token-name-row"><span class="token-name">USD Coin</span></div><div class="token-amt">1.783053 USDC</div></div>
+                <span class="token-usd">$1.78</span>
+                <button type="button" class="row-expand-btn" aria-expanded="false" aria-label="展開分帳戶" title="展開分帳戶"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+              </div>
+            </div>
+            <div class="token-block">
+              <div class="token-card">
+                <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="token-trust-score">99</span></span>
+                <div class="token-icon" aria-hidden="true"><img src="icons/pyusd.png" alt="" /></div>
+                <div class="token-meta"><div class="token-name-row"><span class="token-name">PayPal USD</span></div><div class="token-amt">0.00146 PYUSD</div></div>
+                <span class="token-usd">$0.00</span>
+                <button type="button" class="row-expand-btn" aria-expanded="false" aria-label="展開分帳戶" title="展開分帳戶"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+              </div>
+            </div>
+            <div class="token-block">
+              <div class="token-card">
+                <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="token-trust-score">98</span></span>
+                <div class="token-icon" aria-hidden="true"><img src="icons/jup.png" alt="" /></div>
+                <div class="token-meta"><div class="token-name-row"><span class="token-name">Jupiter</span></div><div class="token-amt">0.000001 JUP</div></div>
+                <span class="token-usd">$0.00</span>
+                <button type="button" class="row-expand-btn" aria-expanded="false" aria-label="展開分帳戶" title="展開分帳戶"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+              </div>
+            </div>
+            <div class="token-block">
+              <div class="token-card">
+                <span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="token-trust-score">76</span></span>
+                <div class="token-icon" aria-hidden="true"><img src="icons/inf.png" alt="" /></div>
+                <div class="token-meta"><div class="token-name-row"><span class="token-name">Infinity</span></div><div class="token-amt">0.000001 INF</div></div>
+                <span class="token-usd">$0.00</span>
+                <button type="button" class="row-expand-btn" aria-expanded="false" aria-label="展開分帳戶" title="展開分帳戶"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <nav class="tabs" aria-label="Home">
+          <button type="button" class="tab" aria-current="true">資產</button>
+          <button type="button" class="tab">活動</button>
+        </nav>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="home-activity">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-top:10px">
+          <div class="top">
+            <button type="button" class="acct-pill" aria-label="帳戶 demo">
+              <span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span>
+              <span class="copy" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
+            </button>
+            <div class="home-actions">
+              <button class="icon-btn-ghost" type="button" aria-label="選單"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="12" cy="19" r="1.75"/></svg></button>
+            </div>
+          </div>
+          <h3 class="activity-head">活動</h3>
+          <div class="act-list">
+            <div class="act-row">
+              <div class="activity-icons" aria-hidden="true"><img class="activity-icon" src="icons/sol.png" alt="" /><img class="activity-icon" src="icons/usdc.png" alt="" /></div>
+              <div class="act-meta"><div class="act-top"><span class="act-title">互換</span><span class="act-time">2026-10-23 04:05:12</span></div><div class="act-sub">0.0115… SOL → 1.188… USDC</div></div>
+              <span class="act-link" aria-label="在瀏覽器開啟"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+            </div>
+            <div class="act-row">
+              <div class="activity-icons" aria-hidden="true"><img class="activity-icon" src="icons/sol.png" alt="" /></div>
+              <div class="act-meta"><div class="act-top"><span class="act-title">送出</span><span class="act-time">2026-10-23 03:41:08</span></div><div class="act-sub">−0.0001 SOL → 8Cqe…W6MM</div></div>
+              <span class="act-link" aria-label="在瀏覽器開啟"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+            </div>
+            <div class="act-row">
+              <div class="activity-icons" aria-hidden="true"><img class="activity-icon" src="icons/sol.png" alt="" /></div>
+              <div class="act-meta"><div class="act-top"><span class="act-title">收到</span><span class="act-time">2026-10-22 21:18:44</span></div><div class="act-sub">+0.07 SOL</div></div>
+              <span class="act-link" aria-label="在瀏覽器開啟"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+            </div>
+            <div class="act-row">
+              <div class="activity-icons" aria-hidden="true"><img class="activity-icon" src="icons/sol.png" alt="" /></div>
+              <div class="act-meta"><div class="act-top"><span class="act-title">交易</span><span class="act-time">2026-10-22 19:02:01</span></div><div class="act-sub">4Bha…SE5m</div></div>
+              <span class="act-link" aria-label="在瀏覽器開啟"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+            </div>
+          </div>
+        </div>
+        <nav class="tabs" aria-label="Home">
+          <button type="button" class="tab">資產</button>
+          <button type="button" class="tab" aria-current="true">活動</button>
+        </nav>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="menu-sheet">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-top:10px; opacity:0.4">
+          <div class="top">
+            <button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button>
+            <button class="icon-btn-ghost" type="button" aria-label="選單" aria-expanded="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="12" cy="19" r="1.75"/></svg></button>
+          </div>
+          <div class="banner-warn">Devnet</div>
+          <div class="sec-head"><h3>資產</h3></div>
+          <div class="empty" style="min-height:120px">尚無資產</div>
+        </div>
+        <nav class="tabs" style="opacity:0.4" aria-label="Home">
+          <button type="button" class="tab" aria-current="true">資產</button>
+          <button type="button" class="tab">活動</button>
+        </nav>
+        <div class="home-gesture" style="opacity:0.4" aria-hidden="true"><span></span></div>
+        <div class="menu-scrim" aria-hidden="true"></div>
+        <div class="menu-sheet" role="menu">
+          <div class="menu-sheet-top">
+            <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <div class="title">選單</div>
+            <span class="spacer" aria-hidden="true"></span>
+          </div>
+          <hr />
+          <button type="button" class="menu-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M4 18c0-2.5 2.2-4 5-4s5 1.5 5 4"/><circle cx="16.5" cy="8.5" r="2.2"/><path d="M15 18c.3-1.6 1.5-2.8 3.2-3.2"/></svg>錢包帳戶</button>
+          <button type="button" class="menu-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>地址簿</button>
+          <button type="button" class="menu-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="16" r="1.6" fill="currentColor" stroke="none"/><path d="M8.2 12.2a5.4 5.4 0 0 1 7.6 0"/><path d="M5 9a9.6 9.6 0 0 1 14 0"/></svg>網路</button>
+          <button type="button" class="menu-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6.1 6.1l1.6 1.6M16.3 16.3l1.6 1.6M6.1 17.9l1.6-1.6M16.3 7.7l1.6-1.6"/></svg>設定</button>
+          <button type="button" class="menu-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 3 4 6 4 9s-1.4 6-4 9M12 3C9.4 6 8 9 8 12s1.4 6 4 9"/></svg>已連線網站</button>
+          <button type="button" class="menu-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>關於此應用</button>
+          <hr />
+          <button type="button" class="menu-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>鎖定錢包</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="token-detail">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">Solana</div>
+          <button class="icon-btn-ghost muted" type="button" aria-label="更多"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+        </div>
+        <div class="token-hero">
+          <div class="token-icon" style="width:64px;height:64px" aria-hidden="true"><img src="icons/sol.png" alt="" /></div>
+          <div class="amt" style="font-size:18px">Solana</div>
+          <button class="token-detail-send" type="button">送出</button>
+        </div>
+        <div class="token-detail-meta">
+          <div class="token-detail-row"><span class="label">數量</span><span>0.12083115 SOL</span></div>
+          <div class="token-detail-row"><span class="label">鑄造</span><span>原生</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="send">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">送出 SOL</div>
+          <button class="icon-btn-ghost muted" type="button" aria-label="更多"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+        </div>
+        <div class="balance-hero"><p class="k">餘額</p><p class="v">0.12083115 SOL</p></div>
+        <label class="field">數量
+          <div class="field-row">
+            <input type="text" readonly value="0" aria-label="數量" />
+            <button type="button" class="chip">50%</button>
+            <button type="button" class="chip">全部</button>
+          </div>
+        </label>
+        <label class="field">收款地址
+          <div class="field-row">
+            <input type="text" readonly placeholder="Base58 地址" aria-label="收款地址" />
+            <button class="icon-btn" type="button" aria-label="選擇地址"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></button>
+          </div>
+        </label>
+        <div class="grow"></div>
+        <div class="sticky-cta"><button class="btn primary" type="button">確認</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="send-pick-address">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">選擇地址</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="seg-tabs" role="tablist">
+          <button type="button">錢包</button>
+          <button type="button" class="on">地址簿</button>
+        </div>
+        <div class="pick-list">
+          <div class="pick-row on"><span class="dot"></span><span class="pick-meta"><span class="pick-title">Bob</span><span class="pick-sum">8Cqe…W6MM</span></span></div>
+          <div class="pick-row"><span class="dot"></span><span class="pick-meta"><span class="pick-title">demo</span><span class="pick-sum">JCLh…1KWj</span></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="accounts">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">帳戶</div>
+          <button class="icon-btn-ghost" type="button" aria-label="選單"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="12" cy="19" r="1.75"/></svg></button>
+        </div>
+        <div class="sec-head"><h3>帳戶</h3><button class="icon-btn-sm accent" type="button" aria-label="新增"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+        <div class="token-list">
+          <div class="acct-card active">
+            <span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+            <div class="meta"><div class="nm">demo <span class="badge-current">使用中</span></div><div class="ad-row"><div class="ad">JCLh…1KWj</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+            <button class="icon-btn-sm" type="button" aria-label="編輯"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+            <button class="icon-btn-sm" type="button" aria-label="更多"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+          </div>
+          <div class="acct-card">
+            <span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+            <div class="meta"><div class="nm">Account 2</div><div class="ad-row"><div class="ad">3uEc…5nfn</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+            <button class="icon-btn-sm" type="button" aria-label="編輯"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+            <button class="icon-btn-sm" type="button" aria-label="更多"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+          </div>
+          <div class="acct-card">
+            <span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <div class="meta"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+            <button class="icon-btn-sm" type="button" aria-label="編輯"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+            <button class="icon-btn-sm" type="button" aria-label="更多"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+          </div>
+          <div class="acct-card">
+            <span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <div class="meta"><div class="nm">watch 2</div><div class="ad-row"><div class="ad">buwa…9XsS</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>
+            <button class="icon-btn-sm" type="button" aria-label="編輯"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+            <button class="icon-btn-sm" type="button" aria-label="更多"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="add-account">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">新增帳戶</div>
+          <span style="width:44px"></span>
+        </div>
+        <div class="chooser-list">
+          <button type="button" class="chooser-row"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22c4-4 6-7.5 6-11a6 6 0 1 0-12 0c0 3.5 2 7 6 11z"/><circle cx="12" cy="11" r="2.5"/></svg></span><span><div class="t">建立助記詞錢包</div><div class="s">產生新的 12 詞助記詞</div></span></button>
+          <button type="button" class="chooser-row"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3c2 4-2 5-1 9 3-1 6-4 6-8 4 4 4 9 1 12a7 7 0 1 1-12.5-1C8 11 10 8 12 3z"/></svg></span><span><div class="t">建立拋棄式錢包</div><div class="s">本機暫用，不長期保管</div></span></button>
+          <button type="button" class="chooser-row"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span><span><div class="t">匯入錢包</div><div class="s">助記詞或密鑰</div></span></button>
+          <button type="button" class="chooser-row"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span><span><div class="t">建立觀察帳戶</div><div class="s">只讀地址，無法簽名</div></span></button>
+          <button type="button" class="chooser-row"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="8" width="12" height="10" rx="2"/><rect x="8" y="5" width="12" height="10" rx="2"/></svg></span><span><div class="t">建立聚合錢包帳戶</div><div class="s">合併多帳戶資產視圖</div></span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="aggregate-create">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">聚合錢包帳戶</div>
+          <button class="icon-btn-ghost muted" type="button" aria-label="更多"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+        </div>
+        <label class="field">名稱<input type="text" readonly value="combined" /></label>
+        <div>
+          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">主錢包</h3></div>
+          <div class="acct-card"><span class="acct-avatar kind-readOnly" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span><div class="meta"><div class="nm">watch 1</div><div class="ad-row"><div class="ad">7CoH…c2yh</div><button class="copy-addr" type="button" aria-label="複製"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div></div>
+        </div>
+        <div>
+          <div class="sec-head" style="margin-bottom:8px"><h3 style="font-size:13px;color:var(--text-muted);font-weight:650">成員</h3><button class="icon-btn-sm accent" type="button" aria-label="新增成員"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+          <div class="token-list">
+            <div class="member-row"><span class="drag">⠿</span><span style="flex:1"><span class="pick-title">demo</span> · <span class="pick-sum">JCLh…1KWj</span></span><button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div>
+            <div class="member-row"><span class="drag">⠿</span><span style="flex:1"><span class="pick-title">Account 2</span> · <span class="pick-sum">3uEc…5nfn</span></span><button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div>
+            <div class="member-row"><span class="drag">⠿</span><span style="flex:1"><span class="pick-title">watch 1</span> · <span class="pick-sum">7CoH…c2yh</span></span><button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div>
+          </div>
+        </div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">建立聚合錢包帳戶</button>
+      </div>
+    </section>
+
+    <section class="screen" id="network">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">網路</div>
+          <button class="icon-btn-ghost" type="button" aria-label="選單"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="12" cy="19" r="1.75"/></svg></button>
+        </div>
+        <div class="pick-list" role="radiogroup" aria-label="網路">
+          <div class="pick-row"><span class="dot"></span><span class="pick-meta"><span class="pick-title">Devnet</span></span></div>
+          <div class="pick-row on"><span class="dot"></span><span class="pick-meta"><span class="pick-title">Mainnet</span></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="settings-hub">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">設定</div>
+          <button class="icon-btn-ghost" type="button" aria-label="選單"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="12" cy="19" r="1.75"/></svg></button>
+        </div>
+        <ul class="hub-list">
+          <li><button type="button" class="hub-row"><span class="hub-label">語言</span><span class="hub-summary">繁體中文</span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">RPC</span><span class="hub-summary">Mainnet · 自訂</span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">API 金鑰</span><span class="hub-summary">已設定</span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">AI 設定</span><span class="hub-summary">開啟</span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">預設 CU price</span><span class="hub-summary">25000</span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">錢包鎖定</span><span class="hub-summary"></span></button></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="screen" id="connect-dapp">
+      <div class="screen-stack">
+        <div class="pad" style="padding-bottom:0">
+          <div class="sub-top">
+            <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <div class="title">連線</div>
+            <span style="width:44px"></span>
+          </div>
+          <div class="connect-viz">
+            <div class="connect-app">J</div>
+            <div class="connect-name">jup.ag</div>
+            <div class="connect-url">https://jup.ag</div>
+            <div class="connect-rail" aria-hidden="true"></div>
+            <div class="connect-acct">
+              <span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
+              <span><div class="acct-name">demo</div><div class="pick-sum">JCLh…1KWj</div></span>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button">拒絕</button>
+          <button class="btn primary" type="button">連線</button>
+        </div>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="approve-sign-tx">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-bottom:0">
+          <div class="top"><button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button></div>
+          <div class="site-line">站點 <code>https://jup.ag</code></div>
+          <h2 style="margin:0;font-size:18px;font-weight:700">簽署交易</h2>
+          <div class="ai-card" data-level="unknown">
+            <div class="ai-row">
+              <span class="ai-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg></span>
+              <span class="ai-label">AI 分析</span>
+              <span class="ai-result">風險指數: 未知</span>
+              <button class="ai-report-btn" type="button" aria-label="開啟報告"><svg viewBox="0 0 24 24"><path d="M7 4.5h7l3.5 3.5V19.5H7z"/><path d="M14 4.5V8h3.5"/><path d="M9.5 12h5"/><path d="M9.5 15h5"/></svg></button>
+            </div>
+          </div>
+          <div>
+            <div class="sec-head" style="margin-bottom:8px"><h3>預期變動</h3><button class="icon-btn-sm" type="button" aria-label="重新整理"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button></div>
+            <div class="delta-list">
+              <div class="delta-row"><span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="token-icon" style="width:28px;height:28px" aria-hidden="true"><img src="icons/sol.png" alt="" /></div><span>SOL</span><span class="delta-amt pos">+0.017204532 SOL</span></div>
+              <div class="delta-row"><span class="token-trust token-trust--verified" title="已驗證" aria-label="已驗證"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" fill="currentColor"/><path d="M8.5 12.2l2.3 2.3 4.7-5" stroke="#0f1419" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="token-trust-score">100</span></span><div class="token-icon" style="width:28px;height:28px" aria-hidden="true"><img src="icons/usdc.png" alt="" /></div><span>USDC · EPjF…Dt1v</span><span class="delta-amt neg">−1.783053 USDC</span></div>
+            </div>
+          </div>
+          <div class="fee-row"><span>交易費</span><strong>0.00001015 SOL</strong></div>
+          <div class="disclosure">▸ 交易明細 · 指令</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button">拒絕</button>
+          <button class="btn primary" type="button">批准</button>
+        </div>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="approve-sign-tx-fail">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-bottom:0">
+          <div class="top"><button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button></div>
+          <div class="site-line">站點 <code>https://jup.ag</code></div>
+          <h2 style="margin:0;font-size:18px;font-weight:700">簽署交易</h2>
+          <div class="ai-card" data-level="low">
+            <div class="ai-row">
+              <span class="ai-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg></span>
+              <span class="ai-label">AI 分析</span>
+              <span class="ai-result">風險指數: 低</span>
+              <button class="ai-report-btn" type="button" aria-label="開啟報告"><svg viewBox="0 0 24 24"><path d="M7 4.5h7l3.5 3.5V19.5H7z"/><path d="M14 4.5V8h3.5"/><path d="M9.5 12h5"/><path d="M9.5 15h5"/></svg></button>
+            </div>
+          </div>
+          <div>
+            <div class="sec-head" style="margin-bottom:8px"><h3>預期變動</h3></div>
+            <div class="fail-box">
+              <p class="ttl">預計交易失敗</p>
+              <code>"BlockhashNotFound"</code>
+              <div class="disclosure" style="padding:8px 0 0">▸ 失敗詳情</div>
+              <p class="hint">無法估計變動</p>
+            </div>
+          </div>
+          <div class="fee-row"><span>交易費</span><strong>0.001405 SOL</strong></div>
+          <div class="disclosure">▸ 交易明細 · 指令</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button">拒絕</button>
+          <button class="btn primary" type="button">批准</button>
+        </div>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="confirm-reclaim">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">確認收回</div>
+          <button class="icon-btn-ghost muted" type="button" aria-label="更多"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+        </div>
+        <div class="reclaim-hero"><p class="v">0.00148844 SOL</p><p class="s">1 個帳戶 · 1 筆交易</p></div>
+        <div class="fee-stack">
+          <div class="fee-row"><span>手續費</span><strong>0.00000525 SOL</strong></div>
+          <div class="fee-row"><span>簽名費</span><strong>0.000005 SOL</strong></div>
+          <div class="fee-row"><span>優先費</span><strong>0.00000025 SOL</strong></div>
+        </div>
+        <div class="card">
+          <h4>交易 1</h4>
+          <div class="fee-row" style="border:0;padding:0;background:transparent"><span class="pick-sum">Epq…207C</span><strong>0.00148844 SOL</strong></div>
+        </div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">確認</button>
+      </div>
+    </section>
+
+  </div>
+
+  <aside class="screen-remarks" aria-label="Designer notes">
+    <p class="remarks-kicker">Designer notes — not shipped UI</p>
+    <div class="remark" data-screen="onboarding-language">
+      <p><strong>Ship:</strong> Logo 列、語系三選一、Next。</p>
+      <p><strong>Do not ship:</strong> 旁注文字。</p>
+      <ul><li><strong>Mobile:</strong> 全螢幕 onboarding；語系選中態用 accent 邊框。</li></ul>
+    </div>
+    <div class="remark" data-screen="onboarding-password">
+      <p><strong>Ship:</strong> 鎖定密碼雙欄 +「開始」。</p>
+      <p><strong>Do not ship:</strong> 真實密碼；稿內僅遮罩。</p>
+    </div>
+    <div class="remark" data-screen="rpc-guide">
+      <p><strong>Ship:</strong> Mainnet 文案：向 Helius 申請 RPC endpoint（勿寫「免費」／API key，定價不能保證）；可點 https://www.helius.dev/；略過｜設定 RPC。</p>
+      <p><strong>Do not ship:</strong> 真實 RPC URL／API key。</p>
+      <ul><li><strong>Mobile:</strong> 首次 Mainnet 關鍵引導；與 Settings → RPC 銜接。</li></ul>
+    </div>
+    <div class="remark on" data-screen="home-assets">
+      <p><strong>Ship:</strong> 帳戶 pill（主切換器）、資產列、底 tab 資產｜活動、refresh。</p>
+      <ul>
+        <li><strong>Mobile:</strong> 帳戶 pill 為頂部主導航；底 tab 保留 web IA。</li>
+        <li>USD 右對齊；綠盾在 token icon <strong>左邊</strong>（對齊 web）。不可放名稱旁——防 scam 把 shield emoji 塞進 symbol／名稱偽造 verified。</li>
+        <li><strong>Icons:</strong> chrome 用 web <code>StrokeIcon.tsx</code> 路徑；綠盾用 <code>TokenTrust</code> SVG（check <code>#0f1419</code>）；token 用 Jupiter／token-list PNG（<code>icons/</code>），非手畫字母圓。</li>
+      </ul>
+    </div>
+    <div class="remark" data-screen="home-assets-combined">
+      <p><strong>Ship:</strong> combined pill、多 token；展開對齊 web <code>HomeTokenList</code>：<code>row-expand-btn</code>（方鈕＋chevron，收合 -90°／展開 0°）、member 列為短地址＋％＋數量＋accent bar（非帳戶名＋金額橫列）。</p>
+      <ul><li><strong>Mobile:</strong> 聚合展開為核心交互；收回鈕可帶 count badge（web <code>close-empty-badge</code>）。</li></ul>
+    </div>
+    <div class="remark" data-screen="home-activity">
+      <p><strong>Ship:</strong> 交易／送出／互換／收到列 + 時間 + explorer 外連。</p>
+      <ul><li><strong>Mobile:</strong> 列表密度可略鬆於 popup；類型色（綠入／紅出）保留。</li></ul>
+    </div>
+    <div class="remark" data-screen="menu-sheet">
+      <p><strong>Ship:</strong> 全寬 top sheet + scrim；7 項順序與 web 一致；觸發鈕為 web <code>IconMenu</code>（kebab），非三橫線 hamburger。</p>
+      <p><strong>Do not ship:</strong> popup 下拉菜單像素布局。</p>
+      <ul><li><strong>Mobile:</strong> Back 只關 sheet。Devnet banner 留在 Home 底層可見。</li></ul>
+    </div>
+    <div class="remark" data-screen="token-detail">
+      <p><strong>Ship:</strong> ←、代幣名、hero 數量、送出 CTA、原生標記。</p>
+      <p><strong>Do not ship:</strong> 獨立收款頁——Receive 走 Home 帳戶 pill 複製公鑰（與 web 一致）。</p>
+      <ul><li><strong>Mobile:</strong> 次要面必有 Back ≥44dp。</li></ul>
+    </div>
+    <div class="remark" data-screen="send">
+      <p><strong>Ship:</strong> 餘額大字、數量 + 50%｜全部、收款地址、確認。</p>
+      <ul><li><strong>Mobile:</strong> 百分比 chips 與地址簿入口是核心適配。</li></ul>
+    </div>
+    <div class="remark" data-screen="send-pick-address">
+      <p><strong>Ship:</strong> 錢包｜地址簿 tabs、聯絡人列（如 Bob）。</p>
+    </div>
+    <div class="remark" data-screen="accounts">
+      <p><strong>Ship:</strong> 使用中徽章、鑰匙／眼睛圖示、+／編輯／列選單。</p>
+      <p><strong>Do not ship:</strong> 完整公鑰；稿用截斷。</p>
+    </div>
+    <div class="remark" data-screen="add-account">
+      <p><strong>Ship:</strong> 五種建立／匯入／觀察／聚合選項（文案對齊 web）。</p>
+      <p><strong>Do not ship:</strong> 助記詞明文畫面。</p>
+    </div>
+    <div class="remark" data-screen="aggregate-create">
+      <p><strong>Ship:</strong> 名稱、主錢包、成員勾選／拖曳／刪、建立 CTA。</p>
+    </div>
+    <div class="remark" data-screen="network">
+      <p><strong>Ship:</strong> Devnet／Mainnet 單選卡。</p>
+      <p><strong>Do not ship:</strong> RPC URL（在 Settings → RPC）。</p>
+    </div>
+    <div class="remark" data-screen="settings-hub">
+      <p><strong>Ship:</strong> hub 列標籤；細節頁以 wallet-020 為準。</p>
+      <p><strong>Do not ship:</strong> API key 明文。</p>
+    </div>
+    <div class="remark" data-screen="connect-dapp">
+      <p><strong>Ship:</strong> 站點↔帳戶視覺連線、拒絕｜連線 sticky。</p>
+      <ul><li><strong>Mobile:</strong> 全螢幕／large sheet，非窄 popup。</li></ul>
+    </div>
+    <div class="remark" data-screen="approve-sign-tx">
+      <p><strong>Ship:</strong> AI 為 web 同款單列卡（bot＋「AI 分析」＋風險指數＋藍圓報告鈕；報告開 overlay，卡內不展開）。預期變動、交易費、拒絕｜批准 sticky。</p>
+      <ul><li><strong>Mobile:</strong> full-screen approval；綠＋／紅− deltas。</li></ul>
+    </div>
+    <div class="remark" data-screen="approve-sign-tx-fail">
+      <p><strong>Ship:</strong> BlockhashNotFound 等高對比失敗態 + AI 低風險並存。</p>
+      <p><strong>Do not ship:</strong> 隱瞞模擬失敗。</p>
+    </div>
+    <div class="remark" data-screen="confirm-reclaim">
+      <p><strong>Ship:</strong> 收回額、帳戶／交易數、手續費拆分、確認。Home 收回 icon 用 web 綠 #3ddc84（close-empty-btn.active）。</p>
+    </div>
+  </aside>
+</div>
+<script>
+  const buttons = document.querySelectorAll("nav.screens [data-screen]");
+  const remarks = document.querySelectorAll(".screen-remarks .remark");
+  function show(id) {
+    document.querySelectorAll(".screen").forEach((el) => el.classList.toggle("on", el.id === id));
+    buttons.forEach((b) => {
+      b.setAttribute("aria-current", b.dataset.screen === id ? "true" : "false");
+    });
+    remarks.forEach((el) => el.classList.toggle("on", el.dataset.screen === id));
+  }
+  buttons.forEach((b) => b.addEventListener("click", () => show(b.dataset.screen)));
+</script>
+</body>
+</html>

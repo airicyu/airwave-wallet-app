@@ -1,51 +1,79 @@
-# Design demos (HTML)
+# Airwave mobile design demos (overall pack)
 
-Static **phone sketches** for the native Android wallet. They are the **visual and interaction contract** for layout, chrome, and theme on each scheduled version that links a file here (for example [`wallet-020.html`](./wallet-020.html) for 0.2.0).
+Static **phone sketches** for the native Android wallet. This folder on the box holds the **overall v1** pack derived from Eric’s live **0.51 web UI** demo (screen captures + notes), plus a copy of the 0.2.0 chrome pattern for reference.
 
-## What these files are
+## Files
 
-| Source | Use in this repo |
-|--------|------------------|
-| **This folder (`wallet-*.html`)** | Ship target for **Compose UI**: screens, navigation chrome, spacing, tokens, empty states. Best-effort HTML inside a ~390×780 phone frame. |
-| **Chrome extension** (`airicyu/airwave-wallet` popup / settings **code**) | **Product IA** only: menu order, Settings rows, field names, persistence rules, color **token values** (`style.css` `:root`). |
-| **Extension `dev-docs/design-demos/`** | Not authoritative. Do not copy layout from there. |
+| File | Role |
+|------|------|
+| [`wallet-overall-v1.html`](./wallet-overall-v1.html) | **Primary** multi-screen mobile-native demo (繁中 labels from Eric’s demo). |
+| `../wallet-020.html` | 0.2.0 Settings / Unlock / menu chrome contract (English). Keep for Settings depth. |
 
-**Theme:** dark surfaces and blue accent (`#3d9cf0` / `#2a6ea8`) match [`AirwaveTheme.kt`](../../android/app/src/main/kotlin/com/airwave/wallet/theme/AirwaveTheme.kt) and extension `style.css`. **Layout** is **mobile-native** (bottom tabs, top sheet menu, safe areas, Back on subpages)—not a 384px popup clone.
+## How this pack differs from `wallet-020.html`
 
-## Workflow (design ↔ implementation)
+| | **wallet-020** | **wallet-overall-v1** |
+|--|----------------|------------------------|
+| Source of truth | Extension IA + early empty Home | Eric ORIGINAL demo captures + `DEMO-UI-NOTES.md` |
+| Labels | Mostly English | **繁體中文** (demo UI strings) |
+| Home | Empty assets placeholder | Rich token lists (demo / combined + expandable shares) |
+| Coverage | Settings-heavy | Home / Activity / Token / Send / Accounts / Aggregate / Approval / Onboarding |
+| Settings | Full hub + children | Hub only (children stay in 020) |
 
-Follow this order whenever UI behavior or chrome changes:
+**Do not** treat extension `dev-docs/design-demos/` as authoritative layout.
 
-1. **Product** — Decide IA and fields in the version `INDEX.md` and `docs/how.md` (extension code may inform labels and order).
-2. **Mobile adaptation** — If phone layout differs from extension popup, record it in `docs/reasoning.md` or design-review under **Mobile adaptation** (one short paragraph per decision).
-3. **Design demo first** — Update the version’s `wallet-*.html` so every affected screen in the left nav matches the intended phone UI. Open the HTML in a browser and sanity-check.
-4. **Human sign-off** — Implementer states what changed in the demo and waits for explicit approval (or a waived design-review note) before Kotlin changes—except tiny fixes that only close a gap between app and an already-approved demo.
-5. **Implement** — Android Compose follows the demo + `how.md` + [`design-principles.md`](../design-principles.md). Extension TypeScript/CSS layout is not ported.
-6. **Close the loop** — `implementation-review.md` lists each demo screen id and whether the app matches (or documents an accepted delta).
+## How to open
 
-**Rule:** Do not ship a materially different mobile chrome (menu pattern, bottom bar, Back placement) than the linked HTML without updating the demo first.
+1. Open `wallet-overall-v1.html` in a desktop browser (Chrome/Firefox).
+2. Use the **left nav** to switch screens; the **phone frame** (~390×780) updates.
+3. Right panel = **Designer notes** (Ship / Do not ship / Mobile) — **not** shipped copy.
 
-## Phone frame vs designer notes
+Authoritative inputs used to build this pack:
 
-| Region | Meaning for implementers |
-|--------|-------------------------|
-| **Inside the phone mockup** | Shipped UI: labels, empty states, controls, and layout the user sees. If it is not meant to ship, it must **not** appear here. |
-| **Right-hand “Designer notes” panel** (`wallet-020.html` and later demos) | Contract commentary only: scope boundaries, “do not ship” footnotes, links to `INDEX` / `how.md`. **Never** implement this text in Compose. |
-| **Page header** (above the layout) | About the demo file itself, not product copy. |
+- `../demo/DEMO-UI-NOTES.md`
+- `../captures/` (+ INDEX)
+- `../design-principles.md`
+- `../web-0.51-screen-inventory.md`
+- `../wallet-020.html` (chrome pattern)
 
-When adding a new screen to a demo, put **Ship:** / **Do not ship:** bullets in the notes panel; keep the phone frame limited to real strings (usually English `ui-messages` / `AppStrings`).
+## Screen checklist (`wallet-overall-v1.html`)
 
-Shared brand art for unlock (and future About): copy from extension `wallet/public/icon128.png` into `design-demos/assets/brand-icon-128.png` and Android `res/drawable/brand_mark.png`. Unlock background is **CSS/Compose radials** from extension `style.css`, not a separate wallpaper image.
+| id | Screen |
+|----|--------|
+| `onboarding-language` | Choose your language |
+| `onboarding-password` | 設定鎖定密碼 |
+| `rpc-guide` | 設定 Mainnet RPC |
+| `home-assets` | Home 資產 (demo) |
+| `home-assets-combined` | Home 資產 (combined + expand) |
+| `home-activity` | Home 活動 |
+| `menu-sheet` | Menu top sheet（7 項） |
+| `token-detail` | Token 詳情 Solana |
+| `send` | 送出 SOL（50%／全部） |
+| `send-pick-address` | 選擇地址（錢包｜地址簿） |
+| `accounts` | 帳戶列表 |
+| `add-account` | 新增帳戶（5 種） |
+| `aggregate-create` | 建立聚合錢包帳戶 |
+| `network` | 網路 Devnet／Mainnet |
+| `settings-hub` | 設定 hub |
+| `connect-dapp` | 連線 jup.ag |
+| `approve-sign-tx` | 簽署交易（預期變動優先） |
+| `approve-sign-tx-fail` | 簽署交易 + BlockhashNotFound |
+| `confirm-reclaim` | 確認收回 |
 
-## File naming
+## Visual / UX contract (summary)
 
-| File | Version |
-|------|---------|
-| `wallet-010.html` | 0.1.0 baseline |
-| `wallet-0XY.html` | `0.X.Y` when INDEX links it |
+- Tokens: `#0F1419` / `#161C24` / `#1E2630` / `#2A3542` / `#E8EEF4` / `#9AA7B4` / accent `#3D9CF0` / danger / ok / warn.
+- Mobile chrome: status safe area, **bottom tabs**, full-width **menu top sheet**, Back ≥44dp on secondary.
+- Approval = full-screen; expected deltas first; AI collapsed; sticky 拒絕｜批准.
+- Account pill = primary switcher; combined assets expandable; Devnet banner + Mainnet RPC guide kept.
+- **No** real seed phrases or API key plaintext in demos.
 
-## Related docs
+## Workflow
 
-- Screen rules: [`design-principles.md`](../design-principles.md)
-- Review gates: [`roadmap/agent-workflow.md`](../roadmap/agent-workflow.md)
-- Per-version contract: `dev-docs/roadmap/X.Y.Z/INDEX.md`
+See parent [`../design-demos-README.md`](../design-demos-README.md) and [`../design-principles.md`](../design-principles.md). Update this HTML before Compose when chrome or IA for these screens changes.
+
+## Design constraints
+- **Trust shield (Jupiter / verified):** always **left of the token icon** (match web). Never beside the token name — scam tokens can put a shield emoji in the symbol/name to look verified （Eric 2026-10-24）。
+
+## Icons (web SSOT)
+
+Chrome stroke icons are copied from extension `StrokeIcon.tsx` (kebab menu, copy, refresh, recycle, back, accounts, book, network, settings, globe, info, lock, external). Verified green shield matches `TokenTrust` in `HomeTokenList.tsx` (shield fill + check stroke `#0f1419`; score badge for non-native). Token logos are real PNGs under `icons/` (Solana token-list / Jupiter CDN / ISC meta / PYUSD hubspot) — **not** hand-drawn letter circles. Shield stays **left of** the token icon (anti-scam).
