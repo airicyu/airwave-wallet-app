@@ -1,14 +1,15 @@
-/**
- * Builds the native, wrapped, and RPC token rows for one address.
- * Does not call Jupiter or the Helius wallet API.
- */
 package com.airwave.wallet.holdings
 
 import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigInteger
 
+/**
+ * Builds the native, wrapped, and RPC token rows for one address.
+ * It does not call Jupiter or the Helius wallet API.
+ */
 object RpcHoldings {
+    /** Holds decoded token-account fields used to build a HoldingRow. */
     data class ParsedAccount(
         val mint: String,
         val raw: BigInteger,

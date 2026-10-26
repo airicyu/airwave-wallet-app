@@ -1,6 +1,6 @@
 /**
- * Add-account chooser: five StrokeIcon rows plus the import sub-chooser.
- * Does not write vault rows; combined-later writes nothing.
+ * Draws the add-account chooser, with five StrokeIcon rows and the import sub-chooser.
+ * It does not write vault rows. Combined-later still writes nothing.
  */
 package com.airwave.wallet.ui
 

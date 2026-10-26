@@ -5,6 +5,10 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+/**
+ * Checks that an MWA request chain maps to the submit RPC URL.
+ * These tests do not call the network.
+ */
 class RpcResolverTest {
     @Test
     fun mapRequestChain() {

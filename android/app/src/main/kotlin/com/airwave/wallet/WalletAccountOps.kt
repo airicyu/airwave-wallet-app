@@ -1,6 +1,6 @@
 /**
- * Multi-account vault edits and active-account session material on WalletModel.
- * Does not render Compose screens or parse holdings RPC.
+ * Applies multi-account vault edits and refreshes active-account session material on WalletModel.
+ * It does not render Compose screens or parse holdings RPC.
  */
 package com.airwave.wallet
 

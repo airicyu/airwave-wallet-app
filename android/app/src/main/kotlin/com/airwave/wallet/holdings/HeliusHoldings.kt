@@ -1,7 +1,3 @@
-/**
- * Decides the Helius wallet-API path and maps SPL rows from one page.
- * Does not draw the assets list or read the vault.
- */
 package com.airwave.wallet.holdings
 
 import com.airwave.wallet.settings.Cluster
@@ -10,7 +6,12 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.net.URI
 
+/**
+ * Decides the Helius wallet-API path and maps SPL rows from one page.
+ * It does not draw the assets list or read the vault.
+ */
 object HeliusHoldings {
+    /** Holds one Helius wallet-API page and whether the round is complete. */
     data class Page(val rows: List<HoldingRow>, val hasMore: Boolean, val full: Boolean)
 
     fun apiKey(url: String): String? {

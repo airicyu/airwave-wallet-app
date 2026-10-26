@@ -5,6 +5,10 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 import javax.crypto.AEADBadTagException
 
+/**
+ * Checks vault seal/open and that a wrong password fails AEAD.
+ * These tests do not write EncryptedFile.
+ */
 class VaultCipherTest {
     @Test
     fun roundTrip() {

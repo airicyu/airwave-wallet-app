@@ -1,0 +1,10 @@
+{
+  "name": "airwave-wallet-app",
+  "private": true,
+  "scripts": {
+    "playground": "bun scripts/mwa-playground.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5"
+  }
+}

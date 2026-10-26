@@ -1,7 +1,3 @@
-/**
- * Vault plaintext JSON for the accounts array and legacy seed migration.
- * Does not open the password box or touch settings.
- */
 package com.airwave.wallet.vault
 
 import java.util.Base64
@@ -9,11 +5,16 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
+/** The accounts parsed from vault plaintext, and whether a legacy single-seed file was migrated. */
 data class VaultPlaintext(
     val accounts: List<AccountRecord>,
     val migrated: Boolean,
 )
 
+/**
+ * Parses and writes vault plaintext JSON for the accounts array, including legacy seed migration.
+ * It does not open the password box or touch settings.
+ */
 object VaultAccounts {
     fun parse(bytes: ByteArray): VaultPlaintext? {
         val json = try {

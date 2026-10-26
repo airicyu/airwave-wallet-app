@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <application
+        android:name=".AirwaveApp"
         android:allowBackup="false"
         android:label="Airwave"
         android:supportsRtl="true"
@@ -15,14 +15,23 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
+        </activity>
+        <activity
+            android:name=".MwaActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.airwave.wallet.mwa"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Airwave.Mwa">
+            <intent-filter android:order="1">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="solana-wallet"
-                    android:pathPrefix="/v1/associate/local"
-                    tools:ignore="AppLinkUrlError" />
+                <data android:scheme="solana-wallet" />
+            </intent-filter>
+            <intent-filter android:order="0">
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="solana-wallet" />
             </intent-filter>
         </activity>
     </application>

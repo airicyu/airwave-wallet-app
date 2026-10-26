@@ -1,6 +1,6 @@
 /**
- * Add-account inner screens matching wallet-overall-v1.html phone frames.
- * Does not own the five-row chooser or vault encryption.
+ * Draws the add-account inner screens that match the wallet-overall-v1.html phone frames.
+ * It does not own the five-row chooser or vault encryption.
  */
 package com.airwave.wallet.ui
 

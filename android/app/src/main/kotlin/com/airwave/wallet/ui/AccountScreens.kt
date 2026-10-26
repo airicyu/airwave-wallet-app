@@ -1,6 +1,6 @@
 /**
- * Wallet account list: switch, rename, delete.
- * Add-account chooser and inner forms live in AddAccountChooser.kt and AddAccountForms.kt.
+ * Draws the wallet account list so the user can switch, rename, or delete an account.
+ * The add-account chooser and inner forms live in AddAccountChooser.kt and AddAccountForms.kt.
  */
 package com.airwave.wallet.ui
 

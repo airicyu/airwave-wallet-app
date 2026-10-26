@@ -1,14 +1,15 @@
-/**
- * Patches Mainnet rows with Jupiter token search metadata.
- * Does not change base units or call Solana RPC.
- */
 package com.airwave.wallet.holdings
 
 import com.airwave.wallet.vault.BurnerKeys
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Patches Mainnet rows with Jupiter token search metadata.
+ * It does not change base units or call Solana RPC.
+ */
 object JupiterMintMeta {
+    /** Holds the name, icon, and verified flag from one Jupiter search hit. */
     data class Hit(
         val name: String,
         val symbol: String,

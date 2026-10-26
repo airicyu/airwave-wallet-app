@@ -1,17 +1,18 @@
-/**
- * Ed25519 burner key generation, Base58, and UI address shortening.
- * Does not encrypt the vault or derive BIP39 paths.
- */
 package com.airwave.wallet.vault
 
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
 import java.security.SecureRandom
 
+/** Holds an in-memory Ed25519 seed and its Base58 address. Call zero() when discarding it. */
 data class BurnerKey(val seed: ByteArray, val address: String) {
     fun zero() = seed.fill(0)
 }
 
+/**
+ * Generates Ed25519 burner keys, encodes Base58, and shortens addresses for the UI.
+ * It does not encrypt the vault or derive BIP39 paths.
+ */
 object BurnerKeys {
     private val alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 

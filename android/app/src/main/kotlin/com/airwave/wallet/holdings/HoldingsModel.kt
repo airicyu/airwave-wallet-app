@@ -1,7 +1,3 @@
-/**
- * In-memory holdings snapshot, round ids, and the Mainnet guide flag.
- * Does not own the vault or parse RPC JSON itself.
- */
 package com.airwave.wallet.holdings
 
 import androidx.compose.runtime.getValue
@@ -14,6 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Holds the in-memory holdings snapshot, the current round id, and the Mainnet guide flag for the assets tab.
+ * WalletModel starts a fetch round; JSON parsing lives in HoldingsFetch and its helpers. This class does not open the vault.
+ */
 class HoldingsModel(private val scope: CoroutineScope) {
     var snapshot by mutableStateOf(HoldingsSnapshot())
         private set

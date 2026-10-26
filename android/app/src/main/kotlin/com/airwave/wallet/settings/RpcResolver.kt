@@ -2,11 +2,16 @@ package com.airwave.wallet.settings
 
 import java.net.URI
 
+/**
+ * Maps an MWA request chain to the RPC URL used to submit, first from settings then from public defaults.
+ * It does not send JSON-RPC itself.
+ */
 object RpcResolver {
     const val PUBLIC_DEVNET = "https://api.devnet.solana.com"
     const val PUBLIC_MAINNET = "https://api.mainnet-beta.solana.com"
     const val PUBLIC_TESTNET = "https://api.testnet.solana.com"
 
+    /** Names the submit cluster implied by an MWA request chain string. */
     enum class SubmitCluster { Devnet, Mainnet, Testnet, Unknown }
 
     fun mapRequestChain(chain: String?): SubmitCluster = when (chain) {

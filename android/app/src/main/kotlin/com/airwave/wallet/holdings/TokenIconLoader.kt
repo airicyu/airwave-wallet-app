@@ -1,12 +1,13 @@
-/**
- * Downloads an https token icon. Does not choose where the image sits on screen.
- */
 package com.airwave.wallet.holdings
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import java.net.URL
 
+/**
+ * Downloads an https token icon.
+ * It does not choose where the image sits on screen.
+ */
 object TokenIconLoader {
     fun bitmap(url: String): Bitmap? {
         if (!url.startsWith("https:")) return null

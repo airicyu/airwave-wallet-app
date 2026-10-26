@@ -1,12 +1,12 @@
-/**
- * Unit tests for imported secret key length rejection.
- */
 package com.airwave.wallet.vault
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+/**
+ * Checks that imported secret keys of unexpected decoded length are rejected.
+ */
 class SecretImportRulesTest {
     @Test
     fun rejectsUnexpectedDecodedLengths() {

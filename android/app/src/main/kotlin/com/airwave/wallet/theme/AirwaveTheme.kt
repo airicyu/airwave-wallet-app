@@ -5,6 +5,10 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Holds the Airwave dark color tokens used by Material3.
+ * Screens and the unlock gradient live in their own files; this object does not draw them.
+ */
 object AirwaveColors {
     val Bg = Color(0xFF0F1419)
     val BgElevated = Color(0xFF161C24)

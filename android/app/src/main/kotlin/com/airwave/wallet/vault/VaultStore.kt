@@ -6,6 +6,10 @@ import androidx.security.crypto.MasterKey
 import org.json.JSONObject
 import java.io.File
 
+/**
+ * Reads and writes `airwave.vault.v1` through EncryptedFile.
+ * The bytes on disk are already password-boxed by VaultCipher. This class does not derive keys from the password or interpret account rows.
+ */
 class VaultStore(context: Context) {
     private val appContext = context.applicationContext
     private val file = File(appContext.filesDir, "airwave.vault.v1")

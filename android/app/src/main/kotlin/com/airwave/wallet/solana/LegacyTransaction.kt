@@ -7,12 +7,17 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Base64
 
+/** Holds parsed instruction names and an optional system Transfer destination and lamports. */
 data class TxSummary(
     val instructionNames: List<String>,
     val destination: String?,
     val amountLamports: BigInteger?,
 )
 
+/**
+ * Parses a legacy Solana transaction for a Transfer summary and signs the wire bytes.
+ * It does not submit to RPC or talk to walletlib.
+ */
 object LegacyTransaction {
     private val SYSTEM_PROGRAM = byteArrayOf(
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -64,12 +69,14 @@ object LegacyTransaction {
         }
     }
 
+    /** Holds one compiled instruction inside a parsed legacy transaction. */
     private data class ParsedInstruction(
         val programIdIndex: Int,
         val accounts: IntArray,
         val data: ByteArray,
     )
 
+    /** Holds account keys and instructions after stripping signatures. */
     private data class ParsedTx(
         val signatures: List<ByteArray>,
         val messageBytes: ByteArray,
@@ -136,6 +143,12 @@ object LegacyTransaction {
     }
 
     fun base64Wire(bytes: ByteArray): String = Base64.getEncoder().encodeToString(bytes)
+
+    fun messageBase64(payload: ByteArray): String? = try {
+        Base64.getEncoder().encodeToString(parse(payload).messageBytes)
+    } catch (_: Exception) {
+        null
+    }
 
     private fun readCompactU16(data: ByteArray, start: Int): Pair<Int, Int> {
         var result = 0

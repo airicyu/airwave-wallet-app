@@ -8,6 +8,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+/** Holds the encrypted vault blob fields that VaultStore writes to disk. */
 data class VaultFile(
     val kdf: String,
     val salt: String,
@@ -15,6 +16,10 @@ data class VaultFile(
     val ciphertext: String,
 )
 
+/**
+ * Password box for vault plaintext: Argon2id derives a key from the user password, then AES-GCM seals and opens the blob.
+ * VaultStore chooses the file path and EncryptedFile wrapping. VaultAccounts parses the plaintext JSON. This class must not persist the password or the derived key.
+ */
 class VaultCipher(
     private val random: SecureRandom = SecureRandom(),
 ) {

@@ -1,7 +1,3 @@
-/**
- * BIP39 mnemonic generation, validation, and seed extraction.
- * Word list lookup lives in Bip39English.kt.
- */
 package com.airwave.wallet.vault
 
 import android.content.res.Resources
@@ -10,6 +6,10 @@ import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
+/**
+ * Generates, validates, and extracts a seed from a BIP39 mnemonic.
+ * Word-list lookup lives in Bip39English.kt.
+ */
 object Bip39 {
     fun generate12(resources: Resources, random: SecureRandom = SecureRandom()): String {
         val entropy = ByteArray(16).also(random::nextBytes)

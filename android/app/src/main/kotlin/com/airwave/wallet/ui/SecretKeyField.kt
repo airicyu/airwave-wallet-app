@@ -24,8 +24,10 @@ import androidx.compose.ui.unit.dp
 import com.airwave.wallet.settings.AirwaveSettings
 import com.airwave.wallet.theme.AirwaveColors
 
+/** Names which settings secret row the user is editing. */
 enum class SecretFieldId { Helius, Jupiter, OpenRouter }
 
+/** Records whether one secret-key field is idle, editing, or revealing a draft. */
 data class SecretFieldState(
     val editing: Boolean = false,
     val revealed: Boolean = false,

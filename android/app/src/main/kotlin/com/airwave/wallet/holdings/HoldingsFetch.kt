@@ -1,7 +1,3 @@
-/**
- * Runs one holdings round against RPC, and Helius or Jupiter when the contract says so.
- * Does not keep the snapshot or the round id.
- */
 package com.airwave.wallet.holdings
 
 import com.airwave.wallet.settings.AirwaveSettings
@@ -10,6 +6,10 @@ import com.airwave.wallet.settings.RpcResolver
 import java.math.BigInteger
 import java.net.URLEncoder
 
+/**
+ * Runs one holdings round against RPC, and against Helius or Jupiter when the contract says so.
+ * It does not keep the snapshot or the round id.
+ */
 object HoldingsFetch {
     fun round(address: String, settings: AirwaveSettings, endpoint: String): HoldingsSnapshot {
         val helius = HeliusHoldings.useWalletApi(settings.cluster, settings.heliusApiUrl)

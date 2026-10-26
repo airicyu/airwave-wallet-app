@@ -35,3 +35,19 @@ cd android
 Contract: [`roadmap/0.1.0/INDEX.md`](./roadmap/0.1.0/INDEX.md) and [`roadmap/0.1.0/docs/how.md`](./roadmap/0.1.0/docs/how.md). Agent guide: [AGENTS.md](../AGENTS.md).
 
 User-facing docs: [docs/user-guide.md](../docs/user-guide.md).
+
+## MWA hand-test (emulator)
+
+Use the official Solana Mobile playground, not a page in this repo. Docs: https://docs.solanamobile.com/cli/playground
+
+With the emulator running and Airwave installed, from the repo root:
+
+```bash
+bun run playground
+```
+
+That script finds Android `platform-tools` (`ANDROID_HOME` / `ANDROID_SDK_ROOT`, then the usual SDK folders on macOS, Linux, and Windows) so `adb` is on `PATH`, then runs `bun x solana-mobile@latest playground`. Needs [Bun](https://bun.sh).
+
+The CLI runs `adb reverse` and opens **Android Chrome** at `http://localhost:4747`. Do not use `http://10.0.2.2:…` (not a secure context). Host Windows Chrome cannot complete local MWA association.
+
+Unlock a signing Airwave account first. Playground Connect / Sign message / Sign and send exercise this app. Sign In With Solana is out of scope until an INDEX schedules it.

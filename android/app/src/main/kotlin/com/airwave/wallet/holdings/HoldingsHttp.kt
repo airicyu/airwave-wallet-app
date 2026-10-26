@@ -1,7 +1,3 @@
-/**
- * HTTP GET and Solana JSON-RPC POST for holdings fetches.
- * Does not parse token rows or keep a snapshot.
- */
 package com.airwave.wallet.holdings
 
 import org.json.JSONArray
@@ -10,6 +6,10 @@ import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * Performs HTTP GET and Solana JSON-RPC POST for holdings fetches.
+ * It does not parse token rows or keep a snapshot.
+ */
 object HoldingsHttp {
     fun get(url: String, headers: Map<String, String> = emptyMap()): String? = try {
         val connection = URL(url).openConnection() as HttpURLConnection

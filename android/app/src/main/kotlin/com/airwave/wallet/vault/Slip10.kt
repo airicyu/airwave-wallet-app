@@ -1,7 +1,3 @@
-/**
- * SLIP-0010 ed25519 derivation for Solana account paths.
- * Does not validate mnemonics or build path strings for the UI.
- */
 package com.airwave.wallet.vault
 
 import org.bouncycastle.crypto.digests.SHA512Digest
@@ -13,6 +9,10 @@ import org.bouncycastle.crypto.params.KeyParameter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+/**
+ * Derives SLIP-0010 ed25519 keys for Solana account paths.
+ * It does not validate mnemonics or build path strings for the UI.
+ */
 object Slip10 {
     fun deriveEd25519(seed: ByteArray, path: List<Int>): ByteArray {
         var key = masterKey(seed)

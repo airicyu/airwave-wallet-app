@@ -1,6 +1,6 @@
 /**
- * Assets tab body: guide, empty skip, failure, and the token list.
- * Does not own the snapshot and does not parse RPC JSON.
+ * Draws the assets tab body, including the guide, empty skip, failure state, and the token list.
+ * It does not own the snapshot and does not parse RPC JSON.
  */
 package com.airwave.wallet.ui
 

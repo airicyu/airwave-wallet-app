@@ -2,7 +2,9 @@
 
 ## Next
 
-（空）
+## 0.5.0 (unreleased)
+
+MWA hand-test: `bun run playground` starts Solana Mobile playground (`http://localhost:4747` on the emulator). Local association implements `LocalScenario.Callbacks` so the wallet websocket binds. A later playground Connect/Sign with a cached `auth_token` reauthorizes silently when the session is unlocked. `solana-wallet:` opens `MwaActivity` (overlay), not Home; `finish()` returns to the dApp. Approval chrome for connect, sign message, and sign-and-send. The repo no longer ships `mwa-test-web/`.
 
 ## 0.4.0 — 2026-10-26
 

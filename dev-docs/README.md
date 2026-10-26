@@ -6,7 +6,7 @@ Only a file named `dev-docs/roadmap/X.Y.Z/INDEX.md` is that version’s contract
 
 | Path | Role |
 |------|------|
-| [setup.md](./setup.md) | Local run (native Android when scaffolded) |
+| [setup.md](./setup.md) | Local run (Android Studio + Solana Mobile playground) |
 | [roadmap/](./roadmap/README.md) | Version contracts (INDEX / Track / acceptance) |
 | [design-principles.md](./design-principles.md) | Screen rules. INDEX wins when it is explicit |
 | [code-design.md](./code-design.md) | Kotlin file size and responsibility comments |

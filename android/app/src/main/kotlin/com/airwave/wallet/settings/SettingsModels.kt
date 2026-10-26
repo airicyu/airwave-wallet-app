@@ -4,6 +4,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigInteger
 
+/** The Network cluster stored in settings, either Devnet or Mainnet. */
 enum class Cluster(val wire: String) {
     Devnet("devnet"),
     Mainnet("mainnet"),
@@ -15,6 +16,7 @@ enum class Cluster(val wire: String) {
     }
 }
 
+/** The UI locale persisted in settings JSON. */
 enum class LocaleTag(val wire: String) {
     En("en"),
     ZhHant("zh-Hant"),
@@ -27,6 +29,7 @@ enum class LocaleTag(val wire: String) {
     }
 }
 
+/** Chooses hardcoded default AI chains or the custom slot list. */
 enum class ModelMode(val wire: String) {
     Default("default"),
     Custom("custom"),
@@ -38,11 +41,16 @@ enum class ModelMode(val wire: String) {
     }
 }
 
+/** Holds the custom RPC URLs for one cluster and which URL is active. */
 data class RpcClusterSettings(
     val urls: List<String> = emptyList(),
     val active: String = "",
 )
 
+/**
+ * The durable settings document and the clamps applied when parsing user input.
+ * It does not read EncryptedSharedPreferences or the vault file.
+ */
 data class AirwaveSettings(
     val cluster: Cluster = Cluster.Devnet,
     val rpcByCluster: Map<Cluster, RpcClusterSettings> = defaultRpcByCluster(),
@@ -207,4 +215,5 @@ data class AirwaveSettings(
     }
 }
 
+/** Summarizes for the settings hub whether API keys are set. */
 enum class KeysSummary { Configured, Partial, Unset }

@@ -1,6 +1,6 @@
 /**
- * RPC endpoint list and URL draft rows for the settings stack.
- * Does not own cluster selection or the settings hub.
+ * Draws the RPC endpoint list and URL draft rows on the settings stack.
+ * It does not own cluster selection or the settings hub.
  */
 package com.airwave.wallet.ui
 

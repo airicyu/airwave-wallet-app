@@ -1,11 +1,11 @@
-/**
- * Message catalog for en, zh-Hant, and zh-Hans.
- * Does not decide which screen is showing.
- */
 package com.airwave.wallet.i18n
 
 import com.airwave.wallet.settings.LocaleTag
 
+/**
+ * Message catalog for en, zh-Hant, and zh-Hans.
+ * It does not decide which screen is showing.
+ */
 object AppStrings {
     fun t(locale: LocaleTag, key: String): String =
         when (locale) {
@@ -151,6 +151,20 @@ object AppStrings {
         "accounts.pathCli" to "CLI path",
         "accounts.pathChange" to "Change path",
         "mwa.watchAccount" to "Watch-only accounts cannot sign.",
+        "mwa.connect.title" to "Connect",
+        "mwa.connect.action" to "Connect",
+        "mwa.signMessage.title" to "Sign message",
+        "mwa.signTx.title" to "Sign transaction",
+        "mwa.reject" to "Reject",
+        "mwa.approve" to "Approve",
+        "mwa.site" to "Site",
+        "mwa.ai.label" to "AI analysis",
+        "mwa.ai.unknown" to "Risk: unknown",
+        "mwa.expected" to "Expected changes",
+        "mwa.expected.unavailable" to "Balance changes unavailable",
+        "mwa.details" to "Transaction details · instructions",
+        "mwa.fee" to "Network fee",
+        "mwa.message.hex" to "Binary message",
     )
 
     private val zhHant = mapOf(
@@ -249,6 +263,20 @@ object AppStrings {
         "accounts.addressPlaceholder" to "Solana 公鑰",
         "accounts.copy" to "複製",
         "mwa.watchAccount" to "僅觀察帳戶無法簽署。",
+        "mwa.connect.title" to "連線",
+        "mwa.connect.action" to "連線",
+        "mwa.signMessage.title" to "簽署訊息",
+        "mwa.signTx.title" to "簽署交易",
+        "mwa.reject" to "拒絕",
+        "mwa.approve" to "批准",
+        "mwa.site" to "站點",
+        "mwa.ai.label" to "AI 分析",
+        "mwa.ai.unknown" to "風險指數: 未知",
+        "mwa.expected" to "預期變動",
+        "mwa.expected.unavailable" to "無法預覽餘額變動",
+        "mwa.details" to "交易明細 · 指令",
+        "mwa.fee" to "交易費",
+        "mwa.message.hex" to "二進位訊息",
     )
 
     private val zhHans = mapOf(
@@ -277,6 +305,7 @@ object AppStrings {
         "menu.settings" to "设置",
         "menu.connectedSites" to "已连接网站",
         "menu.lock" to "锁定钱包",
+        "menu.back" to "返回",
         "empty.accounts" to "还没有钱包账户。",
         "empty.connectedSites" to "还没有已连接网站。",
         "empty.about" to "关于内容稍后提供。",
@@ -331,5 +360,19 @@ object AppStrings {
         "accounts.addressPlaceholder" to "Solana 公钥",
         "accounts.copy" to "复制",
         "mwa.watchAccount" to "仅观察账户无法签署。",
+        "mwa.connect.title" to "连线",
+        "mwa.connect.action" to "连线",
+        "mwa.signMessage.title" to "签署讯息",
+        "mwa.signTx.title" to "签署交易",
+        "mwa.reject" to "拒绝",
+        "mwa.approve" to "批准",
+        "mwa.site" to "站点",
+        "mwa.ai.label" to "AI 分析",
+        "mwa.ai.unknown" to "风险指数: 未知",
+        "mwa.expected" to "预期变动",
+        "mwa.expected.unavailable" to "无法预览余额变动",
+        "mwa.details" to "交易明细 · 指令",
+        "mwa.fee" to "交易费",
+        "mwa.message.hex" to "二进制讯息",
     )
 }

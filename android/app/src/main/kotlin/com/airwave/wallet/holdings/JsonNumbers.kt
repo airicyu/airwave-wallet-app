@@ -1,9 +1,9 @@
-/**
- * Reads a JSON number token as the characters on the wire.
- * Does not interpret balances with floating point.
- */
 package com.airwave.wallet.holdings
 
+/**
+ * Reads a JSON number token as the characters on the wire.
+ * It does not interpret balances with floating point.
+ */
 object JsonNumbers {
     fun numberToken(raw: String, field: String): String? {
         val quoted = Regex(""""$field"\s*:\s*"(\d+(?:\.\d+)?)"""").find(raw)

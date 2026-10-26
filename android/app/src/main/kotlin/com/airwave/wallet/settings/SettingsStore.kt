@@ -4,6 +4,10 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
+/**
+ * Reads and writes `airwave.settings.v1` in EncryptedSharedPreferences.
+ * RpcResolver chooses which URL to submit with. The vault password box is a different store.
+ */
 class SettingsStore(context: Context) {
     private val appContext = context.applicationContext
     private val masterKey = MasterKey.Builder(appContext)

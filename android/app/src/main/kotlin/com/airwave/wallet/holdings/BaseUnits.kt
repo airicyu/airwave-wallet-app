@@ -1,13 +1,13 @@
-/**
- * Formats token base units and halves them toward zero.
- * Does not fetch balances or draw a row.
- */
 package com.airwave.wallet.holdings
 
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 
+/**
+ * Formats token base units and halves them toward zero.
+ * It does not fetch balances or draw a row.
+ */
 object BaseUnits {
     fun formatBaseUnits(raw: BigInteger, decimals: Int): String {
         if (decimals <= 0) return raw.toString()

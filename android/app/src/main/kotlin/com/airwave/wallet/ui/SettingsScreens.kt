@@ -1,6 +1,6 @@
 /**
- * Settings hub and sub-screens from the home menu stack.
- * Does not own RPC endpoint editing or the home shell tabs.
+ * Draws the settings hub and its sub-screens from the home menu stack.
+ * It does not own RPC endpoint editing or the home shell tabs.
  */
 package com.airwave.wallet.ui
 

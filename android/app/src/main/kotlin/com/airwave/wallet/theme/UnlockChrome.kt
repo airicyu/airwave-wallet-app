@@ -1,3 +1,7 @@
+/**
+ * Draws the unlock-screen radial gradient to match the extension CSS.
+ * It does not own the password field or the route.
+ */
 package com.airwave.wallet.theme
 
 import androidx.compose.ui.Modifier
@@ -7,7 +11,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import kotlin.math.max
 
-/** Same layered radials as extension `wallet/src/popup/style.css` `.unlock-screen`. */
 fun Modifier.airwaveUnlockBackground(): Modifier = drawBehind {
     drawRect(AirwaveColors.Bg)
     val w = size.width

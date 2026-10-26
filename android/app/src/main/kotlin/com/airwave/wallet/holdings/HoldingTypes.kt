@@ -1,11 +1,8 @@
-/**
- * Holding row types for the in-memory assets snapshot.
- * Does not fetch balances or format amounts.
- */
 package com.airwave.wallet.holdings
 
 import java.math.BigInteger
 
+/** Records where one holdings fetch round sits on the assets tab. */
 enum class HoldingPhase {
     Idle,
     Loading,
@@ -15,11 +12,16 @@ enum class HoldingPhase {
     Skipped,
 }
 
+/** Names which token program minted this SPL row. */
 enum class TokenProgramKind {
     SplToken,
     Token2022,
 }
 
+/**
+ * One in-memory asset row shown on the assets tab.
+ * It does not fetch balances or format amounts.
+ */
 data class HoldingRow(
     val id: String,
     val name: String,
@@ -34,12 +36,14 @@ data class HoldingRow(
     val usdSort: BigInteger? = null,
 )
 
+/** Holds the current holdings list together with its phase and error for the assets tab. */
 data class HoldingsSnapshot(
     val rows: List<HoldingRow> = emptyList(),
     val phase: HoldingPhase = HoldingPhase.Idle,
     val error: String? = null,
 )
 
+/** Holds well-known mint and program ids used when building holding rows. */
 object HoldingIds {
     const val NATIVE = "native-sol"
     const val WRAPPED = "So11111111111111111111111111111111111111112"

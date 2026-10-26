@@ -1,8 +1,9 @@
-/**
- * Orders a ready holdings list. Does not fetch or format display strings.
- */
 package com.airwave.wallet.holdings
 
+/**
+ * Orders a ready holdings list.
+ * It does not fetch balances or format display strings.
+ */
 object HoldingSort {
     fun ready(rows: List<HoldingRow>, byUsd: Boolean): List<HoldingRow> {
         val native = rows.filter { it.id == HoldingIds.NATIVE }

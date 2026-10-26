@@ -1,3 +1,7 @@
+/**
+ * Draws shared Compose chrome such as the primary button, unlock backdrop, and secret-field colors.
+ * It does not own routes or settings persistence.
+ */
 package com.airwave.wallet.ui
 
 import androidx.compose.foundation.background
@@ -46,10 +50,10 @@ import com.airwave.wallet.Tab
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.airwaveUnlockBackground
 
-/** Two 48dp icon slots — aligns RPC trailing, draft confirm/discard, and SecretKeyField actions. */
+/** Width of two 48dp icon slots so RPC trailing actions, draft confirm/discard, and SecretKeyField line up. */
 val TrailingInlineActionsWidth = 96.dp
 
-/** Width of the radio column on RPC URL rows (draft rows indent to match). */
+/** Width of the radio column on RPC URL rows. Draft rows indent by this amount so they line up. */
 val RpcRadioGutter = 48.dp
 
 @Composable

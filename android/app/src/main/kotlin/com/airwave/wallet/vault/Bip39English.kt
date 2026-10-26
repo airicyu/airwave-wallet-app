@@ -1,12 +1,12 @@
-/**
- * BIP39 English word list loaded from the packaged raw resource.
- * Does not validate mnemonics or derive keys.
- */
 package com.airwave.wallet.vault
 
 import android.content.res.Resources
 import com.airwave.wallet.R
 
+/**
+ * Loads the BIP39 English word list from the packaged raw resource.
+ * It does not validate mnemonics or derive keys.
+ */
 object Bip39English {
     private var cached: List<String>? = null
 

@@ -1,9 +1,6 @@
-/**
- * One wallet account row as stored in vault plaintext and shown in the list.
- * Does not encrypt or parse the vault file.
- */
 package com.airwave.wallet.vault
 
+/** Records whether this vault row is a seed, burner, imported secret, or watch-only account. */
 enum class AccountKind(val wire: String) {
     Seed("seed"),
     Burner("burner"),
@@ -17,6 +14,7 @@ enum class AccountKind(val wire: String) {
     }
 }
 
+/** Names the BIP44 path flavor to use when importing a mnemonic. */
 enum class ImportPathKind(val wire: String) {
     Phantom("phantom"),
     Cli("cli"),
@@ -29,6 +27,10 @@ enum class ImportPathKind(val wire: String) {
     }
 }
 
+/**
+ * One wallet account as stored in vault plaintext and shown in the account list.
+ * It does not encrypt or parse the vault file.
+ */
 data class AccountRecord(
     val id: String,
     val kind: AccountKind,

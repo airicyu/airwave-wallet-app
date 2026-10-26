@@ -8,6 +8,10 @@ import java.math.BigInteger
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * Sends a signed transaction and estimates fees over JSON-RPC for sign-and-send.
+ * It does not parse instruction names or hold keys.
+ */
 object SolanaJsonRpc {
     fun sendTransaction(rpcUrl: String, signedTx: ByteArray): String? {
         val encoded = LegacyTransaction.base64Wire(signedTx)
@@ -16,20 +20,21 @@ object SolanaJsonRpc {
                 .put("encoding", "base64")
                 .put("skipPreflight", false),
         )
-        val result = post(rpcUrl, "sendTransaction", params)
-        return result?.optString("result", null)
+        val json = post(rpcUrl, "sendTransaction", params) ?: return null
+        if (json.isNull("result")) return null
+        val sig = json.optString("result", "")
+        return sig.takeIf { it.isNotEmpty() && it != "null" }
     }
 
-    fun estimateFeeLamports(rpcUrl: String, messageBase64: String): BigInteger? {
-        val params = JSONArray().put(messageBase64).put(
-            JSONObject().put("sigVerify", false),
+    fun estimateFeeLamports(rpcUrl: String, payload: ByteArray): BigInteger? {
+        val message = LegacyTransaction.messageBase64(payload) ?: return null
+        val params = JSONArray().put(message).put(
+            JSONObject().put("encoding", "base64"),
         )
-        val result = post(rpcUrl, "simulateTransaction", params)?.optJSONObject("result")
+        val result = post(rpcUrl, "getFeeForMessage", params)?.optJSONObject("result")
             ?: return null
-        val err = result.optJSONObject("err")
-        if (err != null && err.length() > 0) return null
-        val value = result.optJSONObject("value")
-        val fee = value?.optLong("fee", -1L) ?: -1L
+        if (result.isNull("value")) return null
+        val fee = result.optLong("value", -1L)
         return if (fee >= 0) BigInteger.valueOf(fee) else null
     }
 
@@ -49,7 +54,8 @@ object SolanaJsonRpc {
             val stream = if (code in 200..299) connection.inputStream else connection.errorStream
             val text = stream.bufferedReader().use(BufferedReader::readText)
             val json = JSONObject(text)
-            if (json.has("error")) null else json
+            val err = json.optJSONObject("error")
+            if (err != null) null else json
         } catch (_: Exception) {
             null
         } finally {

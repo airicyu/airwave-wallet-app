@@ -1,6 +1,6 @@
 /**
- * Shared chrome for add-account inner pages: name field, word grid, dice, pubkey row, CTA.
- * Does not commit vault rows.
+ * Draws shared chrome for add-account inner pages, including the name field, word grid, dice, pubkey row, and CTA.
+ * It does not commit vault rows.
  */
 package com.airwave.wallet.ui
 

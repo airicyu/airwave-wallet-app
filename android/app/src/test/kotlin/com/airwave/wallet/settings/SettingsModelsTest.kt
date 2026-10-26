@@ -4,6 +4,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+/**
+ * Checks the clamps applied when parsing settings JSON, including CU price and idle lock minutes.
+ * These tests do not open EncryptedSharedPreferences.
+ */
 class SettingsModelsTest {
     @Test
     fun cuPriceBounds() {

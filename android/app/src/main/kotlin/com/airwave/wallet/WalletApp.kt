@@ -1,3 +1,7 @@
+/**
+ * Top-level Compose tree for the wallet shell.
+ * It switches among setup, unlock, lead, generate, home, and MWA approval from WalletModel.route. It does not talk to walletlib or encrypt the vault.
+ */
 package com.airwave.wallet
 
 import android.content.ClipData
@@ -49,6 +53,7 @@ import com.airwave.wallet.theme.AirwaveTheme
 import com.airwave.wallet.ui.AirwavePrimaryButton
 import com.airwave.wallet.ui.AirwaveUnlockBackdrop
 import com.airwave.wallet.ui.HomeShell
+import com.airwave.wallet.ui.MwaApprovalScreen
 import com.airwave.wallet.ui.airwaveUnlockFieldColors
 import com.airwave.wallet.vault.BurnerKeys
 
@@ -69,14 +74,14 @@ fun WalletApp(model: WalletModel) {
                 Route.Lead -> LeadScreen(model)
                 Route.Generate -> GenerateScreen(model)
                 Route.Home -> HomeShell(model)
-                Route.Approval -> ApprovalScreen(model)
+                Route.Approval -> MwaApprovalScreen(model)
             }
         }
     }
 }
 
 @Composable
-private fun BrandMarkImage() {
+internal fun BrandMarkImage() {
     Image(
         painterResource(R.drawable.brand_mark),
         contentDescription = null,
@@ -145,7 +150,7 @@ private fun SetupScreen(model: WalletModel) {
 }
 
 @Composable
-private fun UnlockScreen(model: WalletModel) {
+internal fun UnlockScreen(model: WalletModel) {
     var password by rememberSaveable { mutableStateOf("") }
     val fieldColors = airwaveUnlockFieldColors()
     Box(Modifier.fillMaxSize()) {
@@ -210,30 +215,6 @@ private fun GenerateScreen(model: WalletModel) {
         }
         OutlinedButton(onClick = { model.roll() }) { Text("Roll again") }
         AirwavePrimaryButton("Generate", { model.commitGenerate() })
-    }
-}
-
-@Composable
-private fun ApprovalScreen(model: WalletModel) {
-    val pending = model.pending
-    Column(Modifier.padding(20.dp).fillMaxSize().background(AirwaveColors.Bg), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(pending?.title ?: "", style = MaterialTheme.typography.headlineMedium, color = AirwaveColors.Text)
-            TextButton(onClick = { model.lock() }) { Text("Lock", color = AirwaveColors.Accent) }
-        }
-        pending?.lines?.forEach { (label, value) ->
-            Text(label, color = AirwaveColors.TextMuted)
-            Text(value, color = AirwaveColors.Text)
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { model.reject() }, modifier = Modifier.weight(1f), enabled = !model.approving) { Text("Reject") }
-            AirwavePrimaryButton(
-                "Approve",
-                { model.approve() },
-                modifier = Modifier.weight(1f),
-                enabled = !model.approving,
-            )
-        }
     }
 }
 

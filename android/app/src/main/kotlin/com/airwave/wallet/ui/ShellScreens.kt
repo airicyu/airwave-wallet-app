@@ -1,5 +1,5 @@
 /**
- * Home shell, hamburger menu, empty placeholders, and the network cluster picker.
+ * Draws the home shell, hamburger menu, empty placeholders, and the network cluster picker.
  * Settings and RPC screens live in sibling files in this package.
  */
 package com.airwave.wallet.ui

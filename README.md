@@ -15,4 +15,4 @@ Non-custodial Solana wallet app. **Separate** from the Chrome extension [`airicy
 
 ## Develop
 
-See [`dev-docs/setup.md`](dev-docs/setup.md). Latest contract: [`dev-docs/roadmap/0.4.0/INDEX.md`](dev-docs/roadmap/0.4.0/INDEX.md).
+See [`dev-docs/setup.md`](dev-docs/setup.md). Latest contract: [`dev-docs/roadmap/0.5.0/INDEX.md`](dev-docs/roadmap/0.5.0/INDEX.md). MWA hand-test: `bun run playground`.

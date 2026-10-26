@@ -1,7 +1,3 @@
-/**
- * Unit checks for base-unit formatting, row filters, and the Helius path switch.
- * Does not call the network.
- */
 package com.airwave.wallet.holdings
 
 import com.airwave.wallet.settings.AirwaveSettings
@@ -14,6 +10,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigInteger
 
+/**
+ * Checks base-unit formatting, row filters, and the Helius path switch.
+ * These tests do not call the network.
+ */
 class HoldingRulesTest {
     @Test
     fun formatOneLamportAndHalf() {

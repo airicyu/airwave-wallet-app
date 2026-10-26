@@ -1,7 +1,3 @@
-/**
- * Unlocked session, vault password box, and the in-memory MWA approval.
- * Settings edits live in WalletSettings.kt. Holdings live on HoldingsModel.
- */
 package com.airwave.wallet
 
 import android.app.Application
@@ -33,6 +29,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.crypto.AEADBadTagException
 
+/**
+ * In-memory wallet session for this process: the unlocked vault, the password box, the shell route, and at most one MWA approval.
+ * Compose screens read this object. VaultStore is the durable file; settings edits live in WalletSettings.kt; holdings live on HoldingsModel. The pending approval is never written to disk. If the process dies, the user unlocks again.
+ */
 class WalletModel(app: Application) : AndroidViewModel(app) {
     internal val store = VaultStore(app)
     internal val cipher = VaultCipher()
@@ -69,6 +69,8 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         private set
     var approving by mutableStateOf(false)
         private set
+    var approvalSettled by mutableStateOf(false)
+        private set
     var accountRows by mutableStateOf<List<AccountRecord>>(emptyList())
         internal set
 
@@ -81,6 +83,7 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
 
     var secretStates by mutableStateOf<Map<SecretFieldId, SecretFieldState>>(emptyMap())
         internal set
+    private var afterUnlock = mutableListOf<(Boolean) -> Unit>()
 
     fun secretState(id: SecretFieldId): SecretFieldState =
         secretStates[id] ?: SecretFieldState()
@@ -125,6 +128,7 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
             return
         }
         bumpUserActivity()
+        flushAfterUnlock()
         if (pending != null && address != null) route = Route.Approval
         else if (route == Route.Home) syncHoldings(refresh = false)
     }
@@ -161,10 +165,27 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun canSignNow(): Boolean = address != null && activeAccount()?.canSign() == true
+
+    fun whenSigningReady(onReady: (Boolean) -> Unit) {
+        if (canSignNow()) {
+            onReady(true)
+            return
+        }
+        if (!store.exists() || (address == null && route != Route.Unlock)) {
+            onReady(false)
+            return
+        }
+        afterUnlock.add(onReady)
+    }
+
     fun lock() {
         menuOpen = false
         homeStack = emptyList()
         failPending()
+        val waiting = afterUnlock.toList()
+        afterUnlock.clear()
+        waiting.forEach { it(false) }
         clearSigningMaterial()
         preview?.zero()
         preview = null
@@ -180,21 +201,20 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         private set
 
     fun offer(request: Pending) {
-        if (activeAccount()?.kind == AccountKind.Watch) {
-            mwaError = t("mwa.watchAccount")
-            request.finish(ApprovalResult.Failed)
+        if (approvalSettled) dropSessionChrome()
+        val watch = activeAccount()?.kind == AccountKind.Watch
+        if (com.airwave.wallet.mwa.MwaPayloads.failBeforeOffer(pending != null, watch)) {
+            if (watch) mwaError = t("mwa.watchAccount")
+            request.finish(ApprovalResult.Rejected)
             return
         }
         mwaError = null
-        if (pending != null) {
-            request.finish(ApprovalResult.Failed)
-            return
-        }
         if (!store.exists() || (address == null && route != Route.Unlock)) {
-            request.finish(ApprovalResult.Failed)
+            request.finish(ApprovalResult.Rejected)
             return
         }
         pending = request
+        approvalSettled = false
         route = if (address == null) Route.Unlock else Route.Approval
     }
 
@@ -213,20 +233,42 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun finishApproval(request: Pending, result: ApprovalResult) {
-        pending = null
-        route = Route.Home
+        approvalSettled = true
         request.finish(result)
+        if (address != null) route = Route.Home
         syncHoldings(refresh = false)
     }
 
     fun reject() {
+        if (approvalSettled) {
+            dropSessionChrome()
+            if (address != null) route = Route.Home
+            return
+        }
         val request = pending
         pending = null
-        request?.finish(ApprovalResult.Failed)
+        request?.finish(ApprovalResult.Rejected)
         if (address != null) {
             route = Route.Home
             syncHoldings(refresh = false)
         }
+    }
+
+    fun endAssociation() {
+        if (approvalSettled) {
+            dropSessionChrome()
+            return
+        }
+        val request = pending
+        pending = null
+        approving = false
+        request?.finish(ApprovalResult.Rejected)
+    }
+
+    fun dropSessionChrome() {
+        pending = null
+        approvalSettled = false
+        approving = false
     }
 
     fun push(destination: HomeDestination) {
@@ -297,10 +339,21 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    private fun flushAfterUnlock() {
+        val waiting = afterUnlock.toList()
+        afterUnlock.clear()
+        val ok = canSignNow()
+        waiting.forEach { it(ok) }
+    }
+
     private fun failPending() {
+        if (approvalSettled) {
+            dropSessionChrome()
+            return
+        }
         val request = pending
         pending = null
-        request?.finish(ApprovalResult.Failed)
+        request?.finish(ApprovalResult.Rejected)
     }
 
     private fun remember(password: String) {
@@ -350,9 +403,13 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     }
 }
 
+/** Names the shell screen WalletApp should show. */
 enum class Route { Setup, Unlock, Lead, Generate, Home, Approval }
+
+/** Names the selected Home bottom tab. */
 enum class Tab { Assets, Activity }
 
+/** Names a screen pushed on the home stack from the hamburger menu. */
 enum class HomeDestination {
     Accounts,
     AddAccount,
@@ -376,15 +433,38 @@ enum class HomeDestination {
     WalletLockSettings,
 }
 
+/** Carries a result that goes back only to the MWA request that created the pending approval. */
 sealed class ApprovalResult {
+    /** Returns the public key or message signature bytes for that originating request. */
     data class Bytes(val value: ByteArray) : ApprovalResult()
+    /** Returns the transaction signatures after a successful sign-and-send. */
     data class Signatures(val value: Array<ByteArray>) : ApprovalResult()
+    /** The user declined, locked, or the sign/send path failed. */
+    /** The user declined or locked, or the request was refused before approval chrome. */
+    data object Rejected : ApprovalResult()
+    /** Signing or submitting failed after the user approved. */
     data object Failed : ApprovalResult()
 }
 
+/** Names the approval chrome MwaScreens should draw for the current pending request. */
+enum class PendingKind { Authorize, SignMessage, SignAndSend }
+
+/**
+ * One in-memory MWA approval waiting for the user.
+ * It is not written to disk. A second offer fails this value in place instead of replacing it, so the originating request still gets a result.
+ */
 data class Pending(
-    val title: String,
-    val lines: List<Pair<String, String>>,
+    val kind: PendingKind,
+    val identityName: String = "",
+    val identityUri: String = "",
+    val chain: String = "",
+    val accountLabel: String = "",
+    val accountShort: String = "",
+    val messageUtf8: String? = null,
+    val messageHex: String? = null,
+    val amountLamports: java.math.BigInteger? = null,
+    val feeLamports: java.math.BigInteger? = null,
+    val instructionNames: List<String> = emptyList(),
     val approve: (ByteArray) -> ApprovalResult,
     val finish: (ApprovalResult) -> Unit,
 )
