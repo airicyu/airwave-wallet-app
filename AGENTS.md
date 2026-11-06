@@ -6,7 +6,9 @@ Feature ideas: [`dev-docs/roadmap/backlog/INDEX.md`](dev-docs/roadmap/backlog/IN
 
 **Replies to the user are Traditional Chinese written prose.** Proper names, paths, APIs, and file names stay in English.
 
-**Documents default to English**, except **`dev-docs/roadmap/` version contracts and reviews are Traditional Chinese** (INDEX、how、reasoning、HANDOFF、design-review、implementation-review). Paths, type names, JSON keys, and commands stay English. After a version is `shipped`, leave its docs as they were written. Domain entries keep their Chinese term names. See [`.agents/skills/version-delivery/SKILL.md`](.agents/skills/version-delivery/SKILL.md).
+**Documents default to English** unless the user says otherwise, or a spec already requires another language. That includes `INDEX.md`, `reasoning.md`, `how.md`, `HANDOFF.md`, review reports, and other roadmap prose. Identifiers, paths, commands, JSON keys, and enums are English.
+
+Shipped version docs through **0.4.0** stay as they were written. Do not rewrite them only to change language. Domain term names follow [`dev-docs/DOMAIN.md`](dev-docs/DOMAIN.md). New domain prose is English. See [`.agents/skills/version-delivery/SKILL.md`](.agents/skills/version-delivery/SKILL.md).
 
 ---
 
@@ -34,7 +36,7 @@ Feature ideas: [`dev-docs/roadmap/backlog/INDEX.md`](dev-docs/roadmap/backlog/IN
 | Consistent screen behavior | [`dev-docs/design-principles.md`](dev-docs/design-principles.md) |
 | Account, address, vault wording | [`dev-docs/DOMAIN.md`](dev-docs/DOMAIN.md). If that version's INDEX overrides a term in plain sentences, the INDEX wins and DOMAIN is updated to match |
 
-**Priority:** a version INDEX decision > GUIDELINES architecture bans > [`dev-docs/design-principles.md`](dev-docs/design-principles.md) (screens only) and [`dev-docs/code-design.md`](dev-docs/code-design.md) (file shape). Sequence: [`dev-docs/roadmap/README.md`](dev-docs/roadmap/README.md) table; only the version the user named.
+**Priority:** a version INDEX decision > GUIDELINES architecture bans > [`dev-docs/code-design.md`](dev-docs/code-design.md) (security, then smallest design, then source layout) > [`dev-docs/design-principles.md`](dev-docs/design-principles.md) (screens only). Sequence: [`dev-docs/roadmap/README.md`](dev-docs/roadmap/README.md) table; only the version the user named.
 
 ---
 
@@ -85,7 +87,9 @@ A version proceeds by stating the work, writing it into that version's proposal 
 
 If the previous version is not `shipped`, do not open a new version. This is a soft rule: remind the user, do not hard-block. If they still want it opened, open it.
 
-When the latest version is `shipped` and the next version is not opened, new **code** work is unversioned. Record it in [`dev-docs/roadmap/unversioned.md`](dev-docs/roadmap/unversioned.md) and add one sentence under `Next` at the top of the changelog. Both places list the same changes. The user later chooses: fold them into the version just shipped, open the next version for them, or leave them unversioned after shipping. Do not guess before they choose. Docs, privacy policy, and terms are not tracked on the roadmap.
+When the latest version is `shipped` and the next version is not opened, new **code** work is unversioned. Record it in [`dev-docs/roadmap/unversioned.md`](dev-docs/roadmap/unversioned.md) and add one sentence under `Next` at the top of the changelog. Both places list the same changes. Docs, privacy policy, and terms are not tracked on the roadmap.
+
+Opening a version, or continuing one that is already `in progress`, absorbs that batch. The open version is built on top of it and ships it. Move the `unversioned.md` items into that version's INDEX and move the changelog `Next` sentences under that version's heading. Then `unversioned.md` has nothing current, and the changelog has no `Next` section. Do not leave `Next` sitting above an in-progress version.
 
 More changes while a version is in progress go into that version's INDEX and under that version's changelog heading. Do not open the next version.
 

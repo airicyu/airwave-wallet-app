@@ -59,13 +59,7 @@ Web `airicyu/airwave-wallet` supplies IA, copy, and SVG `d` values. It does **no
 
 ## 2. Language
 
-**Reply to the user in Traditional Chinese.**
-
-- **Version docs** under `dev-docs/roadmap/X.Y.Z/` (`INDEX.md`, `reasoning.md`, `how.md`, `HANDOFF.md`, `docs/design-review.md`, `docs/implementation-review.md`): **Traditional Chinese**. The reader is the user reviewing the version.
-- Identifiers, paths, commands, JSON keys, enums, drawable names: **English**.
-- Other engineering docs (`code-design.md`, `DOMAIN.md` body except term names, `design-principles.md`) stay **English** unless the user says otherwise.
-- After a version is `shipped`, leave its wording. Do not rewrite it for a later language rule. Versions still `draft` / `in progress` / `done` follow this section.
-- Domain term **names** stay Chinese. See [DOMAIN.md](../DOMAIN.md).
+Language rules live in the repo-root [`AGENTS.md`](../../AGENTS.md). Do not restate them here. Identifiers, paths, commands, JSON keys, enums, and drawable names stay English.
 
 ---
 
@@ -136,7 +130,9 @@ The status table in [`README.md`](README.md) is the **source of truth**. Each ve
 
 **Do not open the next version on your own.** While the previous version is not `shipped`, do not start a new version directory. If the user asks for one anyway, remind them and let them decide.
 
-**Code changes while the latest version is `shipped` and the next is not opened.** Append the same batch to [`unversioned.md`](unversioned.md) and to the `Next` section of [`changelog.md`](../../changelog.md). Do not invent the next number. The user later folds them into the shipped version, opens the next version, or ships while leaving them unversioned. Docs, privacy policy, and terms are not tracked on the roadmap.
+**Code changes while the latest version is `shipped` and the next is not opened.** Append the same batch to [`unversioned.md`](unversioned.md) and to the `Next` section of [`changelog.md`](../../changelog.md). Do not invent the next number. Docs, privacy policy, and terms are not tracked on the roadmap.
+
+**Opening or continuing a version absorbs that batch.** The open version is built on top of it and ships it. Move the items into that version's INDEX and under its changelog heading. Clear `unversioned.md` and remove the changelog `Next` section. Do not leave `Next` above an in-progress version.
 
 **More changes while a version is `in progress`.** Append that version's `INDEX` and its changelog heading. Do not open another version.
 

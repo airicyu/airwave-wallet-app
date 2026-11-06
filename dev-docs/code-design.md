@@ -2,9 +2,28 @@
 
 How Kotlin under `android/` is split and commented. An INDEX overrides this file when it says so. Screen layout lives in [design-principles.md](./design-principles.md). Architecture bans live in [roadmap/GUIDELINES.md](./roadmap/GUIDELINES.md). Version order lives in [roadmap/README.md](./roadmap/README.md): one named INDEX at a time.
 
-The Chrome extension's folder tree (`background/`, `popup/`, `shared/`) does not apply here. The responsibility and size rules are the same idea as that repo's `dev-docs/code-design-principles.md`, tightened for this app: **every named type** has a KDoc on its declaration, not a floating file header.
+The Chrome extension's folder tree (`background/`, `popup/`, `shared/`), command-file line cap, and CSS catalogs do not apply here. Responsibility, size, security, and smallest-design rules follow that repo's `dev-docs/code-design-principles.md`, tightened for this app: **every named type** has a KDoc on its declaration, not a floating file header.
 
-## 1. One responsibility
+## 1. Smallest design
+
+Smallest design applies only when section 2 is already satisfied. With no security hole, make the smallest change that meets this contract: one straight path a reader can maintain. A leak, an injection, or an unauthorized sign path is not a place to keep the diff small. That fix is required, and its size follows the hole.
+
+- Do not add a layer, mode, fallback, or framework the INDEX did not ask for, once section 2 is already satisfied.
+- Do not walk records one by one when one pass does the same work. Extra per-item handling that the contract does not require is harder to maintain and slower.
+- Do not build the next case early. Add it when a contract asks for it.
+- Do not shrink, defer, or skip a fix that section 2 requires. The architecture bans in GUIDELINES stay in force.
+
+## 2. Security
+
+This app holds keys. A hole that leaks a secret, lets another app sign, or injects untrusted data into a privileged surface has serious consequences. Find that hole in the design and close it in this change. Section 1 does not limit that work.
+
+- Treat Intent extras, deep links, page or dApp content, storage values, RPC and simulation results, and model output as untrusted.
+- Do not concatenate that input into HTML, a script, a URL, or a command string. Do not pass it through an evaluator.
+- An incoming Intent or message is not permission to sign, export keys, or change the vault. Keep the origin check and the approval path this repo already uses.
+- Do not log, display in full, or persist a mnemonic, a private key, or the unlock secret.
+- Close the hole before calling the design small. When a check this repo already has closes it, use that check. When it does not, add the check the hole needs.
+
+## 3. One responsibility
 
 A file does one thing a reader can name in a sentence. The neighboring step (the caller, the I/O, the next screen) is a different file.
 
@@ -14,7 +33,7 @@ A file does one thing a reader can name in a sentence. The neighboring step (the
 - A pure data table file only holds that table.
 - Tests sit next to the module they exercise, under `src/test`.
 
-## 2. Responsibility comment
+## 4. Responsibility comment
 
 Put English KDoc **on the declaration** of every named type under `android/` (main and test): `class`, `data class`, `enum class`, `object`, `sealed class`, `interface`.
 
@@ -30,19 +49,19 @@ Do not use headline fragments, colon lists, or "X vs Y" as the whole comment.
 - A string-catalog `object` says it is the catalog, not the list of keys.
 - Do not require a comment on every method. Do not restate the type or function name in prose.
 
-## 3. Line count
+## 5. Line count
 
 The threshold stays **400**. It is not a higher cap. Count **code lines** only: physical lines that have code. **Blank lines do not count.** Comment lines do not count: a full-line `//` comment, and every line of a `/* */` or `/** */` block (including the file header). A line that mixes code and an end-of-line `//` comment still counts as one code line.
 
 - A new `.kt` file stays at or under 400 lines.
 - If a change touches a file that is already over 400, that version either splits it, or the INDEX names the file, says this version does not split it, and gives the reason.
 - One screen that is still a single responsibility may stay over 400 when the INDEX says so. The next structure pass records that reason. It does not split the file only because the line count is high.
-- `android/app/src/main/kotlin/com/airwave/wallet/i18n/AppStrings.kt` is the message catalog. It may exceed 400 lines. That exception is this file. The `AppStrings` object still needs the KDoc in section 2.
+- `android/app/src/main/kotlin/com/airwave/wallet/i18n/AppStrings.kt` is the message catalog. It may exceed 400 lines. That exception is this file. The `AppStrings` object still needs the KDoc in section 4.
 - New files created by a split stay at or under 400 lines.
 - A split does not change behavior, routes, storage keys, or public function results unless the INDEX says so.
 - Do not split a large file in the same change that moves it to another package. A path change and a responsibility change are different diffs.
 
-## 4. Where code goes
+## 6. Where code goes
 
 Group by what changes together, under `com.airwave.wallet`.
 
@@ -52,7 +71,7 @@ Group by what changes together, under `com.airwave.wallet`.
 - Do not keep growing `WalletModel.kt` or `ui/ShellScreens.kt` with the next feature. Call out to the feature's type. Those two files are already the shell.
 - Chrome icons that exist on web as `StrokeIcon` or `TokenTrust` live as vector XML under `android/app/src/main/res/drawable/`. See [design-principles.md](./design-principles.md) Android icons. Do not grow a screen with a hand-drawn `Canvas` glyph.
 
-## 5. When to add an Activity
+## 7. When to add an Activity
 
 An Activity is a **short-lived intent container**: another app (or another task) launches it; it may show one or more views for that one job; when the job ends it `finish()`es and the caller is in front again. It is not an in-app page. Unlock, accounts, settings, and the three MWA approval kinds stay Compose routes or composables on the Activity that already owns that task.
 
@@ -64,11 +83,11 @@ Add a **new** Activity only when **all** of these hold:
 
 Do **not** add an Activity because a phone frame, title, or file length changed. Today: `MainActivity` is the launcher shell; `MwaActivity` is the `solana-wallet:` session host (own task, same role as FakeWallet's `MobileWalletAdapterActivity`). An INDEX may name another Activity only with the three tests above.
 
-## 6. Structure pass between versions
+## 8. Structure pass between versions
 
 Run this pass when opening the next named version: **after** version N's implementation review accepts and **before** version N+1's contract is reconciled.
 
-1. Count every `.kt` file under `android/` (code lines as in section 3: blanks and comment lines excluded).
+1. Count every `.kt` file under `android/` (code lines as in section 5: blanks and comment lines excluded).
 2. List files over 400 lines, named types with no declaration KDoc, and function-only files with no file-level KDoc.
 3. Split a file over 400 when its responsibility comment needs a second job, or when the version that touched it did not name a reason to leave it. A single-responsibility screen that the INDEX left over 400 stays. Add the missing type KDocs.
 4. Behavior stays the same. No new screen, no new store, no new route.

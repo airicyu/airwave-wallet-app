@@ -2,7 +2,7 @@
 
 Version contracts for **airwave-wallet-app**. Start here with no chat history.
 
-**Language:** from 0.4.0 onward, files under `dev-docs/roadmap/X.Y.Z/` (INDEX, how, reasoning, HANDOFF, reviews) are Traditional Chinese. Paths, type names, JSON keys, and commands stay English. Shipped 0.1.0 and 0.2.0 docs are not rewritten. 0.3.0 stays as written.
+**Language:** new roadmap prose is English (see the repo-root `AGENTS.md`). Paths, type names, JSON keys, and commands stay English. Shipped docs through 0.4.0 stay as they were written.
 
 The Chrome extension roadmap in `airicyu/airwave-wallet` does not apply here.
 

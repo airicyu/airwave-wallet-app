@@ -44,7 +44,7 @@ draft  (INDEX, reasoning, how)
 
 **Question:** if we build `how.md` as written, do we get a coherent product or a pile of patches?
 
-Write to `dev-docs/roadmap/X.Y.Z/docs/design-review.md` in Traditional Chinese.
+Write to `dev-docs/roadmap/X.Y.Z/docs/design-review.md` in English.
 
 ### Look for
 
@@ -108,7 +108,7 @@ A single-screen patch can be one Track. Still write the heading so the review kn
 
 **Question:** does the code match `how.md` **and** the INDEX screen spec (phone frame), and did it violate the architecture bans?
 
-Write to `docs/implementation-review.md` in Traditional Chinese.
+Write to `docs/implementation-review.md` in English.
 
 ### Look for
 
