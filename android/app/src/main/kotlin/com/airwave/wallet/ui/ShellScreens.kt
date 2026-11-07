@@ -3,6 +3,9 @@
  * Settings and RPC screens live in sibling files in this package.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.Tab
+import com.airwave.wallet.session.HomeDestination
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,9 +54,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.HomeDestination
-import com.airwave.wallet.Tab
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.setCluster
 import com.airwave.wallet.settings.Cluster
 import com.airwave.wallet.theme.AirwaveColors

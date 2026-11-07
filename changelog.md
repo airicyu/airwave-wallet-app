@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+MWA approval screens live under `ui/mwa`, split into connect, sign message, sign-and-send, and shared chrome. `WalletModel` lives in `session`, with shell routes, the approval request, and offer/approve/reject in their own files.
+
 ## 0.6.0 — 2026-11-08
 
 MWA sign message. A connected dApp can request `sign_messages`. `MwaActivity` shows the message bytes and returns one ed25519 signature. The vault stays on that activity's unlock screen when it is locked. `sign_transactions` and `sign_and_send_transactions` still decline.

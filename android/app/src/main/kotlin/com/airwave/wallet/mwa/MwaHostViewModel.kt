@@ -1,11 +1,11 @@
 package com.airwave.wallet.mwa
+import com.airwave.wallet.session.WalletModel
 
 import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.airwave.wallet.WalletModel
 import com.solana.mobilewalletadapter.walletlib.association.AssociationUri
 import com.solana.mobilewalletadapter.walletlib.association.LocalAssociationUri
 import com.solana.mobilewalletadapter.walletlib.authorization.AuthIssuerConfig

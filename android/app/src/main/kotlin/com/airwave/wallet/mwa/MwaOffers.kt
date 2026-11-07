@@ -1,10 +1,10 @@
 package com.airwave.wallet.mwa
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.ApprovalResult
+import com.airwave.wallet.session.WalletOperationKind
+import com.airwave.wallet.session.WalletOperationRequest
 
-import com.airwave.wallet.ApprovalResult
 import com.airwave.wallet.activeAccount
-import com.airwave.wallet.WalletModel
-import com.airwave.wallet.WalletOperationKind
-import com.airwave.wallet.WalletOperationRequest
 import com.airwave.wallet.vault.BurnerKeys
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizedAccount

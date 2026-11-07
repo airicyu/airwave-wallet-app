@@ -3,6 +3,8 @@
  * It switches among setup, unlock, lead, generate, home, and MWA approval from WalletModel.route. It does not talk to walletlib or encrypt the vault.
  */
 package com.airwave.wallet
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.Route
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -53,7 +55,7 @@ import com.airwave.wallet.theme.AirwaveTheme
 import com.airwave.wallet.ui.AirwavePrimaryButton
 import com.airwave.wallet.ui.AirwaveUnlockBackdrop
 import com.airwave.wallet.ui.HomeShell
-import com.airwave.wallet.ui.MwaApprovalScreen
+import com.airwave.wallet.ui.mwa.MwaApprovalScreen
 import com.airwave.wallet.ui.airwaveUnlockFieldColors
 import com.airwave.wallet.vault.BurnerKeys
 

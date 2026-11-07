@@ -1,12 +1,16 @@
 package com.airwave.wallet.mwa
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.beginMwaSession
+import com.airwave.wallet.session.detachOperation
+import com.airwave.wallet.session.dropSessionChrome
+import com.airwave.wallet.session.offer
+import com.airwave.wallet.session.ApprovalResult
+import com.airwave.wallet.session.WalletOperationRequest
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.airwave.wallet.ApprovalResult
 import com.airwave.wallet.activeAccount
-import com.airwave.wallet.WalletModel
-import com.airwave.wallet.WalletOperationRequest
 import com.airwave.wallet.vault.AccountKind
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.ReauthorizeRequest

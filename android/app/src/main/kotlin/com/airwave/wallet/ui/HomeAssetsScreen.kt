@@ -3,6 +3,8 @@
  * It does not own the snapshot and does not parse RPC JSON.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.HomeDestination
 
 import android.content.Intent
 import android.net.Uri
@@ -42,9 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airwave.wallet.HomeDestination
 import com.airwave.wallet.R
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.holdings.BaseUnits
 import com.airwave.wallet.holdings.HoldingPhase
 import com.airwave.wallet.holdings.HoldingRow

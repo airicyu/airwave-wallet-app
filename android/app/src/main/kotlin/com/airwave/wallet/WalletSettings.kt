@@ -4,6 +4,7 @@
  */
 package com.airwave.wallet
 
+import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.settings.AirwaveSettings
 import com.airwave.wallet.settings.Cluster
 import com.airwave.wallet.settings.LocaleTag

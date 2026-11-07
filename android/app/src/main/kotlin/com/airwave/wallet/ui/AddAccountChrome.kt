@@ -3,6 +3,7 @@
  * It does not commit vault rows.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -44,7 +45,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airwave.wallet.R
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.BurnerKeys
 

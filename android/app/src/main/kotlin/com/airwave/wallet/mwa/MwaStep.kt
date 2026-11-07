@@ -1,6 +1,6 @@
 package com.airwave.wallet.mwa
+import com.airwave.wallet.session.WalletOperationRequest
 
-import com.airwave.wallet.WalletOperationRequest
 
 /** Signals from the association that are not an approval step. */
 sealed interface MwaEvent {

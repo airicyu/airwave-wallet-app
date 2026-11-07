@@ -1,4 +1,8 @@
 package com.airwave.wallet
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.approve
+import com.airwave.wallet.session.reject
+import com.airwave.wallet.session.WalletOperationRequest
 
 import android.content.Intent
 import android.os.Bundle
@@ -28,7 +32,7 @@ import com.airwave.wallet.mwa.MwaStep
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.AirwaveTheme
 import com.airwave.wallet.ui.AirwavePrimaryButton
-import com.airwave.wallet.ui.SignMessageBody
+import com.airwave.wallet.ui.mwa.SignMessageBody
 
 /**
  * Dedicated MWA host Activity.

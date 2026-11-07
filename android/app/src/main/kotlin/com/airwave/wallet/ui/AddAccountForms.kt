@@ -3,6 +3,7 @@
  * It does not own the five-row chooser or vault encryption.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.commitImportedMnemonic
 import com.airwave.wallet.commitImportedSecret
 import com.airwave.wallet.commitPreviewBurner

@@ -1,4 +1,5 @@
 package com.airwave.wallet
+import com.airwave.wallet.session.WalletModel
 
 import android.app.Application
 import androidx.activity.ComponentActivity

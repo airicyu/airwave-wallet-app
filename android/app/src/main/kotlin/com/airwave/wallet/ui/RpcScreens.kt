@@ -3,6 +3,7 @@
  * It does not own cluster selection or the settings hub.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,7 +43,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.addRpcEndpoint
 import com.airwave.wallet.isRpcEndpointActive
 import com.airwave.wallet.removeRpcEndpoint

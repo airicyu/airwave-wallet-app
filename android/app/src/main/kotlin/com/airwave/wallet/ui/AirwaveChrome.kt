@@ -3,6 +3,7 @@
  * It does not own routes or settings persistence.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.Tab
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,7 +47,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.Tab
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.airwaveUnlockBackground
 

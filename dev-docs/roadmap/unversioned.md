@@ -8,4 +8,6 @@ After the user assigns the batch, move the items into that version's INDEX and c
 
 ## Current
 
-None.
+MWA approval screens moved from `ui/MwaScreens.kt` to `ui/mwa`: connect, sign message, sign-and-send, and the shared chrome. Behavior is unchanged.
+
+`WalletModel` moved to `com.airwave.wallet.session`. Shell routes and the approval request types are their own files. Offer, approve, and reject live in `WalletApproval.kt`. Unlock and the shell route stay on `WalletModel`. Behavior is unchanged.

@@ -1,17 +1,21 @@
-package com.airwave.wallet
+package com.airwave.wallet.session
 
 import android.app.Application
+import android.util.Base64
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.airwave.wallet.settings.AirwaveSettings
-import com.airwave.wallet.settings.RpcResolver
-import com.airwave.wallet.settings.SettingsStore
+import com.airwave.wallet.activateAccount
+import com.airwave.wallet.activeAccount
+import com.airwave.wallet.appendAccount
+import com.airwave.wallet.clearSigningMaterial
+import com.airwave.wallet.commitBurnerFromPreview
 import com.airwave.wallet.holdings.HoldingsModel
-import com.airwave.wallet.solana.LegacyTransaction
-import com.airwave.wallet.solana.SolanaJsonRpc
+import com.airwave.wallet.persistSettings
+import com.airwave.wallet.persistVault
+import com.airwave.wallet.settings.SettingsStore
 import com.airwave.wallet.ui.SecretFieldId
 import com.airwave.wallet.ui.SecretFieldState
 import com.airwave.wallet.vault.AccountKind
@@ -22,16 +26,15 @@ import com.airwave.wallet.vault.ImportPathKind
 import com.airwave.wallet.vault.VaultAccounts
 import com.airwave.wallet.vault.VaultCipher
 import com.airwave.wallet.vault.VaultStore
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.util.UUID
 import javax.crypto.AEADBadTagException
 
 /**
- * In-memory wallet session for this process: the unlocked vault, the password box, the shell route, and at most one MWA approval.
- * Compose screens read this object. VaultStore is the durable file; settings edits live in WalletSettings.kt; holdings live on HoldingsModel. The walletOperationRequest approval is never written to disk. If the process dies, the user unlocks again.
+ * In-memory wallet session for this process: the unlocked vault, the password box, and the shell route.
+ * Compose screens read this object. The MWA approval transitions live in WalletApproval.kt and are not written to disk. If the process dies, the user unlocks again.
  */
 class WalletModel(app: Application) : AndroidViewModel(app) {
     internal val store = VaultStore(app)
@@ -61,16 +64,16 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         internal set
     var tab by mutableStateOf(Tab.Assets)
     var walletOperationRequest by mutableStateOf<WalletOperationRequest?>(null)
-        private set
+        internal set
     var settings by mutableStateOf(settingsStore.read())
         internal set
     var menuOpen by mutableStateOf(false)
     var homeStack by mutableStateOf<List<HomeDestination>>(emptyList())
         private set
     var approving by mutableStateOf(false)
-        private set
+        internal set
     var approvalSettled by mutableStateOf(false)
-        private set
+        internal set
     var accountRows by mutableStateOf<List<AccountRecord>>(emptyList())
         internal set
 
@@ -84,6 +87,15 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     var secretStates by mutableStateOf<Map<SecretFieldId, SecretFieldState>>(emptyMap())
         internal set
     private var afterUnlock = mutableListOf<(Boolean) -> Unit>()
+
+    var mwaError by mutableStateOf<String?>(null)
+        internal set
+
+    /** Host hook for a sign request that is waiting until unlock. Not a second walletOperationRequest store. */
+    internal var onMwaUnlocked: (() -> Unit)? = null
+
+    /** Host hook so lock declines a sign request that has not been offered yet. */
+    internal var onMwaInterrupted: (() -> Unit)? = null
 
     fun secretState(id: SecretFieldId): SecretFieldState =
         secretStates[id] ?: SecretFieldState()
@@ -149,13 +161,13 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
             commitBurnerFromPreview()
         } else {
             preview?.let { key ->
-                val id = java.util.UUID.randomUUID().toString()
+                val id = UUID.randomUUID().toString()
                 val row = AccountRecord(
                     id = id,
                     kind = AccountKind.Burner,
                     label = "Burner",
                     address = key.address,
-                    seedBase64 = android.util.Base64.encodeToString(key.seed, android.util.Base64.NO_WRAP),
+                    seedBase64 = Base64.encodeToString(key.seed, Base64.NO_WRAP),
                 )
                 appendAccount(row, id)
                 key.zero()
@@ -196,120 +208,6 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         secretStates = emptyMap()
         holdings.clear()
         route = if (store.exists()) Route.Unlock else Route.Setup
-    }
-
-    var mwaError by mutableStateOf<String?>(null)
-        private set
-
-    /** Host hook for a sign request that is waiting until unlock. Not a second walletOperationRequest store. */
-    internal var onMwaUnlocked: (() -> Unit)? = null
-
-    /** Host hook so lock declines a sign request that has not been offered yet. */
-    internal var onMwaInterrupted: (() -> Unit)? = null
-
-    fun offer(request: WalletOperationRequest) {
-        if (approvalSettled) dropSessionChrome()
-        val watch = activeAccount()?.kind == AccountKind.Watch
-        if (com.airwave.wallet.mwa.MwaPayloads.failBeforeOffer(walletOperationRequest != null, watch)) {
-            if (watch) {
-                mwaError = t("mwa.watchAccount")
-                route = Route.Home
-            }
-            request.finish(ApprovalResult.Rejected)
-            return
-        }
-        mwaError = null
-        if (!store.exists() || (address == null && route != Route.Unlock)) {
-            request.finish(ApprovalResult.Rejected)
-            return
-        }
-        walletOperationRequest = request
-        approvalSettled = false
-        route = when {
-            address == null -> Route.Unlock
-            request.kind == WalletOperationKind.Authorize ||
-                request.kind == WalletOperationKind.Reauthorize ||
-                request.kind == WalletOperationKind.SignMessage -> Route.Home
-            else -> Route.Approval
-        }
-    }
-
-    fun beginMwaSession() {
-        mwaError = null
-    }
-
-    internal fun detachOperation() {
-        walletOperationRequest = null
-    }
-
-    fun approve() {
-        val request = walletOperationRequest ?: return
-        val secret = signingSeed ?: run {
-            finishApproval(request, ApprovalResult.Failed)
-            return
-        }
-        approving = true
-        viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) { request.approve(secret) }
-            approving = false
-            finishApproval(request, result)
-        }
-    }
-
-    private fun finishApproval(request: WalletOperationRequest, result: ApprovalResult) {
-        approvalSettled = true
-        request.finish(result)
-        if (request.kind == WalletOperationKind.Authorize ||
-            request.kind == WalletOperationKind.Reauthorize ||
-            request.kind == WalletOperationKind.SignMessage
-        ) return
-        if (address != null) route = Route.Home
-        syncHoldings(refresh = false)
-    }
-
-    fun reject() {
-        if (walletOperationRequest?.kind == WalletOperationKind.Authorize ||
-            walletOperationRequest?.kind == WalletOperationKind.Reauthorize ||
-            walletOperationRequest?.kind == WalletOperationKind.SignMessage
-        ) {
-            if (approvalSettled) return
-            approvalSettled = true
-            walletOperationRequest?.finish(ApprovalResult.Rejected)
-            return
-        }
-        if (approvalSettled) {
-            dropSessionChrome()
-            if (address != null) route = Route.Home
-            return
-        }
-        val request = walletOperationRequest
-        walletOperationRequest = null
-        request?.finish(ApprovalResult.Rejected)
-        if (address != null) {
-            route = Route.Home
-            syncHoldings(refresh = false)
-        }
-    }
-
-    fun endAssociation() {
-        if (approvalSettled) {
-            dropSessionChrome()
-            return
-        }
-        val request = walletOperationRequest
-        walletOperationRequest = null
-        approving = false
-        try {
-            request?.finish(ApprovalResult.Rejected)
-        } catch (_: RuntimeException) {
-            // The association is already gone. The in-memory walletOperationRequest is cleared above.
-        }
-    }
-
-    fun dropSessionChrome() {
-        walletOperationRequest = null
-        approvalSettled = false
-        approving = false
     }
 
     fun push(destination: HomeDestination) {
@@ -366,35 +264,11 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         return null
     }
 
-    fun rpcForSubmit(chain: String?): String? =
-        RpcResolver.rpcUrlForSubmit(chain, settings)
-
-    fun signAndSend(payload: ByteArray, rpcUrl: String, secret: ByteArray): ApprovalResult {
-        val signed = LegacyTransaction.sign(payload, secret) ?: return ApprovalResult.Failed
-        val signatureB64 = SolanaJsonRpc.sendTransaction(rpcUrl, signed) ?: return ApprovalResult.Failed
-        return try {
-            val sigBytes = BurnerKeys.base58Decode(signatureB64)
-            ApprovalResult.Signatures(arrayOf(sigBytes))
-        } catch (_: Exception) {
-            ApprovalResult.Failed
-        }
-    }
-
     private fun flushAfterUnlock() {
         val waiting = afterUnlock.toList()
         afterUnlock.clear()
         val ok = canSignNow()
         waiting.forEach { it(ok) }
-    }
-
-    private fun failPending() {
-        if (approvalSettled) {
-            dropSessionChrome()
-            return
-        }
-        val request = walletOperationRequest
-        walletOperationRequest = null
-        request?.finish(ApprovalResult.Rejected)
     }
 
     private fun remember(password: String) {
@@ -443,69 +317,3 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         return true
     }
 }
-
-/** Names the shell screen WalletApp should show. */
-enum class Route { Setup, Unlock, Lead, Generate, Home, Approval }
-
-/** Names the selected Home bottom tab. */
-enum class Tab { Assets, Activity }
-
-/** Names a screen pushed on the home stack from the hamburger menu. */
-enum class HomeDestination {
-    Accounts,
-    AddAccount,
-    ImportChooser,
-    AddBurner,
-    GenerateSeed,
-    ImportMnemonic,
-    ImportSecret,
-    WatchAddress,
-    CombinedLater,
-    EmptyAddressBook,
-    EmptyConnected,
-    EmptyAbout,
-    Network,
-    SettingsHub,
-    Language,
-    Rpc,
-    ApiKeys,
-    AiSettings,
-    CuPrice,
-    WalletLockSettings,
-}
-
-/** Carries a result that goes back only to the MWA request that created the walletOperationRequest approval. */
-sealed class ApprovalResult {
-    /** Returns the public key or message signature bytes for that originating request. */
-    data class Bytes(val value: ByteArray) : ApprovalResult()
-    /** Returns the transaction signatures after a successful sign-and-send. */
-    data class Signatures(val value: Array<ByteArray>) : ApprovalResult()
-    /** The user declined, locked, or the sign/send path failed. */
-    /** The user declined or locked, or the request was refused before approval chrome. */
-    data object Rejected : ApprovalResult()
-    /** Signing or submitting failed after the user approved. */
-    data object Failed : ApprovalResult()
-}
-
-/** Names the approval chrome MwaScreens should draw for the current walletOperationRequest request. */
-enum class WalletOperationKind { Authorize, Reauthorize, SignMessage, SignAndSend }
-
-/**
- * One in-memory MWA approval waiting for the user.
- * It is not written to disk. A second offer fails this value in place instead of replacing it, so the originating request still gets a result.
- */
-data class WalletOperationRequest(
-    val kind: WalletOperationKind,
-    val identityName: String = "",
-    val identityUri: String = "",
-    val chain: String = "",
-    val accountLabel: String = "",
-    val accountShort: String = "",
-    val messageUtf8: String? = null,
-    val messageHex: String? = null,
-    val amountLamports: java.math.BigInteger? = null,
-    val feeLamports: java.math.BigInteger? = null,
-    val instructionNames: List<String> = emptyList(),
-    val approve: (ByteArray) -> ApprovalResult,
-    val finish: (ApprovalResult) -> Unit,
-)

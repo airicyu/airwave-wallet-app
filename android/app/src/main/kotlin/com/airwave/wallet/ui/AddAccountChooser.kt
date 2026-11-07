@@ -3,6 +3,8 @@
  * It does not write vault rows. Combined-later still writes nothing.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.HomeDestination
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,9 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.HomeDestination
 import com.airwave.wallet.R
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.Bip39
 import com.airwave.wallet.vault.BurnerKeys

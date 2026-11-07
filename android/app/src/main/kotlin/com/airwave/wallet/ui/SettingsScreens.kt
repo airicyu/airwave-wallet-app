@@ -3,6 +3,8 @@
  * It does not own RPC endpoint editing or the home shell tabs.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.HomeDestination
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,8 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.HomeDestination
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.beginSecretEdit
 import com.airwave.wallet.confirmSecret
 import com.airwave.wallet.discardSecret

@@ -3,8 +3,10 @@
  * It does not render Compose screens or parse holdings RPC.
  */
 package com.airwave.wallet
+import com.airwave.wallet.session.Route
 
 import android.util.Base64
+import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.vault.AccountKind
 import com.airwave.wallet.vault.AccountRecord
 import com.airwave.wallet.vault.Bip39

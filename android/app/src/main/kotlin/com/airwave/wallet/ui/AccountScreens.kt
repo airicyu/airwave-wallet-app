@@ -3,6 +3,8 @@
  * The add-account chooser and inner forms live in AddAccountChooser.kt and AddAccountForms.kt.
  */
 package com.airwave.wallet.ui
+import com.airwave.wallet.session.WalletModel
+import com.airwave.wallet.session.HomeDestination
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,8 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.HomeDestination
-import com.airwave.wallet.WalletModel
 import com.airwave.wallet.removeAccount
 import com.airwave.wallet.renameAccount
 import com.airwave.wallet.setActiveAccountId
