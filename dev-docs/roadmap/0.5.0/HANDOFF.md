@@ -2,7 +2,7 @@
 
 ## 狀態
 
-`in progress`。設計審查通過。Track A／B 已寫進 `ui/MwaScreens.kt`、`LocalAssociation.kt`、`mwa/MwaPayloads.kt`。`solana-wallet:` 由 `MwaActivity` 接。手測：`bun run playground`。下一動：INDEX 手驗 1–6，然後實作審查。
+`shipped`（2026-11-07）。`version.md` 與 Android `versionName` 是 `0.5.0`。Playground Connect 已由使用者手測通過。不要開 0.6.0，除非使用者點名。
 
 ## 讀檔順序
 
@@ -10,7 +10,7 @@
 
 ## 產品摘要
 
-MWA 連線、簽署訊息、簽署並送出。畫面對齊 `connect-dapp` 與 `approve-sign-tx` 骨架；三面都有 Lock；不出貨 refresh／第二 mint／即時 AI。手測用 `bun run playground`。`sign_transactions` 仍 decline。待批只在記憶體。`Pending` 欄位見 how Track A。
+MWA 連線頁（`connect-dapp`）。簽署訊息是 0.6.0。簽署交易未排程，三個 sign 方法都直接 decline。手測用 `bun run playground` 的 Connect。待批只在記憶體。
 
 ## Track 順序
 

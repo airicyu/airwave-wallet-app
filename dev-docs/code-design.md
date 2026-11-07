@@ -83,7 +83,19 @@ Add a **new** Activity only when **all** of these hold:
 
 Do **not** add an Activity because a phone frame, title, or file length changed. Today: `MainActivity` is the launcher shell; `MwaActivity` is the `solana-wallet:` session host (own task, same role as FakeWallet's `MobileWalletAdapterActivity`). An INDEX may name another Activity only with the three tests above.
 
-## 8. Structure pass between versions
+There are two Activities and no Fragments. A new in-app screen (Home, Activity tab, send, close account, in-app transaction approval) is a composable on `MainActivity`. Connect, sign message, and sign transaction for one dApp session are composables on `MwaActivity`. Do not add an Activity or a Fragment for those screens.
+
+## 8. Lock screen and what comes next
+
+`AirwaveApp` owns one `WalletModel`. Both Activities read it with `sharedWalletModel()`. Locked means `route` is `Unlock` and the signing seed is only in that model. `UnlockScreen` is one composable. Each Activity's root draws it first and does not draw its own next screen until unlock succeeds.
+
+`unlock()` decrypts, then `applyPlain()` sets `route` to `Home`. If `pending` is already set, the next line sets `route` to `Approval`. `MainActivity` renders only `route`. Send and close-account approvals are that `Approval` route on `MainActivity`, because the caller is the wallet.
+
+`MwaActivity` keeps the session request (`authorize`, and later sign message or sign transaction) in the session host until the user answers. After unlock, `route` is no longer `Unlock`, so the same Activity draws that still-open request. It does not navigate to Home to find the page.
+
+The Scenario and `MwaActivity` stay up through unlock and the approval. `completeWith*` does not `finish()`. Close the Scenario when that dApp session actually ends, then `finish()` so the browser returns. Do not `close` or `finish` merely because the lock screen is showing. If the websocket drops before the user answers, fail that one request and then tear down. Process death fails the in-flight request. The result returns only to that request.
+
+## 9. Structure pass between versions
 
 Run this pass when opening the next named version: **after** version N's implementation review accepts and **before** version N+1's contract is reconciled.
 

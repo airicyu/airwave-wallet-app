@@ -31,7 +31,7 @@ import javax.crypto.AEADBadTagException
 
 /**
  * In-memory wallet session for this process: the unlocked vault, the password box, the shell route, and at most one MWA approval.
- * Compose screens read this object. VaultStore is the durable file; settings edits live in WalletSettings.kt; holdings live on HoldingsModel. The pending approval is never written to disk. If the process dies, the user unlocks again.
+ * Compose screens read this object. VaultStore is the durable file; settings edits live in WalletSettings.kt; holdings live on HoldingsModel. The walletOperationRequest approval is never written to disk. If the process dies, the user unlocks again.
  */
 class WalletModel(app: Application) : AndroidViewModel(app) {
     internal val store = VaultStore(app)
@@ -60,7 +60,7 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     var preview by mutableStateOf<BurnerKey?>(null)
         internal set
     var tab by mutableStateOf(Tab.Assets)
-    var pending by mutableStateOf<Pending?>(null)
+    var walletOperationRequest by mutableStateOf<WalletOperationRequest?>(null)
         private set
     var settings by mutableStateOf(settingsStore.read())
         internal set
@@ -129,8 +129,8 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         }
         bumpUserActivity()
         flushAfterUnlock()
-        if (pending != null && address != null) route = Route.Approval
-        else if (route == Route.Home) syncHoldings(refresh = false)
+        onMwaUnlocked?.invoke()
+        if (route == Route.Home) syncHoldings(refresh = false)
     }
 
     fun startGenerate() {
@@ -180,6 +180,7 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun lock() {
+        onMwaInterrupted?.invoke()
         menuOpen = false
         homeStack = emptyList()
         failPending()
@@ -200,11 +201,20 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     var mwaError by mutableStateOf<String?>(null)
         private set
 
-    fun offer(request: Pending) {
+    /** Host hook for a sign request that is waiting until unlock. Not a second walletOperationRequest store. */
+    internal var onMwaUnlocked: (() -> Unit)? = null
+
+    /** Host hook so lock declines a sign request that has not been offered yet. */
+    internal var onMwaInterrupted: (() -> Unit)? = null
+
+    fun offer(request: WalletOperationRequest) {
         if (approvalSettled) dropSessionChrome()
         val watch = activeAccount()?.kind == AccountKind.Watch
-        if (com.airwave.wallet.mwa.MwaPayloads.failBeforeOffer(pending != null, watch)) {
-            if (watch) mwaError = t("mwa.watchAccount")
+        if (com.airwave.wallet.mwa.MwaPayloads.failBeforeOffer(walletOperationRequest != null, watch)) {
+            if (watch) {
+                mwaError = t("mwa.watchAccount")
+                route = Route.Home
+            }
             request.finish(ApprovalResult.Rejected)
             return
         }
@@ -213,13 +223,27 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
             request.finish(ApprovalResult.Rejected)
             return
         }
-        pending = request
+        walletOperationRequest = request
         approvalSettled = false
-        route = if (address == null) Route.Unlock else Route.Approval
+        route = when {
+            address == null -> Route.Unlock
+            request.kind == WalletOperationKind.Authorize ||
+                request.kind == WalletOperationKind.Reauthorize ||
+                request.kind == WalletOperationKind.SignMessage -> Route.Home
+            else -> Route.Approval
+        }
+    }
+
+    fun beginMwaSession() {
+        mwaError = null
+    }
+
+    internal fun detachOperation() {
+        walletOperationRequest = null
     }
 
     fun approve() {
-        val request = pending ?: return
+        val request = walletOperationRequest ?: return
         val secret = signingSeed ?: run {
             finishApproval(request, ApprovalResult.Failed)
             return
@@ -232,21 +256,34 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun finishApproval(request: Pending, result: ApprovalResult) {
+    private fun finishApproval(request: WalletOperationRequest, result: ApprovalResult) {
         approvalSettled = true
         request.finish(result)
+        if (request.kind == WalletOperationKind.Authorize ||
+            request.kind == WalletOperationKind.Reauthorize ||
+            request.kind == WalletOperationKind.SignMessage
+        ) return
         if (address != null) route = Route.Home
         syncHoldings(refresh = false)
     }
 
     fun reject() {
+        if (walletOperationRequest?.kind == WalletOperationKind.Authorize ||
+            walletOperationRequest?.kind == WalletOperationKind.Reauthorize ||
+            walletOperationRequest?.kind == WalletOperationKind.SignMessage
+        ) {
+            if (approvalSettled) return
+            approvalSettled = true
+            walletOperationRequest?.finish(ApprovalResult.Rejected)
+            return
+        }
         if (approvalSettled) {
             dropSessionChrome()
             if (address != null) route = Route.Home
             return
         }
-        val request = pending
-        pending = null
+        val request = walletOperationRequest
+        walletOperationRequest = null
         request?.finish(ApprovalResult.Rejected)
         if (address != null) {
             route = Route.Home
@@ -259,14 +296,18 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
             dropSessionChrome()
             return
         }
-        val request = pending
-        pending = null
+        val request = walletOperationRequest
+        walletOperationRequest = null
         approving = false
-        request?.finish(ApprovalResult.Rejected)
+        try {
+            request?.finish(ApprovalResult.Rejected)
+        } catch (_: RuntimeException) {
+            // The association is already gone. The in-memory walletOperationRequest is cleared above.
+        }
     }
 
     fun dropSessionChrome() {
-        pending = null
+        walletOperationRequest = null
         approvalSettled = false
         approving = false
     }
@@ -351,8 +392,8 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
             dropSessionChrome()
             return
         }
-        val request = pending
-        pending = null
+        val request = walletOperationRequest
+        walletOperationRequest = null
         request?.finish(ApprovalResult.Rejected)
     }
 
@@ -433,7 +474,7 @@ enum class HomeDestination {
     WalletLockSettings,
 }
 
-/** Carries a result that goes back only to the MWA request that created the pending approval. */
+/** Carries a result that goes back only to the MWA request that created the walletOperationRequest approval. */
 sealed class ApprovalResult {
     /** Returns the public key or message signature bytes for that originating request. */
     data class Bytes(val value: ByteArray) : ApprovalResult()
@@ -446,15 +487,15 @@ sealed class ApprovalResult {
     data object Failed : ApprovalResult()
 }
 
-/** Names the approval chrome MwaScreens should draw for the current pending request. */
-enum class PendingKind { Authorize, SignMessage, SignAndSend }
+/** Names the approval chrome MwaScreens should draw for the current walletOperationRequest request. */
+enum class WalletOperationKind { Authorize, Reauthorize, SignMessage, SignAndSend }
 
 /**
  * One in-memory MWA approval waiting for the user.
  * It is not written to disk. A second offer fails this value in place instead of replacing it, so the originating request still gets a result.
  */
-data class Pending(
-    val kind: PendingKind,
+data class WalletOperationRequest(
+    val kind: WalletOperationKind,
     val identityName: String = "",
     val identityUri: String = "",
     val chain: String = "",

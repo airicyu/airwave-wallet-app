@@ -83,6 +83,7 @@ Do not use: …      (easy to confuse, or retired)
 - **Chinese:** 待批
 - **English:** pending approval
 - **Definition:** An in-flight approve request held in memory. It is not written to disk. If the process dies, it fails.
+- **Code:** `WalletModel.walletOperationRequest` of type `WalletOperationRequest`. Kinds include authorize, reauthorize, and sign message. `MwaActivity` follows `MwaSession.step` on `MwaHostViewModel.screen`. Protocol objects stay in `com.airwave.wallet.mwa`.
 - **Do not use:** a row in the durable store that the UI reloads in order to find the payload
 
 ---

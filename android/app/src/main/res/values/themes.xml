@@ -2,6 +2,7 @@
 <resources>
     <style name="Theme.Airwave.Mwa" parent="@android:style/Theme.Material.NoActionBar">
         <item name="android:windowBackground">#FF0F1419</item>
+        <item name="android:windowSplashScreenBackground">#FF0F1419</item>
         <item name="android:statusBarColor">#FF0F1419</item>
         <item name="android:navigationBarColor">#FF0F1419</item>
         <item name="android:windowAnimationStyle">@null</item>

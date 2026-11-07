@@ -290,6 +290,7 @@
   .balance-hero .v { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
   .btn { border: 0; border-radius: 12px; padding: 14px 16px; font: inherit; font-weight: 650; cursor: default; }
   .btn.primary { background: var(--accent); color: #0b1220; width: 100%; }
+  .btn.primary:disabled { opacity: 0.4; }
   .btn.ghost { background: var(--fill); color: var(--text); border: 1px solid var(--stroke); width: 100%; }
   .btn-row {
     display: flex; gap: 10px; padding: 12px 16px 8px; border-top: 1px solid var(--stroke-soft);
@@ -493,6 +494,36 @@
   }
   .fail-box .ttl { color: var(--danger); font-weight: 700; margin: 0 0 4px; }
   .fail-box code { font-family: var(--mono); font-size: 12px; color: var(--danger); }
+  .fail-details { margin: 8px 0 0; }
+  .fail-details summary { display: list-item; cursor: default; color: var(--text-muted); font-size: 13px; }
+  .fail-summary { display: inline-flex; align-items: center; gap: 8px; width: calc(100% - 1.25em); vertical-align: middle; }
+  .fail-summary span { flex: 1; }
+  .fail-pre {
+    margin: 8px 0 0; max-height: 320px; overflow: auto; white-space: pre-wrap; word-break: break-word;
+    font-family: var(--mono); font-size: 12px; color: var(--text);
+  }
+  .cluster-strip {
+    margin: 0 -16px 12px; padding: 5px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--warn); background: #3a2e14; border-bottom: 1px solid var(--stroke-soft);
+  }
+  .mismatch {
+    border: 1px solid color-mix(in srgb, var(--warn) 55%, var(--stroke));
+    background: #3a2e14; border-radius: var(--radius); padding: 12px 14px; margin: 0 0 12px;
+  }
+  .mismatch-title { margin: 0 0 4px; font-size: 14px; font-weight: 500; color: var(--warn); }
+  .mismatch-body { margin: 0; font-size: 13px; }
+  .cu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .cu-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); }
+  .cu-field input {
+    border: 1px solid var(--stroke); background: var(--bg); color: var(--text);
+    border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 13px;
+  }
+  .msg-card {
+    border: 1px solid var(--stroke); background: var(--bg-elevated); border-radius: var(--radius);
+    padding: 12px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+    max-height: calc(1.5em * 9 + 24px); overflow: auto;
+  }
+  .payload-k { display: block; font-size: 12px; color: var(--text-dim); font-weight: 600; margin: 0 0 6px; }
   .disclosure { display: flex; align-items: center; gap: 8px; padding: 10px 4px; color: var(--text-muted); font-size: 13px; }
   .onboard { flex: 1; display: flex; flex-direction: column; padding: 24px 20px 28px; min-height: 0; }
   .brand-row { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
@@ -627,7 +658,7 @@
 
 <header class="bar">
   <h1>Airwave Wallet — overall mobile design v1</h1>
-  <p>手機稿；chrome／綠盾／token logo 對齊 web 0.52.0（StrokeIcon + Jupiter／token-list；add-account chooser／RPC Helius／Debug mode），非手畫字母 icon。左側切畫面；右欄 designer notes。<strong>手機畫面內禁止放說明字／實作提示</strong>（會被當成 ship UI）；只寫會上線的文案。</p>
+  <p>手機稿；chrome／綠盾／token logo 對齊 web 0.57.0（0.52.0 chooser／RPC／Debug，加上 0.53–0.57 的優先費、v1 費卡、網路不符、失敗詳情、簽署訊息／登入）。左側切畫面；右欄 designer notes。<strong>手機畫面內禁止放說明字／實作提示</strong>（會被當成 ship UI）；只寫會上線的文案。</p>
 </header>
 <div class="layout">
   <nav class="screens" aria-label="Screens">
@@ -748,7 +779,11 @@
     <div class="nav-group">dApp / Approval</div>
     <button type="button" data-screen="connect-dapp">連線 dApp</button>
     <button type="button" data-screen="approve-sign-tx">簽署交易</button>
+    <button type="button" data-screen="approve-sign-tx-v1">簽署交易 — v1 費卡</button>
     <button type="button" data-screen="approve-sign-tx-fail">簽署交易 — 失敗態</button>
+    <button type="button" data-screen="approve-sign-mismatch">簽署交易 — 網路不符</button>
+    <button type="button" data-screen="approve-sign-message">簽署訊息</button>
+    <button type="button" data-screen="approve-sign-in">登入</button>
     <button type="button" data-screen="confirm-reclaim">確認收回</button>
   </nav>
 
@@ -1587,8 +1622,9 @@
           <li><button type="button" class="hub-row"><span class="hub-label">RPC</span><span class="hub-summary">Mainnet · 自訂</span></button></li>
           <li><button type="button" class="hub-row"><span class="hub-label">API 金鑰</span><span class="hub-summary">已設定</span></button></li>
           <li><button type="button" class="hub-row"><span class="hub-label">AI 設定</span><span class="hub-summary">開啟</span></button></li>
-          <li><button type="button" class="hub-row"><span class="hub-label">預設 CU price</span><span class="hub-summary">25000</span></button></li>
-          <li><button type="button" class="hub-row"><span class="hub-label">錢包鎖定</span><span class="hub-summary"></span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">預設 CU 單價</span><span class="hub-summary">25000</span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">預設優先費</span><span class="hub-summary">5000</span></button></li>
+          <li><button type="button" class="hub-row"><span class="hub-label">錢包鎖定設定</span><span class="hub-summary"></span></button></li>
           <li><button type="button" class="hub-row"><span class="hub-label">Debug mode 設定</span><span class="hub-summary">啟用</span></button></li>
         </ul>
       </div>
@@ -1607,6 +1643,7 @@
         </div>
         <label class="field">Jupiter API URL<input type="text" readonly value="" placeholder="https://api.jup.ag" /></label>
         <label class="field">OpenRouter base URL<input type="text" readonly value="" placeholder="https://openrouter.ai" /></label>
+        <label class="field">Mainnet blockhash RPC<input type="text" readonly value="" placeholder="https://api.mainnet-beta.solana.com" /></label>
       </div>
     </section>
 
@@ -1688,12 +1725,110 @@
             <div class="fail-box">
               <p class="ttl">預計交易失敗</p>
               <code>"BlockhashNotFound"</code>
-              <div class="disclosure" style="padding:8px 0 0">▸ 失敗詳情</div>
+              <details class="fail-details" open>
+                <summary>
+                  <span class="fail-summary">
+                    <span>失敗詳情</span>
+                    <button class="icon-btn-sm" type="button" aria-label="複製"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                  </span>
+                </summary>
+                <pre class="fail-pre">{
+  "InstructionError": [0, "BlockhashNotFound"]
+}</pre>
+              </details>
               <p class="hint">無法估計變動</p>
             </div>
           </div>
           <div class="fee-row"><span>交易費</span><strong>0.001405 SOL</strong></div>
           <div class="disclosure">▸ 交易明細 · 指令</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button">拒絕</button>
+          <button class="btn primary" type="button">批准</button>
+        </div>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="approve-sign-tx-v1">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-bottom:0">
+          <div class="top"><button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button></div>
+          <div class="site-line">站點 <code>https://jup.ag</code></div>
+          <h2 style="margin:0;font-size:18px;font-weight:700">簽署交易</h2>
+          <div class="card" style="margin-top:12px">
+            <h4>交易費</h4>
+            <div class="fee-row" style="margin-bottom:8px"><span>簽名費</span><strong>0.000005 SOL</strong></div>
+            <div class="fee-row"><span>優先費</span><strong>0.000005 SOL</strong></div>
+            <div class="cu-grid">
+              <label class="cu-field">CU limit<input type="text" readonly value="1400000" /></label>
+              <label class="cu-field">優先費<input type="text" readonly value="5000" /></label>
+            </div>
+            <button class="btn ghost" type="button" style="margin-top:10px">套用 CU</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button">拒絕</button>
+          <button class="btn primary" type="button">批准</button>
+        </div>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="approve-sign-mismatch">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-bottom:0">
+          <div class="top"><button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button></div>
+          <div class="cluster-strip">Devnet</div>
+          <div class="site-line">站點 <code>https://jup.ag</code></div>
+          <h2 style="margin:0 0 12px;font-size:18px;font-weight:700">簽署交易</h2>
+          <div class="mismatch">
+            <p class="mismatch-title">網路不符</p>
+            <p class="mismatch-body">錢包目前是 Devnet，這筆交易的 blockhash 在 Mainnet 仍有效。</p>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button">拒絕</button>
+          <button class="btn primary" type="button" disabled>批准</button>
+        </div>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="approve-sign-message">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-bottom:0">
+          <div class="top"><button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button></div>
+          <h2 style="margin:0 0 12px;font-size:18px;font-weight:700;text-align:center">簽署訊息</h2>
+          <div class="site-line">站點 <code>https://swap.app</code></div>
+          <span class="payload-k">Message payload</span>
+          <div class="msg-card">swap.app wants you to sign in with your Solana account.
+Nonce: 8f3a1c9e</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button">拒絕</button>
+          <button class="btn primary" type="button">批准</button>
+        </div>
+        <div class="home-gesture" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="approve-sign-in">
+      <div class="screen-stack">
+        <div class="pad tight" style="padding-bottom:0">
+          <div class="top"><button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button></div>
+          <h2 style="margin:0 0 12px;font-size:18px;font-weight:700;text-align:center">登入</h2>
+          <div class="site-line">站點 <code>https://swap.app</code></div>
+          <span class="payload-k">Message payload</span>
+          <div class="msg-card">swap.app wants you to sign in with your Solana account:
+JCLh…1KWj
+
+Sign in to swap.app. This does not send a transaction.
+
+URI: https://swap.app
+Version: 1
+Nonce: 8f3a1c9e
+Issued At: 2026-11-05T02:00:00Z</div>
         </div>
         <div class="btn-row">
           <button class="btn ghost" type="button">拒絕</button>
@@ -1792,12 +1927,12 @@
       <p><strong>Do not ship:</strong> RPC URL（在 Settings → RPC）。</p>
     </div>
     <div class="remark" data-screen="settings-hub">
-      <p><strong>Ship:</strong> hub 列對齊 web 0.52.0（含 <code>Debug mode 設定</code>）；細節頁見 settings-debug／wallet-020。</p>
+      <p><strong>Ship:</strong> hub 列對齊 web 0.57.0：預設 CU 單價之下是預設優先費（新安裝 5000 lamports），再來錢包鎖定設定、Debug mode 設定。</p>
       <p><strong>Do not ship:</strong> API key 明文。</p>
       <ul><li><strong>Mobile:</strong> hub IA 為手機捷徑；web 亦有 settings hub 列。</li></ul>
     </div>
     <div class="remark" data-screen="settings-debug">
-      <p><strong>Ship:</strong> Debug mode 總開關（產品預設關）；開啟後才顯示 Jupiter API URL、OpenRouter base URL 覆寫欄。空值＝內建 origin（placeholder）。關閉時忽略覆寫。</p>
+      <p><strong>Ship:</strong> Debug mode 總開關（產品預設關）；開啟後才顯示 Jupiter API URL、OpenRouter base URL、Mainnet blockhash RPC。空值＝內建 origin。關閉時忽略覆寫。</p>
       <p><strong>Do not ship:</strong> 真實 vendor URL／金鑰；畫面內「與 web 一致」類備註。</p>
       <ul><li><strong>Mobile:</strong> 稿展示開啟態以露出 URL 欄；hub summary 用「啟用」對應該態。</li></ul>
     </div>
@@ -1809,9 +1944,21 @@
       <p><strong>Ship:</strong> AI 為 web 同款單列卡（bot＋「AI 分析」＋風險指數＋藍圓報告鈕；報告開 overlay，卡內不展開）。預期變動、交易費、拒絕｜批准 sticky。</p>
       <ul><li><strong>Mobile:</strong> full-screen approval；綠＋／紅− deltas。</li></ul>
     </div>
+    <div class="remark" data-screen="approve-sign-tx-v1">
+      <p><strong>Ship:</strong> v1 費卡兩欄是 CU limit 與優先費（lamports），沒有 CU price。Legacy／v0 仍是 CU limit ＋ CU price（見簽署交易主畫面的交易費列）。套用只改 config。</p>
+    </div>
     <div class="remark" data-screen="approve-sign-tx-fail">
-      <p><strong>Ship:</strong> BlockhashNotFound 等高對比失敗態 + AI 低風險並存。</p>
+      <p><strong>Ship:</strong> 失敗詳情用 disclosure marker，展開區最高 320px，摘要列有複製。批准仍可用。AI 低風險可並存。</p>
       <p><strong>Do not ship:</strong> 隱瞞模擬失敗。</p>
+    </div>
+    <div class="remark" data-screen="approve-sign-mismatch">
+      <p><strong>Ship:</strong> 錢包在 Devnet 時，帳戶列下有 Devnet 細條。blockhash 只在另一個網路仍有效時顯示「網路不符」，批准停用，拒絕可用。Mainnet 錢包沒有細條，文案改成錢包目前是 Mainnet。</p>
+    </div>
+    <div class="remark" data-screen="approve-sign-message">
+      <p><strong>Ship:</strong> 與可讀 signMessage 同一殼。標題「簽署訊息」。一張 Message payload，最多九行再捲動。Off-chain 與 raw message 畫面相同，沒有格式切換。</p>
+    </div>
+    <div class="remark" data-screen="approve-sign-in">
+      <p><strong>Ship:</strong> 標題「登入」。同一張卡顯示錢包組好的 SIWS 原文；沒送的欄位整行不出現。useOffchainMessage 不改變這個畫面。</p>
     </div>
     <div class="remark" data-screen="confirm-reclaim">
       <p><strong>Ship:</strong> 收回額、帳戶／交易數、手續費拆分、確認。Home 收回 icon 用 web 綠 #3ddc84（close-empty-btn.active）。</p>

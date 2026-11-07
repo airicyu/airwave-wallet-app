@@ -1,4 +1,4 @@
-# wallet-overall-v1 vs web wallet — review (2026-10-24; 0.52.0 pass 2026-10-25)
+# wallet-overall-v1 vs web wallet — review (2026-10-24; 0.57.0 pass 2026-11-06)
 
 Sources: `captures/` + `DEMO-UI-NOTES.md` + `airwave-ext/.../popup/` (StrokeIcon, TokenTrust, RpcGuide, close-empty `#3ddc84`, base.css tokens).  
 Design: `wallet-overall-v1.html` + `icons/`.
@@ -106,5 +106,6 @@ Windows sync target (this pass):
 - 2026-10-24：Eric 決定拿掉 Home 頂欄 scan／展開 icon（無 sidebar／popup）；`wallet-overall-v1.html` 已刪 3 處。
 - **2026-10-24:** `home-assets-combined` expand／breakdown 對齊 web `HomeTokenList`（`row-expand-btn` + shortAddr＋％＋bar；非帳戶名橫列）。
 - **2026-10-25:** Align overall-v1 to web **0.52.0** — add-account chooser confirmed icon＋subtitle; RPC Helius copy confirmed; added `settings-debug` + hub「Debug mode 設定」; READMEs note 0.52.0.
+- **2026-11-06:** Align overall-v1 to web **0.57.0** — hub「預設優先費」; v1 fee card; Devnet strip + network mismatch; failure details 320px + copy; sign message and sign in; debug Mainnet blockhash RPC.
 - **2026-10-25 (later):** Accounts subtree screens added to overall-v1 (`add-generate-seed` … `account-reveal-key`); aggregate create aligned to web manage layout (main-pick／grip／trash／+); accounts list shows combined card with switch.
   - Skipped: import-seed **pick-index** step (only words step); address-book (`address-cards*`) — not under Accounts priority; non-combined manage delete-confirm as its own screen (reveal covered).

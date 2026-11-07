@@ -12,7 +12,7 @@ Versions proceed one named INDEX at a time. Do not open the next number unless t
 |------|---------|
 | [GUIDELINES.md](./GUIDELINES.md) | How to write a self-sufficient version INDEX |
 | [agent-workflow.md](./agent-workflow.md) | Design review, HANDOFF, Tracks, ship checklist |
-| [../code-design.md](../code-design.md) | Kotlin file responsibility, 400-line review, headers |
+| [../code-design.md](../code-design.md) | Kotlin file responsibility, Activities, shared lock, MWA session |
 | [../DOMAIN.md](../DOMAIN.md) | Domain terms |
 | [../design-principles.md](../design-principles.md) | Screen rules when INDEX is silent |
 | [unversioned.md](./unversioned.md) | Code changes not yet assigned to a version |
@@ -24,7 +24,8 @@ Versions proceed one named INDEX at a time. Do not open the next number unless t
 | [0.2.0](./0.2.0/INDEX.md) | shipped | Hamburger menu (empty rows + Settings + Lock); settings hub; mobile UI + blue theme |
 | [0.3.0](./0.3.0/INDEX.md) | shipped | Home assets: SOL, SPL, Token-2022, Jupiter shield |
 | [0.4.0](./0.4.0/INDEX.md) | shipped | Account list: 12-word, burner, import, watch. Combined row does not create |
-| [0.5.0](./0.5.0/INDEX.md) | in progress | MWA connect, sign message, sign-and-send; approval chrome; Solana Mobile playground |
+| [0.5.0](./0.5.0/INDEX.md) | shipped | MWA connect on `MwaActivity`; unlock stays on that session; sign methods decline |
+| [0.6.0](./0.6.0/INDEX.md) | shipped | MWA `sign_messages` on `MwaActivity`; no off-chain message format |
 
 **Patch** (`0.1.1`, …) = bugfix for the current minor only. **Minor** (`0.2.0`, …) = new scheduled features.
 

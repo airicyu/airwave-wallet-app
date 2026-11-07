@@ -33,6 +33,27 @@ class MwaPayloadsTest {
     }
 
     @Test
+    fun multiPayloadDeclinesBeforeOffer() {
+        val one = "hello".toByteArray()
+        assertTrue(MwaPayloads.declineBeforeOffer(null))
+        assertTrue(MwaPayloads.declineBeforeOffer(arrayOf(ByteArray(0))))
+        assertTrue(MwaPayloads.declineBeforeOffer(arrayOf(ByteArray(0), one)))
+        assertTrue(MwaPayloads.declineBeforeOffer(arrayOf(one, one)))
+        assertFalse(MwaPayloads.declineBeforeOffer(arrayOf(one)))
+    }
+
+    @Test
+    fun addressListMustBeExactlyTheActiveKey() {
+        val active = byteArrayOf(1, 2, 3)
+        val other = byteArrayOf(9, 9, 9)
+        assertTrue(MwaPayloads.addressesAllow(null, active))
+        assertTrue(MwaPayloads.addressesAllow(emptyArray(), active))
+        assertTrue(MwaPayloads.addressesAllow(arrayOf(active), active))
+        assertFalse(MwaPayloads.addressesAllow(arrayOf(other), active))
+        assertFalse(MwaPayloads.addressesAllow(arrayOf(active, other), active))
+    }
+
+    @Test
     fun secondPendingAndWatchFailBeforeOffer() {
         assertTrue(MwaPayloads.failBeforeOffer(hasPending = true, isWatch = false))
         assertTrue(MwaPayloads.failBeforeOffer(hasPending = false, isWatch = true))

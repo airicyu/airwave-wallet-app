@@ -1,6 +1,6 @@
 # Airwave Wallet App — agent guide
 
-This repo is the **Airwave wallet app**. **0.1.0** through **0.4.0** are `shipped`. Work proceeds **one named version at a time**. Do not open the next version unless the user names it. Separate from the Chrome extension repo `airicyu/airwave-wallet`. Do not implement extension code here, and do not apply that repo's roadmap.
+This repo is the **Airwave wallet app**. **0.1.0** through **0.6.0** are `shipped`. Work proceeds **one named version at a time**. Do not open the next version unless the user names it. Separate from the Chrome extension repo `airicyu/airwave-wallet`. Do not implement extension code here, and do not apply that repo's roadmap.
 
 Feature ideas: [`dev-docs/roadmap/backlog/INDEX.md`](dev-docs/roadmap/backlog/INDEX.md).
 

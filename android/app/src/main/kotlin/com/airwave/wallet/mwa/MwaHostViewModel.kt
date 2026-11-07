@@ -1,18 +1,16 @@
-package com.airwave.wallet
+package com.airwave.wallet.mwa
 
 import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.airwave.wallet.vault.BurnerKeys
-import com.solana.mobilewalletadapter.common.ProtocolContract
+import com.airwave.wallet.WalletModel
 import com.solana.mobilewalletadapter.walletlib.association.AssociationUri
 import com.solana.mobilewalletadapter.walletlib.association.LocalAssociationUri
 import com.solana.mobilewalletadapter.walletlib.authorization.AuthIssuerConfig
 import com.solana.mobilewalletadapter.walletlib.protocol.MobileWalletAdapterConfig
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
-import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizedAccount
 import com.solana.mobilewalletadapter.walletlib.scenario.DeauthorizedEvent
 import com.solana.mobilewalletadapter.walletlib.scenario.LocalScenario
 import com.solana.mobilewalletadapter.walletlib.scenario.ReauthorizeRequest
@@ -23,19 +21,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 
 /**
- * Activity-scoped MWA session host, copied from FakeWallet's MobileWalletAdapterViewModel.
- * It owns the Scenario, exposes one request at a time, and does not own the vault. WalletModel still holds unlock key material.
+ * Owns one Mobile Wallet Adapter Scenario for this Activity.
+ * Method handling and the screen step live on [MwaSession]. This class starts, replaces, and closes the association.
  */
 class MwaHostViewModel(application: Application) : AndroidViewModel(application) {
     private val events = MutableStateFlow<MwaEvent>(MwaEvent.None)
     val mobileWalletAdapterServiceEvents = events.asSharedFlow()
 
+    val screen = MwaSession()
     private var scenario: LocalScenario? = null
+    private var dropTeardown = false
+
+    fun bindWallet(model: WalletModel) = screen.bindWallet(model)
 
     fun processLaunch(intent: Intent?): Boolean {
+        screen.noteLaunch()
         val data = intent?.data
         if (data == null) {
             Log.e(TAG, "Intent has no data URI")
@@ -50,6 +52,13 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
             Log.w(TAG, "Remote association is not supported")
             return false
         }
+        val previous = scenario
+        scenario = null
+        if (previous != null) {
+            screen.abandonOperation()
+            dropTeardown = true
+            previous.close()
+        }
         scenario = associationUri.createScenario(
             getApplication<Application>().applicationContext,
             MobileWalletAdapterConfig(
@@ -57,10 +66,7 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
                 10,
                 arrayOf(MobileWalletAdapterConfig.LEGACY_TRANSACTION_VERSION, 0),
                 LOW_POWER_NO_CONNECTION_TIMEOUT_MS,
-                arrayOf(
-                    ProtocolContract.FEATURE_ID_SIGN_TRANSACTIONS,
-                    ProtocolContract.FEATURE_ID_SIGN_IN_WITH_SOLANA,
-                ),
+                arrayOf<String>("solana:signMessages"),
             ),
             AuthIssuerConfig("Airwave"),
             Callbacks(),
@@ -73,23 +79,9 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
         scenario = null
     }
 
-    fun authorizeDapp(request: AuthorizeRequest, authorized: Boolean, publicKey: ByteArray?, label: String) {
-        viewModelScope.launch {
-            if (!authorized || publicKey == null) {
-                request.completeWithDecline()
-                return@launch
-            }
-            val account = AuthorizedAccount(
-                publicKey,
-                BurnerKeys.base58(publicKey),
-                "base58",
-                label,
-                null,
-                null,
-                null,
-            )
-            request.completeWithAuthorize(arrayOf(account), null, "web".toByteArray(), null)
-        }
+    fun completeReauthorize(allowed: Boolean) {
+        screen.completeReauthorize(allowed)
+        events.value = MwaEvent.None
     }
 
     private inner class Callbacks : LocalScenario.Callbacks {
@@ -104,8 +96,12 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
         override fun onScenarioComplete() = Unit
         override fun onScenarioError() = Unit
         override fun onScenarioTeardownComplete() {
-            viewModelScope.launch {
-                events.value = MwaEvent.SessionTerminated
+            if (dropTeardown) {
+                dropTeardown = false
+                return
+            }
+            viewModelScope.launch(Dispatchers.Main) {
+                screen.markFinished()
             }
         }
         override fun onLowPowerAndNoConnection() {
@@ -115,11 +111,11 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
         }
 
         override fun onAuthorizeRequest(request: AuthorizeRequest) {
-            events.value = MwaEvent.AuthorizeDapp(request)
+            viewModelScope.launch(Dispatchers.Main) { screen.offerAuthorize(request) }
         }
 
         override fun onReauthorizeRequest(request: ReauthorizeRequest) {
-            request.completeWithReauthorize()
+            viewModelScope.launch(Dispatchers.Main) { screen.offerReauthorize(request) }
         }
 
         override fun onSignTransactionsRequest(request: SignTransactionsRequest) {
@@ -127,7 +123,7 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
         }
 
         override fun onSignMessagesRequest(request: SignMessagesRequest) {
-            request.completeWithDecline()
+            viewModelScope.launch(Dispatchers.Main) { screen.offerSignMessage(request) }
         }
 
         override fun onSignAndSendTransactionsRequest(request: SignAndSendTransactionsRequest) {
@@ -139,18 +135,8 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    sealed interface MwaEvent {
-        data object None : MwaEvent
-        data object SessionTerminated : MwaEvent
-        data object LowPowerNoConnection : MwaEvent
-        data class AuthorizeDapp(val request: AuthorizeRequest) : MwaEvent
-    }
-
     companion object {
         private val TAG = MwaHostViewModel::class.simpleName
         private const val LOW_POWER_NO_CONNECTION_TIMEOUT_MS = 3000L
     }
 }
-
-fun publicKeyFromSeed(seed: ByteArray): ByteArray =
-    Ed25519PrivateKeyParameters(seed, 0).generatePublicKey().encoded

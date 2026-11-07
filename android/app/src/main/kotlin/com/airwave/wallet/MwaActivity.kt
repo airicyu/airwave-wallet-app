@@ -1,5 +1,6 @@
 package com.airwave.wallet
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -18,17 +19,19 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.airwave.wallet.mwa.MwaHostViewModel
+import com.airwave.wallet.mwa.MwaStep
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.AirwaveTheme
 import com.airwave.wallet.ui.AirwavePrimaryButton
+import com.airwave.wallet.ui.SignMessageBody
 
 /**
- * Dedicated MWA host Activity, the same role as FakeWallet's MobileWalletAdapterActivity.
+ * Dedicated MWA host Activity.
  * It shows the associate wait, then the authorize screen, and finish()es when the Scenario tears down.
  */
 class MwaActivity : ComponentActivity() {
@@ -38,29 +41,32 @@ class MwaActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        session.bindWallet(wallet)
         setContent {
             AirwaveTheme {
-                val event by session.mobileWalletAdapterServiceEvents.collectAsState(
-                    MwaHostViewModel.MwaEvent.None,
-                )
-                LaunchedEffect(event) {
-                    if (event is MwaHostViewModel.MwaEvent.SessionTerminated && !isFinishing) {
-                        finish()
-                    }
+                val step = session.screen.step
+                LaunchedEffect(step) {
+                    if (step is MwaStep.Finished && !isFinishing) finish()
                 }
                 Box(
                     Modifier
                         .fillMaxSize()
                         .background(AirwaveColors.Bg),
                 ) {
-                    val authorize = event as? MwaHostViewModel.MwaEvent.AuthorizeDapp
-                    when {
-                        wallet.route == Route.Unlock ||
-                            (wallet.store.exists() && wallet.address == null) ->
-                            UnlockScreen(wallet)
-                        authorize != null ->
-                            FakeWalletAuthorize(wallet, session, authorize)
-                        else -> AssociateWait()
+                    val vaultLocked = wallet.store.exists() && wallet.address == null
+                    when (step) {
+                        is MwaStep.UnlockConnect,
+                        is MwaStep.UnlockReauthorize,
+                        is MwaStep.UnlockSignMessage,
+                        -> UnlockScreen(wallet)
+                        is MwaStep.ConnectApproval ->
+                            ConnectApproval(wallet, step.request)
+                        is MwaStep.SignMessageApproval ->
+                            SignMessageBody(wallet, step.request)
+                        is MwaStep.WatchBlocked -> WatchNotice(step.message)
+                        MwaStep.Finished,
+                        MwaStep.Waiting,
+                        -> if (vaultLocked) UnlockScreen(wallet) else AssociateWait()
                     }
                 }
             }
@@ -72,8 +78,24 @@ class MwaActivity : ComponentActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (!session.processLaunch(intent)) {
+            Log.w(TAG, "Invalid new intent; finishing activity")
+            finish()
+        }
+    }
+
     companion object {
         private val TAG = MwaActivity::class.simpleName
+    }
+}
+
+@Composable
+private fun WatchNotice(message: String) {
+    Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+        Text(message, color = AirwaveColors.Text)
     }
 }
 
@@ -85,12 +107,7 @@ private fun AssociateWait() {
 }
 
 @Composable
-private fun FakeWalletAuthorize(
-    wallet: WalletModel,
-    session: MwaHostViewModel,
-    event: MwaHostViewModel.MwaEvent.AuthorizeDapp,
-) {
-    val request = event.request
+private fun ConnectApproval(wallet: WalletModel, approval: WalletOperationRequest) {
     Column(
         Modifier
             .fillMaxSize()
@@ -98,26 +115,11 @@ private fun FakeWalletAuthorize(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(request.identityName ?: "", color = AirwaveColors.Text)
-        Text(request.identityUri?.toString() ?: "", color = AirwaveColors.TextMuted)
+        Text(approval.identityName, color = AirwaveColors.Text)
+        Text(approval.identityUri, color = AirwaveColors.TextMuted)
         Spacer(Modifier.height(24.dp))
-        AirwavePrimaryButton(
-            wallet.t("mwa.connect.action"),
-            {
-                val seed = wallet.signingSeed
-                val pub = seed?.let { publicKeyFromSeed(it) }
-                session.authorizeDapp(
-                    request,
-                    pub != null,
-                    pub,
-                    wallet.activeAccount()?.label ?: "",
-                )
-            },
-        )
+        AirwavePrimaryButton(wallet.t("mwa.connect.action"), { wallet.approve() })
         Spacer(Modifier.height(12.dp))
-        AirwavePrimaryButton(
-            wallet.t("mwa.reject"),
-            { session.authorizeDapp(request, false, null, "") },
-        )
+        AirwavePrimaryButton(wallet.t("mwa.reject"), { wallet.reject() })
     }
 }

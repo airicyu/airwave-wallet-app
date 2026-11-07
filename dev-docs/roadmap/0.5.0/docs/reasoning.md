@@ -1,10 +1,10 @@
 # 0.5.0 — reasoning
 
-0.1.0 已把 MWA wallet endpoint 接上。之後幾版改了帳戶與資產，批准畫面仍是鍵值清單，和 overall-v1 的連線／簽署交易電話框不一致。手測用官方 Solana Mobile playground 驗連線、簽訊息、簽交易，必須先把這三條使用者路徑寫成可對照的畫面契約。
+0.1.0 already exposed the MWA wallet endpoint. Later versions changed accounts and assets; the connect screen is still a name, a URI, and two buttons, not the overall-v1 `connect-dapp` frame. This version ships that connect page only. Sign message is 0.6.0. Sign-and-send is unscheduled.
 
 ## 做法
 
-協定與待批規則不重開。本版只換 UI 組裝。手測客戶端用官方 playground（`authorize`、`signMessage`、`sendTransaction`／`sign_and_send_transactions`），不在倉庫內放第二套測試 dApp。
+協定與待批規則不重開。本版只換連線畫面。手測客戶端用官方 playground 的 Connect。Sign message 與 Sign and send 本版直接 decline。
 
 「簽交易」對齊測試頁與 spec 2.x 的強制能力 `solana:signAndSendTransaction`，而不是 deprecated 的 `sign_transactions`。後者繼續 decline，避免假裝有第二條產品流。
 

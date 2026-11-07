@@ -37,10 +37,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airwave.wallet.Pending
-import com.airwave.wallet.PendingKind
+import com.airwave.wallet.WalletOperationRequest
+import com.airwave.wallet.WalletOperationKind
 import com.airwave.wallet.R
 import com.airwave.wallet.WalletModel
 import com.airwave.wallet.holdings.BaseUnits
@@ -49,7 +50,7 @@ import java.math.BigInteger
 
 @Composable
 fun MwaApprovalScreen(model: WalletModel) {
-    val pending = model.pending ?: return
+    val pending = model.walletOperationRequest ?: return
     Column(
         Modifier
             .fillMaxSize()
@@ -58,15 +59,16 @@ fun MwaApprovalScreen(model: WalletModel) {
             .navigationBarsPadding(),
     ) {
         when (pending.kind) {
-            PendingKind.Authorize -> ConnectBody(model, pending)
-            PendingKind.SignMessage -> SignMessageBody(model, pending)
-            PendingKind.SignAndSend -> SignTxBody(model, pending)
+            WalletOperationKind.Authorize -> ConnectBody(model, pending)
+            WalletOperationKind.Reauthorize -> Unit
+            WalletOperationKind.SignMessage -> SignMessageBody(model, pending)
+            WalletOperationKind.SignAndSend -> SignTxBody(model, pending)
         }
     }
 }
 
 @Composable
-private fun ConnectBody(model: WalletModel, pending: Pending) {
+private fun ConnectBody(model: WalletModel, pending: WalletOperationRequest) {
     Column(Modifier.fillMaxSize()) {
         ApprovalTop(
             title = model.t("mwa.connect.title"),
@@ -110,7 +112,7 @@ private fun ConnectBody(model: WalletModel, pending: Pending) {
 }
 
 @Composable
-private fun SignMessageBody(model: WalletModel, pending: Pending) {
+internal fun SignMessageBody(model: WalletModel, pending: WalletOperationRequest) {
     Column(Modifier.fillMaxSize()) {
         ApprovalTop(
             title = model.t("mwa.signMessage.title"),
@@ -118,6 +120,7 @@ private fun SignMessageBody(model: WalletModel, pending: Pending) {
             lockLabel = model.t("menu.lock"),
             onBack = { model.reject() },
             onLock = { model.lock() },
+            centeredTitle = true,
         )
         Column(
             Modifier
@@ -146,7 +149,7 @@ private fun SignMessageBody(model: WalletModel, pending: Pending) {
 }
 
 @Composable
-private fun SignTxBody(model: WalletModel, pending: Pending) {
+private fun SignTxBody(model: WalletModel, pending: WalletOperationRequest) {
     var openDetails by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize()) {
         Row(
@@ -210,7 +213,14 @@ private fun SignTxBody(model: WalletModel, pending: Pending) {
 }
 
 @Composable
-private fun ApprovalTop(title: String, backLabel: String, lockLabel: String, onBack: () -> Unit, onLock: () -> Unit) {
+private fun ApprovalTop(
+    title: String,
+    backLabel: String,
+    lockLabel: String,
+    onBack: () -> Unit,
+    onLock: () -> Unit,
+    centeredTitle: Boolean = false,
+) {
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -218,7 +228,14 @@ private fun ApprovalTop(title: String, backLabel: String, lockLabel: String, onB
         IconButton(onClick = onBack, modifier = Modifier.semantics { contentDescription = backLabel }) {
             Icon(painterResource(R.drawable.ic_stroke_back), backLabel, tint = AirwaveColors.Text)
         }
-        Text(title, color = AirwaveColors.Text, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f), fontSize = 16.sp)
+        Text(
+            title,
+            color = AirwaveColors.Text,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(1f),
+            fontSize = 16.sp,
+            textAlign = if (centeredTitle) TextAlign.Center else TextAlign.Start,
+        )
         LockButton(lockLabel, onLock)
     }
 }
@@ -231,7 +248,7 @@ private fun LockButton(label: String, onLock: () -> Unit) {
 }
 
 @Composable
-private fun AccountChip(pending: Pending, modifier: Modifier = Modifier) {
+private fun AccountChip(pending: WalletOperationRequest, modifier: Modifier = Modifier) {
     Row(
         modifier
             .clip(RoundedCornerShape(20.dp))
@@ -256,7 +273,7 @@ private fun AccountChip(pending: Pending, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SiteLine(model: WalletModel, pending: Pending) {
+private fun SiteLine(model: WalletModel, pending: WalletOperationRequest) {
     val site = pending.identityUri.ifBlank { pending.identityName }
     Text("${model.t("mwa.site")} $site", color = AirwaveColors.TextMuted)
 }

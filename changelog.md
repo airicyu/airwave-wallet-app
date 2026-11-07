@@ -1,10 +1,12 @@
 # Changelog
 
-## Next
+## 0.6.0 — 2026-11-08
 
-## 0.5.0 (unreleased)
+MWA sign message. A connected dApp can request `sign_messages`. `MwaActivity` shows the message bytes and returns one ed25519 signature. The vault stays on that activity's unlock screen when it is locked. `sign_transactions` and `sign_and_send_transactions` still decline.
 
-MWA hand-test: `bun run playground` starts Solana Mobile playground (`http://localhost:4747` on the emulator). Local association implements `LocalScenario.Callbacks` so the wallet websocket binds. A later playground Connect/Sign with a cached `auth_token` reauthorizes silently when the session is unlocked. `solana-wallet:` opens `MwaActivity` (overlay), not Home; `finish()` returns to the dApp. Approval chrome for connect, sign message, and sign-and-send. The repo no longer ships `mwa-test-web/`.
+## 0.5.0 — 2026-11-07
+
+MWA connect. `solana-wallet:` opens `MwaActivity`. A locked vault stays on the unlock screen until the user unlocks, then Connect authorizes the active account. The walletlib auth database is kept so a later `auth_token` can reauthorize. `sign_messages` is 0.6.0. Sign-and-send stays unscheduled. `bun run playground` starts Solana Mobile playground (`http://localhost:4747` on the emulator). The repo no longer ships `mwa-test-web/`.
 
 ## 0.4.0 — 2026-10-26
 

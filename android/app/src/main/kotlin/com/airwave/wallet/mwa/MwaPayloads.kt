@@ -35,4 +35,19 @@ object MwaPayloads {
 
     fun failBeforeOffer(hasPending: Boolean, isWatch: Boolean): Boolean =
         hasPending || isWatch
+
+    /** True when the wallet must decline before offer: no payload, an empty first payload, or more than one. */
+    fun declineBeforeOffer(payloads: Array<ByteArray>?): Boolean {
+        if (emptyPayloads(payloads)) return true
+        return payloads!!.size != 1
+    }
+
+    /**
+     * True when there is no address list, or the list is exactly the active public key.
+     * Any other list is not valid for this account.
+     */
+    fun addressesAllow(addresses: Array<ByteArray>?, active: ByteArray): Boolean {
+        if (addresses == null || addresses.isEmpty()) return true
+        return addresses.size == 1 && addresses[0].contentEquals(active)
+    }
 }

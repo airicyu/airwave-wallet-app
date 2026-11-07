@@ -1,6 +1,6 @@
 # Airwave mobile design demos (overall pack)
 
-Static **phone sketches** for the native Android wallet. This folder holds the **overall v1** pack aligned to web wallet **0.52.0** (add-account chooser rows, RPC Helius copy, Debug mode settings), derived from Eric’s live web UI demo + notes, plus a copy of the 0.2.0 chrome pattern for Settings depth.
+Static **phone sketches** for the native Android wallet. This folder holds the **overall v1** pack aligned to web wallet **0.57.0** (0.52.0 chooser / RPC / Debug, plus 0.53–0.57 priority fee, v1 fee card, network mismatch, failure details, sign message / sign in), derived from Eric’s live web UI demo + notes, plus a copy of the 0.2.0 chrome pattern for Settings depth.
 
 ## Files
 
@@ -32,7 +32,7 @@ Authoritative inputs used to build this pack:
 - `../demo/DEMO-UI-NOTES.md`
 - `../captures/` (+ INDEX)
 - `../design-principles.md`
-- `../web-0.51-screen-inventory.md` (baseline inventory; product deltas through **0.52.0**)
+- `../web-0.51-screen-inventory.md` (baseline inventory; product deltas through **0.57.0**)
 - Web `dev-docs/design-demos/0.52.0/add-account-chooser-ux.html` + `wallet/src` i18n / settings
 - `../wallet-020.html` (chrome pattern / Settings depth)
 
@@ -76,7 +76,11 @@ Authoritative inputs used to build this pack:
 | `settings-debug` | Debug mode 設定（Jupiter／OpenRouter URL） |
 | `connect-dapp` | 連線 jup.ag |
 | `approve-sign-tx` | 簽署交易（預期變動優先） |
-| `approve-sign-tx-fail` | 簽署交易 + BlockhashNotFound |
+| `approve-sign-tx-v1` | 簽署交易 v1 費卡（CU limit＋優先費） |
+| `approve-sign-tx-fail` | 簽署交易 + 失敗詳情（320px、複製） |
+| `approve-sign-mismatch` | 簽署交易 Devnet 細條 + 網路不符 |
+| `approve-sign-message` | 簽署訊息（九行卡） |
+| `approve-sign-in` | 登入（SIWS 原文） |
 | `confirm-reclaim` | 確認收回 |
 
 ## 0.52.0 alignment
@@ -84,6 +88,14 @@ Authoritative inputs used to build this pack:
 - **Add-account chooser:** five icon＋title＋subtitle rows; **Accounts subtree** now includes generate／import／watch／combined create＋member flows, rename／switch／manage／reveal (web route ids). Import *sub*-chooser = title＋chevron only.
 - **RPC guide:** Helius link = 「向 Helius 申請 RPC endpoint」— no 「免費」／「申請 API key」.
 - **Debug mode settings:** hub row + detail screen; default off in product; demo shows on so URL override fields are visible.
+
+## 0.53.0–0.57.0 alignment
+
+- **0.53:** Devnet strip on a Devnet sign approval; network-mismatch card disables Approve. Debug-on adds Mainnet blockhash RPC. A fresh install starts on Mainnet (network screen already selects Mainnet).
+- **0.54:** Settings hub row「預設優先費」under「預設 CU 單價」, summary `5000`. v1 fee card edits CU limit and priority fee in lamports.
+- **0.55:** no wallet UI change.
+- **0.56:** Sign message and Sign in share one message card, nine lines then scroll. Titles「簽署訊息」／「登入」.
+- **0.57:** Failed simulation details stay a disclosure, max-height 320px, with a copy control on the summary.
 
 ## Visual / UX contract (summary)
 
