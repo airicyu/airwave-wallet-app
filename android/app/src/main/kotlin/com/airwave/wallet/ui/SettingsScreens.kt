@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -56,7 +55,6 @@ internal fun SettingsHubScreen(model: WalletModel) {
         Modifier
             .fillMaxSize()
             .background(AirwaveColors.Bg)
-            .statusBarsPadding()
             .padding(20.dp),
     ) {
         SubTopBar(model, "settings.title")
@@ -111,7 +109,7 @@ private fun localeEndonym(tag: LocaleTag): String = when (tag) {
 
 @Composable
 internal fun LanguageScreen(model: WalletModel) {
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(horizontal = 16.dp, vertical = 8.dp)) {
         SubTopBar(model, "settings.language")
         Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             LocaleTag.entries.forEach { tag ->
@@ -131,7 +129,7 @@ internal fun LanguageScreen(model: WalletModel) {
 
 @Composable
 internal fun ApiKeysScreen(model: WalletModel) {
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).statusBarsPadding().padding(20.dp).verticalScroll(rememberScrollState())) {
+    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(20.dp).verticalScroll(rememberScrollState())) {
         SubTopBar(model, "settings.apiKeys")
         secretField(model, SecretFieldId.Helius, model.t("settings.helius"), model.settings.heliusApiUrl) {
             model.updateSettings { s -> s.copy(heliusApiUrl = it) }
@@ -171,7 +169,7 @@ private fun secretField(
 
 @Composable
 internal fun AiSettingsScreen(model: WalletModel) {
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).statusBarsPadding().padding(20.dp).verticalScroll(rememberScrollState())) {
+    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(20.dp).verticalScroll(rememberScrollState())) {
         SubTopBar(model, "settings.ai")
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text(model.t("settings.ai"), color = AirwaveColors.Text)
@@ -244,7 +242,7 @@ private fun modelChainBlock(model: WalletModel, title: String, report: Boolean) 
 @Composable
 internal fun CuPriceScreen(model: WalletModel) {
     var draft by remember(model.settings.defaultCuPrice) { mutableStateOf(model.settings.defaultCuPrice.toString()) }
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).statusBarsPadding().padding(20.dp)) {
+    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(20.dp)) {
         SubTopBar(model, "settings.cuPrice")
         OutlinedTextField(
             draft,
@@ -277,7 +275,6 @@ internal fun WalletLockSettingsScreen(model: WalletModel) {
         Modifier
             .fillMaxSize()
             .background(AirwaveColors.Bg)
-            .statusBarsPadding()
             .padding(20.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),

@@ -38,7 +38,8 @@ fun WalletModel.offer(request: WalletOperationRequest) {
         address == null -> Route.Unlock
         request.kind == WalletOperationKind.Authorize ||
             request.kind == WalletOperationKind.Reauthorize ||
-            request.kind == WalletOperationKind.SignMessage -> Route.Home
+            request.kind == WalletOperationKind.SignMessage ||
+            request.kind == WalletOperationKind.SignTransaction -> Route.Home
         else -> Route.Approval
     }
 }
@@ -70,7 +71,8 @@ private fun WalletModel.finishApproval(request: WalletOperationRequest, result: 
     request.finish(result)
     if (request.kind == WalletOperationKind.Authorize ||
         request.kind == WalletOperationKind.Reauthorize ||
-        request.kind == WalletOperationKind.SignMessage
+        request.kind == WalletOperationKind.SignMessage ||
+        request.kind == WalletOperationKind.SignTransaction
     ) return
     if (address != null) route = Route.Home
     syncHoldings(refresh = false)
@@ -79,11 +81,18 @@ private fun WalletModel.finishApproval(request: WalletOperationRequest, result: 
 fun WalletModel.reject() {
     if (walletOperationRequest?.kind == WalletOperationKind.Authorize ||
         walletOperationRequest?.kind == WalletOperationKind.Reauthorize ||
-        walletOperationRequest?.kind == WalletOperationKind.SignMessage
+        walletOperationRequest?.kind == WalletOperationKind.SignMessage ||
+        walletOperationRequest?.kind == WalletOperationKind.SignTransaction
     ) {
         if (approvalSettled) return
         approvalSettled = true
-        walletOperationRequest?.finish(ApprovalResult.Rejected)
+        try {
+            walletOperationRequest?.finish(ApprovalResult.Rejected)
+        } catch (_: RuntimeException) {
+            // The dApp already dropped the association. The screen still closes below.
+        }
+        dropSessionChrome()
+        onMwaDeclineStale?.invoke()
         return
     }
     if (approvalSettled) {

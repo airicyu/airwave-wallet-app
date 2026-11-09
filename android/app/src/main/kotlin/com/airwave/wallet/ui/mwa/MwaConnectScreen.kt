@@ -63,7 +63,7 @@ internal fun ConnectBody(model: WalletModel, pending: WalletOperationRequest) {
             Text(pending.identityName.ifBlank { pending.identityUri }, color = AirwaveColors.Text, fontWeight = FontWeight.SemiBold)
             Text(pending.identityUri, color = AirwaveColors.TextMuted)
             Box(Modifier.fillMaxWidth().height(24.dp).background(AirwaveColors.StrokeSoft))
-            AccountChip(pending)
+            AccountChip(model, pending)
         }
         BottomPair(
             ghost = model.t("mwa.reject"),

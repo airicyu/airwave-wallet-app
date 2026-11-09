@@ -97,6 +97,9 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     /** Host hook so lock declines a sign request that has not been offered yet. */
     internal var onMwaInterrupted: (() -> Unit)? = null
 
+    /** Host hook when decline fails because the association is already gone. */
+    internal var onMwaDeclineStale: (() -> Unit)? = null
+
     fun secretState(id: SecretFieldId): SecretFieldState =
         secretStates[id] ?: SecretFieldState()
 

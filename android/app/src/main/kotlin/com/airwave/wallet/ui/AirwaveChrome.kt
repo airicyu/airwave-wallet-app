@@ -17,10 +17,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -128,7 +126,7 @@ fun AirwaveUnlockBackdrop(
         Modifier
             .fillMaxSize()
             .airwaveUnlockBackground()
-            .statusBarsPadding(),
+,
     ) {
         Column(
             Modifier
@@ -170,7 +168,7 @@ fun AirwavePrimaryButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = AirwaveColors.Accent,
             contentColor = Color(0xFF061018),
@@ -194,7 +192,7 @@ fun HomeBottomTabs(
         Modifier
             .fillMaxWidth()
             .background(AirwaveColors.BgElevated)
-            .navigationBarsPadding(),
+,
     ) {
         Row(Modifier.fillMaxWidth()) {
             homeTabCell(selected == Tab.Assets, assetsLabel, onAssets, Modifier.weight(1f))

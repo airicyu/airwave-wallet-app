@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +32,9 @@ import com.airwave.wallet.mwa.MwaStep
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.AirwaveTheme
 import com.airwave.wallet.ui.AirwavePrimaryButton
+import androidx.activity.compose.BackHandler
 import com.airwave.wallet.ui.mwa.SignMessageBody
+import com.airwave.wallet.ui.mwa.SignTxBody
 
 /**
  * Dedicated MWA host Activity.
@@ -44,7 +46,6 @@ class MwaActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         session.bindWallet(wallet)
         setContent {
             AirwaveTheme {
@@ -55,6 +56,7 @@ class MwaActivity : ComponentActivity() {
                 Box(
                     Modifier
                         .fillMaxSize()
+                        .statusBarsPadding()
                         .background(AirwaveColors.Bg),
                 ) {
                     val vaultLocked = wallet.store.exists() && wallet.address == null
@@ -62,11 +64,16 @@ class MwaActivity : ComponentActivity() {
                         is MwaStep.UnlockConnect,
                         is MwaStep.UnlockReauthorize,
                         is MwaStep.UnlockSignMessage,
+                        is MwaStep.UnlockSignTransaction,
                         -> UnlockScreen(wallet)
                         is MwaStep.ConnectApproval ->
                             ConnectApproval(wallet, step.request)
                         is MwaStep.SignMessageApproval ->
                             SignMessageBody(wallet, step.request)
+                        is MwaStep.SignTransactionApproval -> {
+                            BackHandler { wallet.reject() }
+                            SignTxBody(wallet, step.request, session.screen)
+                        }
                         is MwaStep.WatchBlocked -> WatchNotice(step.message)
                         MwaStep.Finished,
                         MwaStep.Waiting,

@@ -114,7 +114,7 @@ private fun TokenRow(row: HoldingRow) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        if (row.verified) Shield(row.organicScore)
+        if (row.verified) HoldingShield(row.organicScore)
         TokenIcon(row.iconUrl)
         Column(Modifier.weight(1f)) {
             Text(row.name, color = AirwaveColors.Text, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -129,7 +129,7 @@ private fun TokenRow(row: HoldingRow) {
 }
 
 @Composable
-private fun Shield(score: String?) {
+internal fun HoldingShield(score: String?) {
     val fill = lerp(AirwaveColors.BgElevated, AirwaveColors.Ok, 0.18f)
     val badgeFill = lerp(AirwaveColors.Bg, AirwaveColors.Ok, 0.16f)
     val badgeStroke = lerp(AirwaveColors.Stroke, AirwaveColors.Ok, 0.35f)

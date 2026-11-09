@@ -34,7 +34,13 @@ Conventions:
 - Do not rely on the system gesture alone; always show in-app Back (or equivalent) on secondary surfaces.
 - Opening the hamburger from a subpage is allowed; **Back** on the menu sheet closes only the menu, not the subpage underneath.
 
-Status-bar and navigation-bar **safe areas** apply to menu sheets and subpage top bars so controls do not overlap system time, notifications, or gesture bars.
+## System bars
+
+App UI does not draw under the status bar. The clock, notification icons, and status icons stay in a system row. No wallet control, title, or account chip overlaps that row.
+
+Apply this once at each activity root (`MainActivity` and `MwaActivity`) with the status-bar inset the system reports. Do not pad each screen separately. Do not use `windowOptOutEdgeToEdgeEnforcement`: Android 16 and later ignore it, and a theme that still names it fails to inflate on those versions.
+
+The same root inset keeps menu sheets and subpage top bars below the status bar.
 
 ## Token trust shield placement
 - Jupiter / verified **green shield is leftmost**, before the token icon (same as web).

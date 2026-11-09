@@ -9,7 +9,10 @@ import com.airwave.wallet.vault.BurnerKeys
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizedAccount
 import com.solana.mobilewalletadapter.walletlib.scenario.ReauthorizeRequest
+import com.airwave.wallet.mwa.tx.SignTxBytes
+import com.airwave.wallet.mwa.tx.SignTxWire
 import com.solana.mobilewalletadapter.walletlib.scenario.SignMessagesRequest
+import com.solana.mobilewalletadapter.walletlib.scenario.SignTransactionsRequest
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 
 /**
@@ -90,6 +93,45 @@ object MwaOffers {
             messageUtf8 = shown.utf8,
             messageHex = shown.hex,
             approve = { secret -> ApprovalResult.Bytes(BurnerKeys.sign(secret, bytes)) },
+            finish = { result ->
+                when (result) {
+                    is ApprovalResult.Bytes -> request.completeWithSignedPayloads(arrayOf(result.value))
+                    else -> request.completeWithDecline()
+                }
+            },
+        )
+    }
+
+    /** Null when the payload must be declined before offer. The protocol request is already completed. */
+    fun signTransaction(
+        request: SignTransactionsRequest,
+        model: WalletModel,
+        bytes: SignTxBytes,
+    ): WalletOperationRequest? {
+        val payloads = request.payloads
+        if (MwaPayloads.declineBeforeOffer(payloads)) {
+            request.completeWithDecline()
+            return null
+        }
+        val original = payloads[0]
+        if (SignTxWire.inspect(original) == null) {
+            request.completeWithDecline()
+            return null
+        }
+        bytes.original = original
+        bytes.working = original
+        val account = model.activeAccount()
+        return WalletOperationRequest(
+            kind = WalletOperationKind.SignTransaction,
+            identityName = request.identityName.orEmpty(),
+            identityUri = request.identityUri?.toString().orEmpty(),
+            chain = request.chain.orEmpty(),
+            accountLabel = account?.label.orEmpty(),
+            accountShort = BurnerKeys.short(model.address.orEmpty()),
+            approve = { secret ->
+                val signed = SignTxWire.partialSign(bytes.working, secret)
+                if (signed == null) ApprovalResult.Failed else ApprovalResult.Bytes(signed)
+            },
             finish = { result ->
                 when (result) {
                     is ApprovalResult.Bytes -> request.completeWithSignedPayloads(arrayOf(result.value))

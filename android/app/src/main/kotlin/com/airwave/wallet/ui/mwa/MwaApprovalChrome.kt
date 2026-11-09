@@ -7,6 +7,8 @@ import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.session.WalletOperationRequest
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,14 +17,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -70,34 +77,62 @@ internal fun LockButton(label: String, onLock: () -> Unit) {
 }
 
 @Composable
-internal fun AccountChip(pending: WalletOperationRequest, modifier: Modifier = Modifier) {
+internal fun AccountChip(model: WalletModel, pending: WalletOperationRequest, modifier: Modifier = Modifier) {
+    val clipboard = LocalClipboardManager.current
+    val address = model.address.orEmpty()
     Row(
         modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(AirwaveColors.Fill)
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .clip(RoundedCornerShape(999.dp))
+            .background(AirwaveColors.Bg)
+            .border(1.dp, AirwaveColors.Stroke, RoundedCornerShape(999.dp))
+            .padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(
-            Modifier.size(36.dp).clip(RoundedCornerShape(18.dp)).background(AirwaveColors.BgElevated),
+            Modifier.size(36.dp).clip(RoundedCornerShape(18.dp)).background(AirwaveColors.Fill),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(painterResource(R.drawable.ic_stroke_key), contentDescription = null, tint = AirwaveColors.Text, modifier = Modifier.size(16.dp))
+            Icon(painterResource(R.drawable.ic_stroke_key), contentDescription = null, tint = Color(0xFFD08B5B), modifier = Modifier.size(16.dp))
         }
-        Column {
-            if (pending.accountLabel.isNotBlank()) {
-                Text(pending.accountLabel, color = AirwaveColors.Text, fontWeight = FontWeight.Medium)
+        Text(
+            pending.accountLabel.ifBlank { pending.accountShort },
+            color = AirwaveColors.Text,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 13.sp,
+            modifier = Modifier.padding(horizontal = 8.dp),
+        )
+        if (address.isNotEmpty()) {
+            IconButton(onClick = { clipboard.setText(AnnotatedString(address)) }, modifier = Modifier.size(32.dp)) {
+                Icon(painterResource(R.drawable.ic_stroke_copy), model.t("accounts.copy"), tint = AirwaveColors.TextMuted, modifier = Modifier.size(16.dp))
             }
-            Text(pending.accountShort, color = AirwaveColors.TextMuted)
         }
     }
 }
 
 @Composable
 internal fun SiteLine(model: WalletModel, pending: WalletOperationRequest) {
+    val clipboard = LocalClipboardManager.current
     val site = pending.identityUri.ifBlank { pending.identityName }
-    Text("${model.t("mwa.site")} $site", color = AirwaveColors.TextMuted)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier
+                .weight(1f, fill = false)
+                .clip(RoundedCornerShape(8.dp))
+                .background(AirwaveColors.Fill)
+                .border(1.dp, AirwaveColors.Stroke, RoundedCornerShape(8.dp))
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(model.t("mwa.site"), color = AirwaveColors.TextDim, fontSize = 12.sp)
+            Text(site, color = AirwaveColors.Text, fontSize = 13.sp, maxLines = 1)
+        }
+        if (site.isNotEmpty()) {
+            IconButton(onClick = { clipboard.setText(AnnotatedString(site)) }, modifier = Modifier.size(34.dp)) {
+                Icon(painterResource(R.drawable.ic_stroke_copy), model.t("accounts.copy"), tint = AirwaveColors.TextMuted, modifier = Modifier.size(16.dp))
+            }
+        }
+    }
 }
 
 @Composable
@@ -125,6 +160,7 @@ internal fun BottomPair(
     ghost: String,
     primary: String,
     enabled: Boolean,
+    primaryEnabled: Boolean = enabled,
     onGhost: () -> Unit,
     onPrimary: () -> Unit,
 ) {
@@ -134,9 +170,16 @@ internal fun BottomPair(
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        OutlinedButton(onClick = onGhost, enabled = enabled, modifier = Modifier.weight(1f)) {
+        OutlinedButton(
+            onClick = onGhost,
+            enabled = enabled,
+            modifier = Modifier.weight(0.38f),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, AirwaveColors.Stroke),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = AirwaveColors.Text),
+        ) {
             Text(ghost, color = AirwaveColors.Text)
         }
-        AirwavePrimaryButton(primary, onPrimary, modifier = Modifier.weight(1f), enabled = enabled)
+        AirwavePrimaryButton(primary, onPrimary, modifier = Modifier.weight(0.62f), enabled = primaryEnabled)
     }
 }

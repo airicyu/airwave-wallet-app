@@ -34,7 +34,10 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
     private var scenario: LocalScenario? = null
     private var dropTeardown = false
 
-    fun bindWallet(model: WalletModel) = screen.bindWallet(model)
+    fun bindWallet(model: WalletModel) {
+        screen.bindWallet(model)
+        screen.bindScope(viewModelScope)
+    }
 
     fun processLaunch(intent: Intent?): Boolean {
         screen.noteLaunch()
@@ -64,9 +67,9 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
             MobileWalletAdapterConfig(
                 10,
                 10,
-                arrayOf(MobileWalletAdapterConfig.LEGACY_TRANSACTION_VERSION, 0),
+                arrayOf<Any>(MobileWalletAdapterConfig.LEGACY_TRANSACTION_VERSION, 0, 1),
                 LOW_POWER_NO_CONNECTION_TIMEOUT_MS,
-                arrayOf<String>("solana:signMessages"),
+                arrayOf("solana:signMessages", "solana:signTransactions"),
             ),
             AuthIssuerConfig("Airwave"),
             Callbacks(),
@@ -119,7 +122,7 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
         }
 
         override fun onSignTransactionsRequest(request: SignTransactionsRequest) {
-            request.completeWithDecline()
+            viewModelScope.launch(Dispatchers.Main) { screen.offerSignTransaction(request) }
         }
 
         override fun onSignMessagesRequest(request: SignMessagesRequest) {

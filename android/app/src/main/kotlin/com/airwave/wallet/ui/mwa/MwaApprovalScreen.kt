@@ -9,8 +9,6 @@ import com.airwave.wallet.session.WalletOperationKind
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.airwave.wallet.theme.AirwaveColors
@@ -22,14 +20,14 @@ fun MwaApprovalScreen(model: WalletModel) {
         Modifier
             .fillMaxSize()
             .background(AirwaveColors.Bg)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
+,
     ) {
         when (pending.kind) {
             WalletOperationKind.Authorize -> ConnectBody(model, pending)
             WalletOperationKind.Reauthorize -> Unit
             WalletOperationKind.SignMessage -> SignMessageBody(model, pending)
-            WalletOperationKind.SignAndSend -> SignTxBody(model, pending)
+            WalletOperationKind.SignTransaction -> Unit
+            WalletOperationKind.SignAndSend -> Unit
         }
     }
 }

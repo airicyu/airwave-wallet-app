@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -95,7 +94,7 @@ fun HomeShell(model: WalletModel) {
 
 @Composable
 private fun HomeTabs(model: WalletModel) {
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).statusBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg)) {
         Column(
             Modifier
                 .padding(horizontal = 16.dp, vertical = 12.dp)
@@ -184,7 +183,6 @@ private fun HamburgerMenu(model: WalletModel) {
             Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .statusBarsPadding()
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(AirwaveColors.BgElevated)
                 .padding(bottom = 8.dp),
@@ -276,7 +274,7 @@ internal fun SubTopBar(model: WalletModel, titleKey: String, showMenu: Boolean =
 
 @Composable
 private fun EmptyScreen(model: WalletModel, titleKey: String, bodyKey: String) {
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(horizontal = 16.dp, vertical = 8.dp)) {
         SubTopBar(model, titleKey)
         Box(
             Modifier
@@ -291,7 +289,7 @@ private fun EmptyScreen(model: WalletModel, titleKey: String, bodyKey: String) {
 
 @Composable
 private fun NetworkScreen(model: WalletModel) {
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(horizontal = 16.dp, vertical = 8.dp)) {
         SubTopBar(model, "network.title")
         Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Cluster.entries.forEach { cluster ->

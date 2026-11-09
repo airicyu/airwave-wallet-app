@@ -13,7 +13,7 @@ sealed class ApprovalResult {
 }
 
 /** Names the approval chrome the MWA screens should draw for the current walletOperationRequest. */
-enum class WalletOperationKind { Authorize, Reauthorize, SignMessage, SignAndSend }
+enum class WalletOperationKind { Authorize, Reauthorize, SignMessage, SignTransaction, SignAndSend }
 
 /**
  * One in-memory MWA approval waiting for the user.

@@ -6,7 +6,7 @@
         android:allowBackup="false"
         android:label="Airwave"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.Material.NoActionBar">
+        android:theme="@style/Theme.Airwave">
         <activity
             android:name=".MainActivity"
             android:exported="true"
