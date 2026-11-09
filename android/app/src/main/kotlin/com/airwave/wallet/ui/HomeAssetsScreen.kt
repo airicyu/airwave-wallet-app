@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airwave.wallet.R
 import com.airwave.wallet.holdings.BaseUnits
+import com.airwave.wallet.holdings.HoldingIds
 import com.airwave.wallet.holdings.HoldingPhase
 import com.airwave.wallet.holdings.HoldingRow
 import com.airwave.wallet.holdings.TokenIconLoader
@@ -71,14 +72,8 @@ fun HomeAssetsScreen(model: WalletModel) {
             HoldingPhase.Loading -> Text(model.t("assets.loading"), color = AirwaveColors.TextMuted)
             HoldingPhase.Failed -> {
                 Text(model.t("assets.failed"), color = AirwaveColors.Danger)
-                TextButton(onClick = { model.refreshHoldings() }) {
-                    Text(model.t("assets.refresh"))
-                }
             }
             HoldingPhase.Ready, HoldingPhase.Idle -> {
-                TextButton(onClick = { model.refreshHoldings() }) {
-                    Text(model.t("assets.refresh"))
-                }
                 snapshot.rows.forEach { TokenRow(it) }
             }
         }
@@ -110,21 +105,44 @@ private fun Skipped(model: WalletModel) {
 @Composable
 private fun TokenRow(row: HoldingRow) {
     Row(
-        Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(AirwaveColors.Fill)
+            .border(1.dp, AirwaveColors.Stroke, RoundedCornerShape(12.dp))
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        if (row.verified) HoldingShield(row.organicScore)
+        TrustSlot(row)
         TokenIcon(row.iconUrl)
         Column(Modifier.weight(1f)) {
-            Text(row.name, color = AirwaveColors.Text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                row.name,
+                color = AirwaveColors.Text,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             Text(
                 BaseUnits.formatBaseUnits(row.raw, row.decimals) + " " + row.symbol,
                 color = AirwaveColors.TextMuted,
+                fontSize = 12.sp,
                 maxLines = 1,
             )
         }
-        Text(row.usdLabel, color = AirwaveColors.Text)
+        Text(row.usdLabel, color = AirwaveColors.Text, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+    }
+}
+
+@Composable
+private fun TrustSlot(row: HoldingRow) {
+    val native = row.id == HoldingIds.NATIVE
+    Box(Modifier.size(26.dp), contentAlignment = Alignment.Center) {
+        if (native || row.verified) {
+            HoldingShield(if (native) null else row.organicScore)
+        }
     }
 }
 
@@ -173,12 +191,17 @@ private fun TokenIcon(url: String?) {
         if (url.isNullOrBlank() || !url.startsWith("https:")) return@LaunchedEffect
         bitmap = withContext(Dispatchers.IO) { TokenIconLoader.bitmap(url)?.asImageBitmap() }
     }
-    if (bitmap != null) {
-        Image(
-            bitmap = bitmap!!,
-            contentDescription = null,
-            modifier = Modifier.size(40.dp).clip(CircleShape).background(AirwaveColors.Fill),
-            contentScale = ContentScale.Crop,
-        )
+    Box(
+        Modifier.size(40.dp).clip(CircleShape).background(AirwaveColors.Bg),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap!!,
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop,
+            )
+        }
     }
 }

@@ -449,9 +449,9 @@
     content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
     width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
   }
-  .connect-acct {
-    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-    border: 1px solid var(--stroke); border-radius: 999px; background: var(--fill);
+  .connect-mark {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #0f1419;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
   }
   .card { border: 1px solid var(--stroke); border-radius: var(--radius); background: var(--bg-elevated); padding: 12px 14px; }
   .card h4 { margin: 0 0 8px; font-size: 13px; color: var(--text-muted); font-weight: 650; }
@@ -1660,10 +1660,9 @@
             <div class="connect-name">jup.ag</div>
             <div class="connect-url">https://jup.ag</div>
             <div class="connect-rail" aria-hidden="true"></div>
-            <div class="connect-acct">
-              <span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span>
-              <span><div class="acct-name">demo</div><div class="pick-sum">JCLh…1KWj</div></span>
-            </div>
+            <div class="connect-mark">D</div>
+            <div class="connect-name">demo wallet</div>
+            <div class="connect-url">JCLh…1KWj</div>
           </div>
         </div>
         <div class="btn-row">
@@ -1801,9 +1800,10 @@
           <div class="top"><button type="button" class="acct-pill"><span class="acct-avatar kind-signing" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="15" r="4"/><path d="M12 13l7-7"/><path d="M16 6h3v3"/></svg></span><span class="acct-name">demo</span></button></div>
           <h2 style="margin:0 0 12px;font-size:18px;font-weight:700;text-align:center">簽署訊息</h2>
           <div class="site-line">站點 <code>https://swap.app</code></div>
-          <span class="payload-k">Message payload</span>
+          <span class="payload-k">MESSAGE PAYLOAD</span>
           <div class="msg-card">swap.app wants you to sign in with your Solana account.
 Nonce: 8f3a1c9e</div>
+          <p style="margin:10px 0 0;font-size:13px;color:var(--text-muted)">▸ Raw binary payload</p>
         </div>
         <div class="btn-row">
           <button class="btn ghost" type="button">拒絕</button>
@@ -1937,7 +1937,7 @@ Issued At: 2026-11-05T02:00:00Z</div>
       <ul><li><strong>Mobile:</strong> 稿展示開啟態以露出 URL 欄；hub summary 用「啟用」對應該態。</li></ul>
     </div>
     <div class="remark" data-screen="connect-dapp">
-      <p><strong>Ship:</strong> 站點↔帳戶視覺連線、拒絕｜連線 sticky。</p>
+      <p><strong>Ship:</strong> 返回、置中「連線」。站點字母塊、名稱、網址。直向連線接到帳戶首字圓標、帳戶名、短地址。拒絕｜連線。</p>
       <ul><li><strong>Mobile:</strong> 全螢幕／large sheet，非窄 popup。</li></ul>
     </div>
     <div class="remark" data-screen="approve-sign-tx">
@@ -1955,7 +1955,7 @@ Issued At: 2026-11-05T02:00:00Z</div>
       <p><strong>Ship:</strong> 錢包在 Devnet 時，帳戶列下有 Devnet 細條。blockhash 只在另一個網路仍有效時顯示「網路不符」，批准停用，拒絕可用。Mainnet 錢包沒有細條，文案改成錢包目前是 Mainnet。</p>
     </div>
     <div class="remark" data-screen="approve-sign-message">
-      <p><strong>Ship:</strong> 與可讀 signMessage 同一殼。標題「簽署訊息」。一張 Message payload，最多九行再捲動。Off-chain 與 raw message 畫面相同，沒有格式切換。</p>
+      <p><strong>Ship:</strong> 帳戶 pill、站點 chip、置中標題「簽署訊息」。一張 MESSAGE PAYLOAD。底下 Raw binary payload 預設收合。不解析 off-chain 標頭。沒有返回與鎖定。</p>
     </div>
     <div class="remark" data-screen="approve-sign-in">
       <p><strong>Ship:</strong> 標題「登入」。同一張卡顯示錢包組好的 SIWS 原文；沒送的欄位整行不出現。useOffchainMessage 不改變這個畫面。</p>

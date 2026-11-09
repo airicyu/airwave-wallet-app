@@ -6,7 +6,12 @@ package com.airwave.wallet
 import com.airwave.wallet.session.Route
 
 import android.util.Base64
+import androidx.lifecycle.viewModelScope
 import com.airwave.wallet.session.WalletModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import com.airwave.wallet.vault.AccountKind
 import com.airwave.wallet.vault.AccountRecord
 import com.airwave.wallet.vault.Bip39
@@ -25,6 +30,14 @@ fun WalletModel.setActiveAccountId(id: String) {
     updateSettings { it.copy(activeAccountId = id) }
     activateAccount(id)
     syncHoldings(refresh = false)
+}
+
+fun WalletModel.reorderAccounts(ids: List<String>, persist: Boolean) {
+    val byId = accountRows.associateBy { it.id }
+    val next = ids.mapNotNull { byId[it] }
+    if (next.size != accountRows.size) return
+    if (next.map { it.id } != accountRows.map { it.id }) accountRows = next
+    if (persist) persistVaultAfterFrame()
 }
 
 fun WalletModel.renameAccount(id: String, label: String) {
@@ -171,6 +184,23 @@ internal fun WalletModel.appendAccount(row: AccountRecord, makeActiveId: String)
     updateSettings { it.copy(activeAccountId = makeActiveId) }
     activateAccount(makeActiveId)
     persistVault()
+}
+
+private val vaultPersistMutex = Mutex()
+
+/** Seals the vault off the main thread so a drag-end reorder can paint before Argon2id finishes. */
+internal fun WalletModel.persistVaultAfterFrame() {
+    val chars = passwordChars?.copyOf() ?: return
+    val bytes = VaultAccounts.toJsonBytes(accountRows)
+    viewModelScope.launch(Dispatchers.Default) {
+        vaultPersistMutex.withLock {
+            try {
+                store.write(cipher.seal(chars, bytes))
+            } finally {
+                chars.fill('\u0000')
+            }
+        }
+    }
 }
 
 internal fun WalletModel.persistVault() {

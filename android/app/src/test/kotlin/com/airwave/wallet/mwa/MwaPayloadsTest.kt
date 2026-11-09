@@ -22,7 +22,7 @@ class MwaPayloadsTest {
     fun utf8MessageKeepsText() {
         val shown = MwaPayloads.display("airwave mwa test".toByteArray())
         assertEquals("airwave mwa test", shown.utf8)
-        assertNull(shown.hex)
+        assertEquals("61697277617665206d77612074657374", shown.hex)
     }
 
     @Test

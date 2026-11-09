@@ -1,8 +1,6 @@
 package com.airwave.wallet
 import com.airwave.wallet.session.WalletModel
-import com.airwave.wallet.session.approve
 import com.airwave.wallet.session.reject
-import com.airwave.wallet.session.WalletOperationRequest
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,12 +9,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,8 +25,8 @@ import com.airwave.wallet.mwa.MwaHostViewModel
 import com.airwave.wallet.mwa.MwaStep
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.AirwaveTheme
-import com.airwave.wallet.ui.AirwavePrimaryButton
 import androidx.activity.compose.BackHandler
+import com.airwave.wallet.ui.mwa.ConnectBody
 import com.airwave.wallet.ui.mwa.SignMessageBody
 import com.airwave.wallet.ui.mwa.SignTxBody
 
@@ -67,7 +61,7 @@ class MwaActivity : ComponentActivity() {
                         is MwaStep.UnlockSignTransaction,
                         -> UnlockScreen(wallet)
                         is MwaStep.ConnectApproval ->
-                            ConnectApproval(wallet, step.request)
+                            ConnectBody(wallet, step.request)
                         is MwaStep.SignMessageApproval ->
                             SignMessageBody(wallet, step.request)
                         is MwaStep.SignTransactionApproval -> {
@@ -114,23 +108,5 @@ private fun WatchNotice(message: String) {
 private fun AssociateWait() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(color = AirwaveColors.Text)
-    }
-}
-
-@Composable
-private fun ConnectApproval(wallet: WalletModel, approval: WalletOperationRequest) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(approval.identityName, color = AirwaveColors.Text)
-        Text(approval.identityUri, color = AirwaveColors.TextMuted)
-        Spacer(Modifier.height(24.dp))
-        AirwavePrimaryButton(wallet.t("mwa.connect.action"), { wallet.approve() })
-        Spacer(Modifier.height(12.dp))
-        AirwavePrimaryButton(wallet.t("mwa.reject"), { wallet.reject() })
     }
 }

@@ -105,6 +105,7 @@ object AppStrings {
         "accounts.active" to "Active",
         "accounts.rename" to "Rename",
         "accounts.delete" to "Delete",
+        "accounts.reorder" to "Reorder",
         "accounts.kindSeed" to "Seed",
         "accounts.kindBurner" to "Burner",
         "accounts.kindSecret" to "Imported",
@@ -204,6 +205,8 @@ object AppStrings {
         "mwa.details" to "Transaction details · instructions",
         "mwa.fee" to "Network fee",
         "mwa.message.hex" to "Binary message",
+        "mwa.message.payload" to "Message payload",
+        "mwa.message.raw" to "Raw binary payload",
     )
 
     private val zhHant = mapOf(
@@ -265,6 +268,9 @@ object AppStrings {
         "locale.zhHans" to "简体中文",
         "accounts.add" to "新增帳戶",
         "accounts.active" to "使用中",
+        "accounts.rename" to "重新命名",
+        "accounts.delete" to "刪除",
+        "accounts.reorder" to "調整順序",
         "accounts.generate12" to "建立助記詞錢包",
         "accounts.importMnemonic" to "助記詞",
         "accounts.importSecret" to "密鑰",
@@ -355,6 +361,8 @@ object AppStrings {
         "mwa.details" to "交易明細 · 指令",
         "mwa.fee" to "交易費",
         "mwa.message.hex" to "二進位訊息",
+        "mwa.message.payload" to "Message payload",
+        "mwa.message.raw" to "Raw binary payload",
     )
 
     private val zhHans = mapOf(
@@ -401,6 +409,10 @@ object AppStrings {
         "locale.zhHant" to "繁體中文",
         "locale.zhHans" to "简体中文",
         "accounts.add" to "新增账户",
+        "accounts.active" to "使用中",
+        "accounts.rename" to "重命名",
+        "accounts.delete" to "删除",
+        "accounts.reorder" to "调整顺序",
         "accounts.generate12" to "建立助记词钱包",
         "accounts.importMnemonic" to "助记词",
         "accounts.importSecret" to "密钥",
@@ -491,5 +503,7 @@ object AppStrings {
         "mwa.details" to "交易明细 · 指令",
         "mwa.fee" to "交易费",
         "mwa.message.hex" to "二进制讯息",
+        "mwa.message.payload" to "Message payload",
+        "mwa.message.raw" to "Raw binary payload",
     )
 }

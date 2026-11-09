@@ -4,7 +4,15 @@
 
 MWA `sign_transactions` approval for one legacy, v0, or v1 payload. The wallet simulates, can edit compute budget on an unsigned transaction, and returns signed bytes. It does not submit. No AI card. `sign_and_send_transactions` still declines. The approval chrome follows the web wallet sign-transaction popout: copy on the account and site, the simulation card, the fee editor, and decoded instruction details.
 
+The connect screen uses the web connect popout: back, centered title, site letter tile, a rail to the account mark, then the account name and short address. Reject and Connect sit on one row.
+
+The sign-message screen uses that same popout chrome: account pill, site chip, centered title, a message-payload card, and a collapsed raw-byte disclosure. It still signs the original bytes and does not parse an off-chain header.
+
 MWA approval screens live under `ui/mwa`, split into connect, sign message, sign-and-send, and shared chrome. `WalletModel` lives in `session`, with shell routes, the approval request, and offer/approve/reject in their own files.
+
+Home uses the web home chrome: account pill, overflow, a section title with a refresh icon, and bordered token cards.
+
+The account list uses the web account-list chrome: a vertical overflow icon, an outlined add control with no fill, a tight active pill, a solid stroke on the other rows, pencil and overflow aligned with the account name, a copy control on the short address, and a 2×6 dot grip. While dragging, the row stays put at reduced opacity and an accent line marks the insertion slot. The order changes when the drag ends.
 
 ## 0.6.0 — 2026-11-08
 

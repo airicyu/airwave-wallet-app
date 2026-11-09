@@ -19,8 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -31,13 +30,22 @@ import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.airwave.wallet.R
+import com.airwave.wallet.activeAccount
+import com.airwave.wallet.vault.AccountKind
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,17 +54,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.airwave.wallet.setCluster
 import com.airwave.wallet.settings.Cluster
 import com.airwave.wallet.theme.AirwaveColors
-import com.airwave.wallet.vault.BurnerKeys
 
 @Composable
 fun HomeShell(model: WalletModel) {
@@ -102,52 +107,42 @@ private fun HomeTabs(model: WalletModel) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    if (model.tab == Tab.Assets) model.t("home.assets") else model.t("home.activity"),
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = AirwaveColors.Text,
-                )
+                HomeAccountPill(model)
                 IconButton(
                     onClick = { model.menuOpen = true },
                     modifier = Modifier.semantics { contentDescription = model.t("menu.menu") },
                 ) {
                     Icon(
-                        Icons.Default.Menu,
+                        Icons.Default.MoreVert,
                         model.t("menu.menu"),
-                        tint = AirwaveColors.Accent,
-                        modifier = Modifier.size(24.dp),
+                        tint = AirwaveColors.Text,
+                        modifier = Modifier.size(22.dp),
                     )
                 }
-            }
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable { model.push(HomeDestination.Accounts) }
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    Icons.Default.VpnKey,
-                    contentDescription = null,
-                    tint = Color(0xFFD08B5B),
-                    modifier = Modifier.size(18.dp),
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    BurnerKeys.short(model.address.orEmpty()),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = AirwaveColors.Text,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontFamily = FontFamily.Monospace,
-                )
             }
             model.mwaError?.let { msg ->
                 Text(msg, color = AirwaveColors.Danger, style = MaterialTheme.typography.bodySmall)
             }
-            if (model.settings.cluster == Cluster.Devnet) {
-                Text(model.t("network.devnet"), color = AirwaveColors.Warn, style = MaterialTheme.typography.bodyMedium)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    if (model.tab == Tab.Assets) model.t("home.assets") else model.t("home.activity"),
+                    color = AirwaveColors.Text,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                if (model.tab == Tab.Assets) {
+                    IconButton(
+                        onClick = { model.refreshHoldings() },
+                        modifier = Modifier.size(36.dp).semantics { contentDescription = model.t("assets.refresh") },
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_stroke_refresh),
+                            model.t("assets.refresh"),
+                            tint = AirwaveColors.TextMuted,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                }
             }
             if (model.tab == Tab.Assets) {
                 HomeAssetsScreen(model)
@@ -167,6 +162,51 @@ private fun HomeTabs(model: WalletModel) {
             assetsLabel = model.t("home.assets"),
             activityLabel = model.t("home.activity"),
         )
+    }
+}
+
+@Composable
+private fun HomeAccountPill(model: WalletModel) {
+    val clipboard = LocalClipboardManager.current
+    val account = model.activeAccount()
+    val address = model.address.orEmpty()
+    val name = account?.label?.ifBlank { null } ?: address.take(4)
+    val mark = if (account?.kind == AccountKind.Watch) R.drawable.ic_stroke_eye else R.drawable.ic_stroke_key
+    val tint = if (account?.kind == AccountKind.Watch) Color(0xFF6CB4E8) else Color(0xFFD08B5B)
+    Row(
+        Modifier
+            .clip(RoundedCornerShape(999.dp))
+            .background(AirwaveColors.Bg)
+            .border(1.dp, AirwaveColors.Stroke, RoundedCornerShape(999.dp))
+            .clickable { model.push(HomeDestination.Accounts) }
+            .padding(start = 4.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier.size(28.dp).clip(CircleShape).background(AirwaveColors.Fill),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(painterResource(mark), contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
+        }
+        Text(
+            name,
+            color = AirwaveColors.Text,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 13.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 8.dp),
+        )
+        if (address.isNotEmpty()) {
+            Icon(
+                painterResource(R.drawable.ic_stroke_copy),
+                contentDescription = model.t("accounts.copy"),
+                tint = AirwaveColors.TextMuted,
+                modifier = Modifier
+                    .size(16.dp)
+                    .clickable { clipboard.setText(AnnotatedString(address)) },
+            )
+        }
     }
 }
 
@@ -247,7 +287,12 @@ private fun menuRow(
 }
 
 @Composable
-internal fun SubTopBar(model: WalletModel, titleKey: String, showMenu: Boolean = true) {
+internal fun SubTopBar(
+    model: WalletModel,
+    titleKey: String,
+    showMenu: Boolean = true,
+    menuIcon: ImageVector = Icons.Default.Menu,
+) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         IconButton(
             onClick = { model.pop() },
@@ -264,7 +309,7 @@ internal fun SubTopBar(model: WalletModel, titleKey: String, showMenu: Boolean =
         )
         if (showMenu) {
             IconButton(onClick = { model.menuOpen = true }) {
-                Icon(Icons.Default.Menu, model.t("menu.menu"), tint = AirwaveColors.Accent)
+                Icon(menuIcon, model.t("menu.menu"), tint = AirwaveColors.Accent)
             }
         } else {
             Box(Modifier.padding(12.dp))

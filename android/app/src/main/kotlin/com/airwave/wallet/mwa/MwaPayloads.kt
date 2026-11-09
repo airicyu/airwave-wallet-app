@@ -5,10 +5,10 @@ import java.nio.charset.CharsetDecoder
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
 
-/** Holds UTF-8 text for a sign-message payload, or hex when the bytes are not valid UTF-8. */
+/** Holds UTF-8 text when the bytes decode, and always the lowercase hex of those same bytes. */
 data class MessageDisplay(
     val utf8: String?,
-    val hex: String?,
+    val hex: String,
 )
 
 /**
@@ -25,11 +25,12 @@ object MwaPayloads {
         val decoder: CharsetDecoder = StandardCharsets.UTF_8.newDecoder()
             .onMalformedInput(CodingErrorAction.REPORT)
             .onUnmappableCharacter(CodingErrorAction.REPORT)
+        val hex = bytes.joinToString("") { b -> "%02x".format(b) }
         return try {
             val text = decoder.decode(java.nio.ByteBuffer.wrap(bytes)).toString()
-            MessageDisplay(text, null)
+            MessageDisplay(text, hex)
         } catch (_: CharacterCodingException) {
-            MessageDisplay(null, bytes.joinToString("") { b -> "%02x".format(b) })
+            MessageDisplay(null, hex)
         }
     }
 
