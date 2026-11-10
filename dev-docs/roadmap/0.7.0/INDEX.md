@@ -1,6 +1,6 @@
 # 0.7.0 — MWA sign transaction
 
-- **Status:** `in progress`. Matches the roadmap table.
+- **Status:** `shipped` (2026-11-11). Matches the roadmap table. Changelog: [`changelog.md`](../../../changelog.md) heading `0.7.0 — 2026-11-11`.
 - **Previous:** [0.6.0](../0.6.0/INDEX.md) (`sign_messages`)
 - **Background:** [web sign-transaction](../../research/web-sign-transaction.md). That note is not this contract.
 - **Design demo:** [`wallet-overall-v1.html`](../../design-demos/wallet-overall-v1.html) phone frames `approve-sign-tx`, `approve-sign-tx-v1`, `approve-sign-tx-fail`, and `approve-sign-mismatch`. This version does not draw the AI card those frames include. AI is a later version.

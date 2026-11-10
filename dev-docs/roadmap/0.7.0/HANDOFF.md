@@ -1,6 +1,6 @@
 # 0.7.0 handoff
 
-Status is `in progress`. Design-review round 2 passed. Implementation has started and is not complete.
+`shipped` (2026-11-11). `version.md` and Android `versionName` are `0.7.0`. Do not open 0.8.0 unless the user names it.
 
 ## Done this session
 
