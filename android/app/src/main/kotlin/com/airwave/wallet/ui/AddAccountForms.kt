@@ -87,9 +87,19 @@ internal fun GenerateSeedScreen(model: WalletModel) {
         ctaEnabled = padded.count { it.isNotBlank() } == 12,
     ) {
         OptionalNameField(model, name, { name = it })
-        SeedWarnLine(model.t("accounts.seedWarn"))
-        DiceButton(model.t("accounts.rerollA11y")) {
-            model.seedGenerateDraft = Bip39.generate12(context.resources)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp, bottom = 28.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SeedWarnLine(
+                model.t("accounts.seedWarn"),
+                Modifier.weight(1f).padding(end = 16.dp),
+            )
+            DiceButton(model.t("accounts.rerollA11y"), inline = true) {
+                model.seedGenerateDraft = Bip39.generate12(context.resources)
+            }
         }
         WordGrid(padded, readOnly = true) { }
         PubkeyRow(model.t("accounts.pubkey"), model.t("accounts.copy"), previewAddress)

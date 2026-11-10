@@ -12,6 +12,8 @@ MWA approval screens live under `ui/mwa`, split into connect, sign message, sign
 
 Home uses the web home chrome: account pill, overflow, a section title with a refresh icon, and bordered token cards.
 
+The create-wallet die uses the web spacing. Burner: 22dp under the name field and 8dp above the public key. Seed phrase: the warning and the die share one row, 24dp under the name field and 28dp above the word grid. A tap shakes the icon for 210ms.
+
 The account list uses the web account-list chrome: a vertical overflow icon, an outlined add control with no fill, a tight active pill, a solid stroke on the other rows, pencil and overflow aligned with the account name, a copy control on the short address, and a 2×6 dot grip. While dragging, the row stays put at reduced opacity and an accent line marks the insertion slot. The order changes when the drag ends.
 
 ## 0.6.0 — 2026-11-08

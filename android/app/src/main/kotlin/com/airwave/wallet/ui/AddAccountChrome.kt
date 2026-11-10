@@ -8,6 +8,10 @@ import com.airwave.wallet.session.WalletModel
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +19,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,12 +34,20 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -42,6 +55,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import com.airwave.wallet.R
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.BurnerKeys
@@ -138,20 +153,53 @@ internal fun LabeledFillField(
 }
 
 @Composable
-internal fun SeedWarnLine(text: String) {
-    Text(text, color = SeedWarn, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
+internal fun SeedWarnLine(text: String, modifier: Modifier = Modifier) {
+    Text(text, color = SeedWarn, fontSize = 12.sp, modifier = modifier)
 }
 
+/** Burner: web field margin plus toolbar padding. */
+internal val BurnerDicePadding = PaddingValues(top = 22.dp, bottom = 8.dp)
+
+private val DiceEase = CubicBezierEasing(0.25f, 0.1f, 0.25f, 1f)
+
+/** Web `dice-shake`: 210ms, origin 50% 60%, per-keyframe CSS ease. Offsets are fractions; y is dp. */
+private val DiceShakeKeys = listOf(
+    0f to (0f to 0f),
+    0.18f to (-3f to -10f),
+    0.36f to (-2.5f to 8f),
+    0.54f to (-2f to -5f),
+    0.72f to (-1f to 2f),
+    1f to (0f to 0f),
+)
+
 @Composable
-internal fun DiceButton(label: String, onClick: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+internal fun DiceButton(
+    label: String,
+    padding: PaddingValues = BurnerDicePadding,
+    inline: Boolean = false,
+    onClick: () -> Unit,
+) {
+    val progress = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    var shakeJob by remember { mutableStateOf<Job?>(null) }
+    val hopPx = with(LocalDensity.current) { 1.dp.toPx() }
+    val sample = diceShake(progress.value)
+    val circle = @Composable {
         Box(
             Modifier
-                .padding(vertical = 4.dp)
                 .size(45.dp)
                 .clip(CircleShape)
                 .border(2.dp, DiePurple, CircleShape)
-                .clickable(onClick = onClick)
+                .clickable {
+                    val previous = shakeJob
+                    shakeJob = scope.launch {
+                        previous?.cancel()
+                        previous?.join()
+                        progress.snapTo(0f)
+                        progress.animateTo(1f, tween(210, easing = LinearEasing))
+                    }
+                    onClick()
+                }
                 .semantics { contentDescription = label },
             contentAlignment = Alignment.Center,
         ) {
@@ -159,10 +207,34 @@ internal fun DiceButton(label: String, onClick: () -> Unit) {
                 painter = painterResource(R.drawable.ic_die_3d),
                 contentDescription = null,
                 tint = DieTint,
-                modifier = Modifier.size(34.dp),
+                modifier = Modifier
+                    .size(34.dp)
+                    .graphicsLayer {
+                        transformOrigin = TransformOrigin(0.5f, 0.6f)
+                        translationY = sample.first * hopPx
+                        rotationZ = sample.second
+                    },
             )
         }
     }
+    if (inline) {
+        circle()
+    } else {
+        Row(Modifier.fillMaxWidth().padding(padding), horizontalArrangement = Arrangement.End) {
+            circle()
+        }
+    }
+}
+
+private fun diceShake(t: Float): Pair<Float, Float> {
+    val keys = DiceShakeKeys
+    val clamped = t.coerceIn(0f, 1f)
+    val i = keys.indexOfLast { it.first <= clamped }.coerceAtLeast(0)
+    val (aT, a) = keys[i]
+    val (bT, b) = keys[(i + 1).coerceAtMost(keys.lastIndex)]
+    val span = (bT - aT).takeIf { it > 0f } ?: return b
+    val eased = DiceEase.transform(((clamped - aT) / span).coerceIn(0f, 1f))
+    return (a.first + (b.first - a.first) * eased) to (a.second + (b.second - a.second) * eased)
 }
 
 @Composable
