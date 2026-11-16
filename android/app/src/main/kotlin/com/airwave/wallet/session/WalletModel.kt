@@ -15,6 +15,7 @@ import com.airwave.wallet.account.activeAccount
 import com.airwave.wallet.account.appendAccount
 import com.airwave.wallet.account.clearSigningMaterial
 import com.airwave.wallet.account.commitBurnerFromPreview
+import com.airwave.wallet.home.ActivityModel
 import com.airwave.wallet.holdings.HoldingsModel
 import com.airwave.wallet.settings.persistSettings
 import com.airwave.wallet.account.persistVault
@@ -48,6 +49,7 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     internal var signingSeed: ByteArray? = null
     private var lastUserActivityAt = System.currentTimeMillis()
     val holdings = HoldingsModel(viewModelScope)
+    val activity = ActivityModel(viewModelScope)
 
     init {
         viewModelScope.launch {
@@ -218,6 +220,7 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         error = null
         secretStates = emptyMap()
         holdings.clear()
+        activity.clear()
         route = if (store.exists()) Route.Unlock else Route.Setup
     }
 

@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -40,7 +41,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
+import com.airwave.wallet.R
 import com.airwave.wallet.settings.beginSecretEdit
 import com.airwave.wallet.settings.confirmSecret
 import com.airwave.wallet.settings.discardSecret
@@ -68,37 +72,44 @@ internal fun SettingsHubScreen(model: WalletModel) {
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.padding(horizontal = 4.dp)) {
-                hubRow(model, "settings.language", localeEndonym(model.settings.locale)) { model.push(HomeDestination.Language) }
+                hubRow(model, "settings.language", localeEndonym(model.settings.locale), R.drawable.ic_stroke_globe) { model.push(HomeDestination.Language) }
                 HorizontalDivider(color = AirwaveColors.StrokeSoft)
-                hubRow(model, "settings.rpc", summary = null) { model.push(HomeDestination.Rpc) }
+                hubRow(model, "settings.rpc", null, R.drawable.ic_stroke_network) { model.push(HomeDestination.Rpc) }
                 HorizontalDivider(color = AirwaveColors.StrokeSoft)
-                hubRow(model, "settings.apiKeys", summary = null) { model.push(HomeDestination.ApiKeys) }
+                hubRow(model, "settings.apiKeys", null, R.drawable.ic_stroke_key) { model.push(HomeDestination.ApiKeys) }
                 HorizontalDivider(color = AirwaveColors.StrokeSoft)
                 hubRow(
                     model,
                     "settings.ai",
                     if (model.settings.txAiAnalysisEnabled) model.t("settings.aiOn") else model.t("settings.aiOff"),
+                    R.drawable.ic_stroke_ai,
                 ) { model.push(HomeDestination.AiSettings) }
                 HorizontalDivider(color = AirwaveColors.StrokeSoft)
-                hubRow(model, "settings.cuPrice", model.settings.defaultCuPrice.toString()) { model.push(HomeDestination.CuPrice) }
+                hubRow(model, "settings.txFee", null, R.drawable.ic_stroke_coin) { model.push(HomeDestination.TxFee) }
                 HorizontalDivider(color = AirwaveColors.StrokeSoft)
-                hubRow(model, "settings.walletLock", summary = null) { model.push(HomeDestination.WalletLockSettings) }
+                hubRow(model, "settings.walletLock", null, R.drawable.ic_stroke_lock) { model.push(HomeDestination.WalletLockSettings) }
             }
         }
     }
 }
 
 @Composable
-private fun hubRow(model: WalletModel, labelKey: String, summary: String?, onClick: () -> Unit) {
+private fun hubRow(model: WalletModel, labelKey: String, summary: String?, icon: Int, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(model.t(labelKey), color = AirwaveColors.Text)
+        Icon(
+            painterResource(icon),
+            contentDescription = null,
+            tint = AirwaveColors.TextMuted,
+            modifier = Modifier.size(18.dp),
+        )
+        Text(model.t(labelKey), color = AirwaveColors.Text, modifier = Modifier.weight(1f))
         if (summary != null) {
             Text(summary, color = AirwaveColors.TextMuted)
         }
@@ -135,11 +146,18 @@ internal fun LanguageScreen(model: WalletModel) {
 internal fun ApiKeysScreen(model: WalletModel) {
     Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(20.dp).verticalScroll(rememberScrollState())) {
         SubTopBar(model, "settings.apiKeys")
-        secretField(model, SecretFieldId.Helius, model.t("settings.helius"), model.settings.heliusApiUrl) {
-            model.updateSettings { s -> s.copy(heliusApiUrl = it) }
+        secretField(model, SecretFieldId.Helius, model.t("settings.helius"), model.settings.heliusApiUrl) { draft ->
+            val key = heliusApiKeyFromStored(draft)
+            if (draft.isNotEmpty() && key == null) {
+                false
+            } else {
+                model.updateSettings { s -> s.copy(heliusApiUrl = key ?: "") }
+                true
+            }
         }
         secretField(model, SecretFieldId.Jupiter, model.t("settings.jupiter"), model.settings.jupiterApiKey) {
             model.updateSettings { s -> s.copy(jupiterApiKey = it) }
+            true
         }
     }
 }
@@ -150,7 +168,7 @@ private fun secretField(
     id: SecretFieldId,
     label: String,
     value: String,
-    onSave: (String) -> Unit,
+    onSave: (String) -> Boolean,
 ) {
     val state = model.secretState(id)
     SecretKeyField(
@@ -184,6 +202,7 @@ internal fun AiSettingsScreen(model: WalletModel) {
         }
         secretField(model, SecretFieldId.OpenRouter, model.t("settings.openRouter"), model.settings.openRouterApiKey) {
             model.updateSettings { s -> s.copy(openRouterApiKey = it) }
+            true
         }
         modelChainBlock(model, model.t("settings.aiReportModel"), true)
         modelChainBlock(model, model.t("settings.aiGradingModel"), false)
@@ -240,28 +259,6 @@ private fun modelChainBlock(model: WalletModel, title: String, report: Boolean) 
                 singleLine = true,
             )
         }
-    }
-}
-
-@Composable
-internal fun CuPriceScreen(model: WalletModel) {
-    var draft by remember(model.settings.defaultCuPrice) { mutableStateOf(model.settings.defaultCuPrice.toString()) }
-    Column(Modifier.fillMaxSize().background(AirwaveColors.Bg).padding(20.dp)) {
-        SubTopBar(model, "settings.cuPrice")
-        OutlinedTextField(
-            draft,
-            { draft = it },
-            label = { Text(model.t("settings.cuLabel")) },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Button(
-            onClick = {
-                val parsed = AirwaveSettings.parseCuPriceInput(draft, model.settings.defaultCuPrice)
-                model.updateSettings { it.copy(defaultCuPrice = parsed) }
-                draft = parsed.toString()
-            },
-            modifier = Modifier.padding(top = 12.dp),
-        ) { Text(model.t("common.confirm")) }
     }
 }
 

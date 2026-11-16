@@ -22,7 +22,7 @@ import com.airwave.wallet.account.WatchAddressScreen
 import com.airwave.wallet.home.HomeAssetsScreen
 import com.airwave.wallet.settings.AiSettingsScreen
 import com.airwave.wallet.settings.ApiKeysScreen
-import com.airwave.wallet.settings.CuPriceScreen
+import com.airwave.wallet.settings.TxFeeScreen
 import com.airwave.wallet.settings.LanguageScreen
 import com.airwave.wallet.settings.RpcScreen
 import com.airwave.wallet.settings.SettingsHubScreen
@@ -30,6 +30,7 @@ import com.airwave.wallet.settings.WalletLockSettingsScreen
 import com.airwave.wallet.ui.CopyIcon
 import com.airwave.wallet.ui.HomeBottomTabs
 import com.airwave.wallet.ui.PickRow
+import com.airwave.wallet.home.HomeActivityScreen
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.shell.Tab
 import com.airwave.wallet.shell.HomeDestination
@@ -120,7 +121,7 @@ fun HomeShell(model: WalletModel) {
             HomeDestination.Rpc -> RpcScreen(model)
             HomeDestination.ApiKeys -> ApiKeysScreen(model)
             HomeDestination.AiSettings -> AiSettingsScreen(model)
-            HomeDestination.CuPrice -> CuPriceScreen(model)
+            HomeDestination.TxFee -> TxFeeScreen(model)
             HomeDestination.WalletLockSettings -> WalletLockSettingsScreen(model)
         }
     }
@@ -155,14 +156,14 @@ private fun HomeTabs(model: WalletModel) {
             model.mwaError?.let { msg ->
                 Text(msg, color = AirwaveColors.Danger, style = MaterialTheme.typography.bodySmall)
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    if (model.tab == Tab.Assets) model.t("home.assets") else model.t("home.activity"),
-                    color = AirwaveColors.Text,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                if (model.tab == Tab.Assets) {
+            if (model.tab == Tab.Assets) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        model.t("home.assets"),
+                        color = AirwaveColors.Text,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                     IconButton(
                         onClick = { model.refreshHoldings() },
                         modifier = Modifier.size(36.dp).semantics { contentDescription = model.t("assets.refresh") },
@@ -175,16 +176,9 @@ private fun HomeTabs(model: WalletModel) {
                         )
                     }
                 }
-            }
-            if (model.tab == Tab.Assets) {
                 HomeAssetsScreen(model)
             } else {
-                Text(
-                    model.t("home.noActivity"),
-                    color = AirwaveColors.TextMuted,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+                HomeActivityScreen(model)
             }
         }
         HomeBottomTabs(

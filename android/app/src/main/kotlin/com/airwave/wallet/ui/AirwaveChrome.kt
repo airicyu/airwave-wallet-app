@@ -16,15 +16,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.res.painterResource
+import com.airwave.wallet.R
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -48,8 +49,8 @@ import androidx.compose.ui.unit.dp
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.airwaveUnlockBackground
 
-/** Width of two 48dp icon slots so RPC trailing actions, draft confirm/discard, and SecretKeyField line up. */
-val TrailingInlineActionsWidth = 96.dp
+/** Two 36dp confirm and discard buttons plus the 8dp gap between them. */
+val TrailingInlineActionsWidth = 80.dp
 
 /** Width of the radio column on RPC URL rows. Draft rows indent by this amount so they line up. */
 val RpcRadioGutter = 48.dp
@@ -63,22 +64,48 @@ fun ConfirmDiscardActions(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier.width(TrailingInlineActionsWidth),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically,
+        modifier
+            .width(TrailingInlineActionsWidth)
+            .fillMaxHeight(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        IconButton(
+        DraftMarkButton(
+            label = confirmLabel,
+            icon = R.drawable.ic_stroke_check,
+            tint = AirwaveColors.Ok,
+            border = androidx.compose.ui.graphics.lerp(AirwaveColors.Stroke, AirwaveColors.Ok, 0.5f),
             onClick = onConfirm,
-            modifier = Modifier.semantics { contentDescription = confirmLabel },
-        ) {
-            Icon(Icons.Default.Check, confirmLabel, tint = AirwaveColors.Ok)
-        }
-        IconButton(
+        )
+        DraftMarkButton(
+            label = discardLabel,
+            icon = R.drawable.ic_stroke_x,
+            tint = AirwaveColors.Danger,
+            border = androidx.compose.ui.graphics.lerp(AirwaveColors.Stroke, AirwaveColors.Danger, 0.5f),
             onClick = onDiscard,
-            modifier = Modifier.semantics { contentDescription = discardLabel },
-        ) {
-            Icon(Icons.Default.Close, discardLabel, tint = AirwaveColors.Danger)
-        }
+        )
+    }
+}
+
+@Composable
+private fun DraftMarkButton(
+    label: String,
+    icon: Int,
+    tint: Color,
+    border: Color,
+    onClick: () -> Unit,
+) {
+    Box(
+        Modifier
+            .width(36.dp)
+            .fillMaxHeight()
+            .clip(RoundedCornerShape(8.dp))
+            .background(AirwaveColors.Fill)
+            .border(1.dp, border, RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .semantics { contentDescription = label },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(painterResource(icon), label, tint = tint, modifier = Modifier.size(16.dp))
     }
 }
 
@@ -93,7 +120,7 @@ fun RevealEditActions(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier.width(TrailingInlineActionsWidth),
+        modifier.width(96.dp),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
     ) {

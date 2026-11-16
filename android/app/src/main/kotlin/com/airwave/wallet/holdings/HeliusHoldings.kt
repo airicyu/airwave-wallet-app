@@ -1,10 +1,9 @@
 package com.airwave.wallet.holdings
 
 import com.airwave.wallet.settings.Cluster
-import com.airwave.wallet.settings.RpcResolver
+import com.airwave.wallet.settings.heliusApiKeyFromStored
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.net.URI
 
 /**
  * Decides the Helius wallet-API path and maps SPL rows from one page.
@@ -14,28 +13,7 @@ object HeliusHoldings {
     /** Holds one Helius wallet-API page and whether the round is complete. */
     data class Page(val rows: List<HoldingRow>, val hasMore: Boolean, val full: Boolean)
 
-    fun apiKey(url: String): String? {
-        if (!RpcResolver.isAllowedCustomUrl(url)) return null
-        val uri = try {
-            URI(url.trim())
-        } catch (_: Exception) {
-            return null
-        }
-        if (!uri.host.equals("api.helius.xyz", ignoreCase = true)) return null
-        val query = uri.rawQuery ?: return null
-        var apiKey = ""
-        var apiKeyAlt = ""
-        for (part in query.split("&")) {
-            val bits = part.split("=", limit = 2)
-            if (bits.size != 2) continue
-            val value = bits[1].trim()
-            if (value.isEmpty()) continue
-            if (bits[0] == "api-key") apiKey = value
-            if (bits[0] == "apiKey" && apiKeyAlt.isEmpty()) apiKeyAlt = value
-        }
-        val chosen = apiKey.ifEmpty { apiKeyAlt }
-        return chosen.ifEmpty { null }
-    }
+    fun apiKey(url: String): String? = heliusApiKeyFromStored(url)
 
     fun useWalletApi(cluster: Cluster, heliusApiUrl: String): Boolean =
         cluster == Cluster.Mainnet && apiKey(heliusApiUrl) != null

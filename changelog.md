@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.0 — 2026-11-17
+
+### Home activity
+
+Mainnet uses enhanced transactions when the stored Helius field is an API key, the same rule as the web wallet. The settings label is Helius API key, and a previously saved URL is stored as the key from its query. Other reachable clusters use the signature list. Rows stay in memory. Each row shows the kind, local time, detail, token icons, and an Orb link.
+
+### Settings list and transaction fee
+
+The settings list uses a stroke icon on each row. Transaction fee is its own page with the v1 priority fee and the legacy CU price. Each field saves only from its confirm button. A v1 transaction that has no priority fee uses the stored lamport value.
+
+---
+
 ## 0.10.0 — 2026-11-16
 
 ### Source packages

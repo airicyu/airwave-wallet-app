@@ -34,7 +34,7 @@ object SignTxRun {
             val here = SignTxRpc.blockhashValid(walletRpc, blockhash)
             val there = SignTxRpc.blockhashValid(otherRpc, blockhash)
             if (here == false && there == true) {
-                val prepared = SignTxPlan.prepare(original, settings.defaultCuPrice, null, userLimit, userPrice, userPriority)
+                val prepared = SignTxPlan.prepare(original, settings.defaultCuPrice, null, userLimit, userPrice, userPriority, priorityDefault(settings))
                 val bytes = prepared?.bytes ?: original
                 return bytes to mismatch(devnetStrip, cluster, other)
             }
@@ -44,7 +44,15 @@ object SignTxRun {
             val probe = SignTxWire.writeBudget(original, SignTxMath.CU_LIMIT_MAX, 0, null)
             if (probe != null) measured = SignTxRpc.simulate(walletRpc, probe)?.unitsConsumed
         }
-        val prepared = SignTxPlan.prepare(original, settings.defaultCuPrice, measured, userLimit, userPrice, userPriority)
+        val prepared = SignTxPlan.prepare(
+            original,
+            settings.defaultCuPrice,
+            measured,
+            userLimit,
+            userPrice,
+            userPriority,
+            priorityDefault(settings),
+        )
             ?: return original to failed(devnetStrip, "TX_UNPARSEABLE", emptyList(), null)
         val sim = if (walletRpc == null) null else SignTxRpc.simulate(walletRpc, prepared.bytes)
         val ui = if (sim == null) {
@@ -176,4 +184,7 @@ object SignTxRun {
         val body = HoldingsHttp.get("https://api.jup.ag/tokens/v2/search?query=$query", headers) ?: return null
         return JupiterMintMeta.hits(body)
     }
+
+    private fun priorityDefault(settings: AirwaveSettings): BigInteger =
+        settings.defaultPriorityFeeLamports.toBigIntegerOrNull() ?: SignTxMath.V1_DEFAULT_PRIORITY
 }

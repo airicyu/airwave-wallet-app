@@ -111,8 +111,8 @@ fun WalletModel.updateSecretDraft(id: SecretFieldId, draft: String) {
     secretStates = secretStates + (id to state.copy(draft = draft, editing = true))
 }
 
-fun WalletModel.confirmSecret(id: SecretFieldId, onValue: (String) -> Unit) {
+fun WalletModel.confirmSecret(id: SecretFieldId, onValue: (String) -> Boolean) {
     val state = secretStates[id] ?: return
-    onValue(state.draft.trim())
+    if (!onValue(state.draft.trim())) return
     secretStates = secretStates - id
 }

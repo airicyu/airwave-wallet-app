@@ -33,6 +33,6 @@ enum class HomeDestination {
     Rpc,
     ApiKeys,
     AiSettings,
-    CuPrice,
+    TxFee,
     WalletLockSettings,
 }

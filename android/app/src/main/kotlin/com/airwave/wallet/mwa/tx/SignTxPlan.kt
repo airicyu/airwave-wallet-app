@@ -26,6 +26,7 @@ object SignTxPlan {
         userLimit: Long?,
         userPrice: Long?,
         userPriority: BigInteger?,
+        defaultPriority: BigInteger = SignTxMath.V1_DEFAULT_PRIORITY,
     ): SignTxPrepared? {
         val budget = SignTxWire.inspect(original) ?: return null
         val signature = SignTxMath.signatureFee(budget.requiredSignatures)
@@ -47,7 +48,7 @@ object SignTxPlan {
             if (budget.priorityFeeLamports != null) {
                 return done(original, budget, true, false, budget.cuLimit, null, budget.priorityFeeLamports, signature)
             }
-            val written = SignTxWire.writeBudget(original, null, null, SignTxMath.V1_DEFAULT_PRIORITY)
+            val written = SignTxWire.writeBudget(original, null, null, defaultPriority)
             return done(
                 written ?: original,
                 budget,
@@ -55,7 +56,7 @@ object SignTxPlan {
                 written == null,
                 budget.cuLimit,
                 null,
-                if (written != null) SignTxMath.V1_DEFAULT_PRIORITY else null,
+                if (written != null) defaultPriority else null,
                 signature,
             )
         }

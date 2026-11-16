@@ -69,8 +69,8 @@ fun HomeAssetsScreen(model: WalletModel) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         when (snapshot.phase) {
-            HoldingPhase.Guide -> Guide(model)
-            HoldingPhase.Skipped -> Skipped(model)
+            HoldingPhase.Guide -> HoldingsGuide(model)
+            HoldingPhase.Skipped -> HoldingsSkipped(model)
             HoldingPhase.Loading -> Text(model.t("assets.loading"), color = AirwaveColors.TextMuted)
             HoldingPhase.Failed -> {
                 Text(model.t("assets.failed"), color = AirwaveColors.Danger)
@@ -83,7 +83,7 @@ fun HomeAssetsScreen(model: WalletModel) {
 }
 
 @Composable
-private fun Guide(model: WalletModel) {
+internal fun HoldingsGuide(model: WalletModel) {
     val context = LocalContext.current
     Text(model.t("rpcGuide.title"), color = AirwaveColors.Text, style = MaterialTheme.typography.titleLarge)
     Text(model.t("rpcGuide.body"), color = AirwaveColors.TextMuted)
@@ -99,7 +99,7 @@ private fun Guide(model: WalletModel) {
 }
 
 @Composable
-private fun Skipped(model: WalletModel) {
+internal fun HoldingsSkipped(model: WalletModel) {
     Text(model.t("home.noAssets"), color = AirwaveColors.TextMuted)
     TextButton(onClick = { model.push(HomeDestination.Rpc) }) { Text(model.t("rpcGuide.set")) }
 }

@@ -63,13 +63,14 @@ data class AirwaveSettings(
     val openRouterDecisionsModelMode: ModelMode = ModelMode.Default,
     val openRouterDecisionsModelChain: List<String> = emptyList(),
     val defaultCuPrice: Long = 25_000L,
+    val defaultPriorityFeeLamports: String = "5000",
     val locale: LocaleTag = LocaleTag.En,
     val idleAutoLockEnabled: Boolean = true,
     val idleAutoLockMinutes: Int = 10,
     val activeAccountId: String = "",
 ) {
     val heliusConfigured: Boolean
-        get() = RpcResolver.isAllowedCustomUrl(heliusApiUrl.trim())
+        get() = heliusApiKeyFromStored(heliusApiUrl) != null
 
     val jupiterConfigured: Boolean
         get() = jupiterApiKey.trim().isNotEmpty()
@@ -111,6 +112,7 @@ data class AirwaveSettings(
             .put("openRouterDecisionsModelMode", openRouterDecisionsModelMode.wire)
             .put("openRouterDecisionsModelChain", stringArray(openRouterDecisionsModelChain))
             .put("defaultCuPrice", defaultCuPrice)
+            .put("defaultPriorityFeeLamports", defaultPriorityFeeLamports)
             .put("locale", locale.wire)
             .put("idleAutoLockEnabled", idleAutoLockEnabled)
             .put("idleAutoLockMinutes", idleAutoLockMinutes)
@@ -159,7 +161,7 @@ data class AirwaveSettings(
             return AirwaveSettings(
                 cluster = Cluster.fromWire(json.optString("cluster", "devnet")),
                 rpcByCluster = rpcByCluster,
-                heliusApiUrl = json.optString("heliusApiUrl", ""),
+                heliusApiUrl = heliusApiKeyFromStored(json.optString("heliusApiUrl", "")) ?: "",
                 jupiterApiKey = json.optString("jupiterApiKey", ""),
                 openRouterApiKey = json.optString("openRouterApiKey", ""),
                 txAiAnalysisEnabled = json.optBoolean("txAiAnalysisEnabled", true),
@@ -168,6 +170,7 @@ data class AirwaveSettings(
                 openRouterDecisionsModelMode = ModelMode.fromWire(json.optString("openRouterDecisionsModelMode")),
                 openRouterDecisionsModelChain = json.optStringArray("openRouterDecisionsModelChain"),
                 defaultCuPrice = cu,
+                defaultPriorityFeeLamports = normalizePriorityFee(json.optString("defaultPriorityFeeLamports", "")),
                 locale = LocaleTag.fromWire(json.optString("locale", "en")),
                 idleAutoLockEnabled = json.optBoolean("idleAutoLockEnabled", true),
                 idleAutoLockMinutes = idleMinutes,
@@ -184,6 +187,16 @@ data class AirwaveSettings(
                 lastSaved
             }
         }
+
+        fun parsePriorityFeeLamports(text: String): String? {
+            val trimmed = text.trim()
+            if (!trimmed.matches(Regex("\\d+"))) return null
+            val value = trimmed.toBigIntegerOrNull() ?: return null
+            if (value > java.math.BigInteger.valueOf(1_000_000_000L)) return null
+            return value.toString()
+        }
+
+        fun normalizePriorityFee(raw: String): String = parsePriorityFeeLamports(raw) ?: "5000"
 
         fun parseCuPriceInput(text: String, lastSaved: Long): Long {
             val trimmed = text.trim()

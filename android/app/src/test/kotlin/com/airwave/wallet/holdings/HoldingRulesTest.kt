@@ -33,12 +33,13 @@ class HoldingRulesTest {
     fun heliusKeyAndCluster() {
         val url = "https://api.helius.xyz/?apiKey=alt&api-key=REPLACE_ME"
         assertEquals("REPLACE_ME", HeliusHoldings.apiKey(url))
-        assertNull(HeliusHoldings.apiKey("https://example.com/?api-key=REPLACE_ME"))
+        assertEquals("REPLACE_ME", HeliusHoldings.apiKey("https://example.com/?api-key=REPLACE_ME"))
+        assertEquals("bare-key", HeliusHoldings.apiKey("bare-key"))
         assertFalse(HeliusHoldings.useWalletApi(Cluster.Devnet, url))
         assertTrue(HeliusHoldings.useWalletApi(Cluster.Mainnet, url))
         val settings = AirwaveSettings(heliusApiUrl = "https://rpc.example.com")
-        assertTrue(settings.heliusConfigured)
-        assertFalse(HeliusHoldings.useWalletApi(Cluster.Mainnet, settings.heliusApiUrl))
+        assertFalse(settings.heliusConfigured)
+        assertTrue(AirwaveSettings(heliusApiUrl = "bare-key").heliusConfigured)
     }
 
     @Test
