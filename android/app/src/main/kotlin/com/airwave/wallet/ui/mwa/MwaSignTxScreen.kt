@@ -62,7 +62,7 @@ import com.airwave.wallet.mwa.tx.SignTxMath
 import com.airwave.wallet.mwa.tx.SignTxUi
 import com.airwave.wallet.mwa.tx.SignTxWire
 import com.airwave.wallet.ui.CopyIcon
-import com.airwave.wallet.ui.HoldingShield
+import com.airwave.wallet.home.HoldingShield
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.BurnerKeys
 import java.math.BigInteger

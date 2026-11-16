@@ -4,7 +4,7 @@ import com.airwave.wallet.session.ApprovalResult
 import com.airwave.wallet.session.WalletOperationKind
 import com.airwave.wallet.session.WalletOperationRequest
 
-import com.airwave.wallet.activeAccount
+import com.airwave.wallet.account.activeAccount
 import com.airwave.wallet.vault.BurnerKeys
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizedAccount

@@ -1,10 +1,13 @@
 /**
- * Draws the combined-account create flow, manage menu, and member sheet.
- * It does not encrypt the vault.
+ * Draws the combined-account create flow and the member rows that sheet uses.
+ * The manage menu is CombinedManageScreens. This file does not encrypt the vault.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.account
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.CopyIcon
+import com.airwave.wallet.ui.AirwavePrimaryButton
 
-import com.airwave.wallet.session.HomeDestination
+import com.airwave.wallet.shell.HomeDestination
 import com.airwave.wallet.session.WalletModel
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -41,13 +44,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airwave.wallet.R
-import com.airwave.wallet.appendCombinedMembers
-import com.airwave.wallet.beginCombinedCreate
-import com.airwave.wallet.commitCombinedCreate
-import com.airwave.wallet.parseCombinedPaste
-import com.airwave.wallet.removeAccount
-import com.airwave.wallet.removeCombinedMember
-import com.airwave.wallet.setCombinedCurrent
+import com.airwave.wallet.account.appendCombinedMembers
+import com.airwave.wallet.account.beginCombinedCreate
+import com.airwave.wallet.account.commitCombinedCreate
+import com.airwave.wallet.account.parseCombinedPaste
+import com.airwave.wallet.account.removeAccount
+import com.airwave.wallet.account.removeCombinedMember
+import com.airwave.wallet.account.setCombinedCurrent
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.AccountKind
 import com.airwave.wallet.vault.BurnerKeys
@@ -175,60 +178,7 @@ internal fun CombinedLocalScreen(model: WalletModel) {
 }
 
 @Composable
-internal fun CombinedManageScreen(model: WalletModel) {
-    val row = model.accountRows.firstOrNull { it.id == model.combinedEditId && it.kind == AccountKind.Combined }
-    if (row == null) {
-        model.pop()
-        return
-    }
-    MenuPage(model, "accounts.manageTitle") {
-        Text(row.label, color = AirwaveColors.Text, fontSize = 16.sp, modifier = Modifier.padding(top = 8.dp))
-        Text(
-            BurnerKeys.short(row.address),
-            color = AirwaveColors.TextMuted,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 13.sp,
-            modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
-        )
-        MenuRow(model.t("accounts.manageCombined")) { model.push(HomeDestination.CombinedMembers) }
-        MenuRow(model.t("accounts.removeCombined"), danger = true) {
-            model.removeAccount(row.id)
-            model.combinedEditId = null
-            model.pop()
-        }
-    }
-}
-
-@Composable
-internal fun CombinedMembersScreen(model: WalletModel) {
-    val row = model.accountRows.firstOrNull { it.id == model.combinedEditId && it.kind == AccountKind.Combined }
-    if (row == null) {
-        model.pop()
-        return
-    }
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(AirwaveColors.Bg)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        SubTopBar(model, "accounts.manage", showMenu = false)
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            CurrentWalletCard(model, row.address)
-            MemberSheet(
-                model = model,
-                members = row.members,
-                current = row.address,
-                onAdd = { model.push(HomeDestination.CombinedAdd) },
-                onCurrent = { model.setCombinedCurrent(it) },
-                onRemove = { model.removeCombinedMember(it) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun CurrentWalletCard(model: WalletModel, address: String) {
+internal fun CurrentWalletCard(model: WalletModel, address: String) {
     val local = model.accountRows.firstOrNull { it.address == address && it.kind != AccountKind.Combined }
     Text(
         model.t("accounts.currentWallet"),
@@ -252,7 +202,7 @@ private fun CurrentWalletCard(model: WalletModel, address: String) {
 }
 
 @Composable
-private fun MemberSheet(
+internal fun MemberSheet(
     model: WalletModel,
     members: List<String>,
     current: String,
@@ -303,7 +253,7 @@ private fun MemberSheet(
 }
 
 @Composable
-private fun MenuPage(model: WalletModel, titleKey: String, content: @Composable () -> Unit) {
+internal fun MenuPage(model: WalletModel, titleKey: String, content: @Composable () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
@@ -316,7 +266,7 @@ private fun MenuPage(model: WalletModel, titleKey: String, content: @Composable 
 }
 
 @Composable
-private fun MenuRow(label: String, danger: Boolean = false, onClick: () -> Unit) {
+internal fun MenuRow(label: String, danger: Boolean = false, onClick: () -> Unit) {
     Text(
         label,
         color = if (danger) Color(0xFFE08080) else AirwaveColors.Text,

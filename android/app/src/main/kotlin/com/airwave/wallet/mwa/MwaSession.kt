@@ -21,7 +21,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
-import com.airwave.wallet.activeAccount
+import com.airwave.wallet.account.activeAccount
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.ReauthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.SignAndSendTransactionsRequest

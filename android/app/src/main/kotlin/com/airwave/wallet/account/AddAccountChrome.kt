@@ -2,7 +2,10 @@
  * Draws shared chrome for add-account inner pages, including the name field, word grid, dice, pubkey row, and CTA.
  * It does not commit vault rows.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.account
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.CopyIcon
+import com.airwave.wallet.ui.AirwavePrimaryButton
 import com.airwave.wallet.session.WalletModel
 
 import androidx.compose.animation.core.Animatable

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.0 — 2026-11-16
+
+Transaction byte readers moved into `SignTxCodec`, the v1 message into `SignTxV1`, and the combined-account manage screens into `CombinedManageScreens`. Account, settings, shell, and home code moved into those packages. Behavior is unchanged.
+
 ## 0.9.0 — 2026-11-16
 
 MWA `sign_and_send_transactions` uses the 0.7.0 approval screen, then submits and returns one signature. `sign_transactions` still does not submit.

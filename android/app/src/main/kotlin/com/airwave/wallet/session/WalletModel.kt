@@ -1,4 +1,7 @@
 package com.airwave.wallet.session
+import com.airwave.wallet.shell.HomeDestination
+import com.airwave.wallet.shell.Route
+import com.airwave.wallet.shell.Tab
 
 import android.app.Application
 import android.util.Base64
@@ -7,20 +10,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.airwave.wallet.activateAccount
-import com.airwave.wallet.activeAccount
-import com.airwave.wallet.appendAccount
-import com.airwave.wallet.clearSigningMaterial
-import com.airwave.wallet.commitBurnerFromPreview
+import com.airwave.wallet.account.activateAccount
+import com.airwave.wallet.account.activeAccount
+import com.airwave.wallet.account.appendAccount
+import com.airwave.wallet.account.clearSigningMaterial
+import com.airwave.wallet.account.commitBurnerFromPreview
 import com.airwave.wallet.holdings.HoldingsModel
-import com.airwave.wallet.persistSettings
-import com.airwave.wallet.persistVault
+import com.airwave.wallet.settings.persistSettings
+import com.airwave.wallet.account.persistVault
 import com.airwave.wallet.settings.SettingsStore
 import com.airwave.wallet.ui.SecretFieldId
 import com.airwave.wallet.ui.SecretFieldState
 import com.airwave.wallet.vault.AccountKind
 import com.airwave.wallet.vault.AccountRecord
-import com.airwave.wallet.CombinedDraft
+import com.airwave.wallet.account.CombinedDraft
 import com.airwave.wallet.vault.BurnerKey
 import com.airwave.wallet.vault.BurnerKeys
 import com.airwave.wallet.vault.ImportPathKind

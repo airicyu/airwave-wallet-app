@@ -2,7 +2,7 @@
  * Draws the add-account inner screens that match the wallet-overall-v1.html phone frames.
  * It does not own the five-row chooser or vault encryption.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.account
 import com.airwave.wallet.session.WalletModel
 
 import androidx.compose.foundation.background
@@ -29,11 +29,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airwave.wallet.commitImportedMnemonic
-import com.airwave.wallet.commitImportedSecret
-import com.airwave.wallet.commitPreviewBurner
-import com.airwave.wallet.commitSeedAccount
-import com.airwave.wallet.commitWatchAddress
+import com.airwave.wallet.account.commitImportedMnemonic
+import com.airwave.wallet.account.commitImportedSecret
+import com.airwave.wallet.account.commitPreviewBurner
+import com.airwave.wallet.account.commitSeedAccount
+import com.airwave.wallet.account.commitWatchAddress
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.Bip39
 import com.airwave.wallet.vault.BurnerKeys

@@ -1,4 +1,5 @@
 package com.airwave.wallet
+import com.airwave.wallet.shell.UnlockScreen
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.session.reject
 

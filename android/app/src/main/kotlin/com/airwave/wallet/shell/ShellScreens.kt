@@ -1,11 +1,38 @@
 /**
  * Draws the home shell, hamburger menu, empty placeholders, and the network cluster picker.
- * Settings and RPC screens live in sibling files in this package.
+ * Account, settings, and asset screens live in their own packages.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.shell
+import com.airwave.wallet.account.AccountManageScreen
+import com.airwave.wallet.account.AccountRevealScreen
+import com.airwave.wallet.account.AccountsScreen
+import com.airwave.wallet.account.AddAccountScreen
+import com.airwave.wallet.account.AddBurnerScreen
+import com.airwave.wallet.account.CombinedAddScreen
+import com.airwave.wallet.account.CombinedCreateScreen
+import com.airwave.wallet.account.CombinedLocalScreen
+import com.airwave.wallet.account.CombinedManageScreen
+import com.airwave.wallet.account.CombinedMembersScreen
+import com.airwave.wallet.account.CombinedPasteScreen
+import com.airwave.wallet.account.GenerateSeedScreen
+import com.airwave.wallet.account.ImportChooserScreen
+import com.airwave.wallet.account.ImportMnemonicScreen
+import com.airwave.wallet.account.ImportSecretScreen
+import com.airwave.wallet.account.WatchAddressScreen
+import com.airwave.wallet.home.HomeAssetsScreen
+import com.airwave.wallet.settings.AiSettingsScreen
+import com.airwave.wallet.settings.ApiKeysScreen
+import com.airwave.wallet.settings.CuPriceScreen
+import com.airwave.wallet.settings.LanguageScreen
+import com.airwave.wallet.settings.RpcScreen
+import com.airwave.wallet.settings.SettingsHubScreen
+import com.airwave.wallet.settings.WalletLockSettingsScreen
+import com.airwave.wallet.ui.CopyIcon
+import com.airwave.wallet.ui.HomeBottomTabs
+import com.airwave.wallet.ui.PickRow
 import com.airwave.wallet.session.WalletModel
-import com.airwave.wallet.session.Tab
-import com.airwave.wallet.session.HomeDestination
+import com.airwave.wallet.shell.Tab
+import com.airwave.wallet.shell.HomeDestination
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,7 +69,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.airwave.wallet.R
-import com.airwave.wallet.activeAccount
+import com.airwave.wallet.account.activeAccount
 import com.airwave.wallet.vault.AccountKind
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -57,7 +84,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.setCluster
+import com.airwave.wallet.settings.setCluster
 import com.airwave.wallet.settings.Cluster
 import com.airwave.wallet.theme.AirwaveColors
 

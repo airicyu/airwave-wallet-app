@@ -65,6 +65,8 @@ The threshold stays **400**. It is not a higher cap. Count **code lines** only: 
 
 Group by what changes together, under `com.airwave.wallet`.
 
+The root package holds `AirwaveApp`, `MainActivity`, and `MwaActivity`. `account` holds vault-row edits and the account screens. `settings` holds the settings store and the settings screens. `shell` holds the app shell, the home shell, and the route enums. `home` holds the assets screen. `session` holds `WalletModel` and the in-memory approval. `ui` holds chrome shared by those screens. `vault`, `holdings`, `mwa`, and `mwa/tx` stay as they are.
+
 - A feature's pure decisions, its I/O, and its Compose screen are separate files. They may share one package.
 - Do not add a `util`, `components`, or `types` package as the primary cut. A type lives with the module that owns the value.
 - Key material stays in `vault`. A UI file does not hold seed bytes.

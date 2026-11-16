@@ -2,7 +2,7 @@
  * Applies settings and secret-field edits on WalletModel.
  * It does not change the vault password box or hold signing key material.
  */
-package com.airwave.wallet
+package com.airwave.wallet.settings
 
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.settings.AirwaveSettings

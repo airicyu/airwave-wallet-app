@@ -1,4 +1,4 @@
-package com.airwave.wallet.session
+package com.airwave.wallet.shell
 
 /** Names the shell screen WalletApp should show. */
 enum class Route { Setup, Unlock, Lead, Generate, Home, Approval }

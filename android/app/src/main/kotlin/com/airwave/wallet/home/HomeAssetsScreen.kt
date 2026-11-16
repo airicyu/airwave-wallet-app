@@ -2,9 +2,11 @@
  * Draws the assets tab body, including the guide, empty skip, failure state, and the token list.
  * It does not own the snapshot and does not parse RPC JSON.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.home
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.CopyIcon
 import com.airwave.wallet.session.WalletModel
-import com.airwave.wallet.session.HomeDestination
+import com.airwave.wallet.shell.HomeDestination
 
 import android.content.Intent
 import android.net.Uri

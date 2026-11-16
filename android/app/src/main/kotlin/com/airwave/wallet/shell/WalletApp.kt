@@ -2,9 +2,9 @@
  * Top-level Compose tree for the wallet shell.
  * It switches among setup, unlock, lead, generate, home, and MWA approval from WalletModel.route. It does not talk to walletlib or encrypt the vault.
  */
-package com.airwave.wallet
+package com.airwave.wallet.shell
 import com.airwave.wallet.session.WalletModel
-import com.airwave.wallet.session.Route
+import com.airwave.wallet.shell.Route
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,7 +53,7 @@ import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.theme.AirwaveTheme
 import com.airwave.wallet.ui.AirwavePrimaryButton
 import com.airwave.wallet.ui.AirwaveUnlockBackdrop
-import com.airwave.wallet.ui.HomeShell
+import com.airwave.wallet.shell.HomeShell
 import com.airwave.wallet.ui.mwa.MwaApprovalScreen
 import com.airwave.wallet.ui.airwaveUnlockFieldColors
 import com.airwave.wallet.vault.BurnerKeys

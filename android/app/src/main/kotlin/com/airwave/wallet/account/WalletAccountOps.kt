@@ -2,8 +2,9 @@
  * Applies multi-account vault edits and refreshes active-account session material on WalletModel.
  * It does not render Compose screens or parse holdings RPC.
  */
-package com.airwave.wallet
-import com.airwave.wallet.session.Route
+package com.airwave.wallet.account
+import com.airwave.wallet.settings.updateSettings
+import com.airwave.wallet.shell.Route
 
 import android.util.Base64
 import androidx.lifecycle.viewModelScope

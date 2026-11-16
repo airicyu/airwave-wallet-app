@@ -8,4 +8,4 @@ After the user assigns the batch, move the items into that version's INDEX and c
 
 ## Current
 
-None. The previous batch is in [0.7.0](./0.7.0/INDEX.md).
+None. The previous batch is in [0.10.0](./0.10.0/INDEX.md).

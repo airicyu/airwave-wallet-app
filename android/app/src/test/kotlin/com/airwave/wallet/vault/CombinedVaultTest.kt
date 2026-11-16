@@ -1,6 +1,6 @@
 package com.airwave.wallet.vault
 
-import com.airwave.wallet.parseCombinedPaste
+import com.airwave.wallet.account.parseCombinedPaste
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

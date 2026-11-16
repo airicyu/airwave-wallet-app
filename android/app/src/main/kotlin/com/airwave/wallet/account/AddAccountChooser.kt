@@ -2,10 +2,13 @@
  * Draws the add-account chooser, with five StrokeIcon rows and the import sub-chooser.
  * It does not write vault rows.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.account
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.CopyIcon
+import com.airwave.wallet.ui.AirwavePrimaryButton
 import com.airwave.wallet.session.WalletModel
-import com.airwave.wallet.session.HomeDestination
-import com.airwave.wallet.beginCombinedCreate
+import com.airwave.wallet.shell.HomeDestination
+import com.airwave.wallet.account.beginCombinedCreate
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

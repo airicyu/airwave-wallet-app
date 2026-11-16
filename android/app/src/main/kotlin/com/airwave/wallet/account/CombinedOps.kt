@@ -2,7 +2,8 @@
  * Creates and edits a combined wallet account on the in-memory vault list.
  * It does not draw screens or sign.
  */
-package com.airwave.wallet
+package com.airwave.wallet.account
+import com.airwave.wallet.shell.HomeDestination
 
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.vault.AccountKind
@@ -61,7 +62,7 @@ fun WalletModel.commitCombinedCreate() {
     )
     combinedDraft = null
     popToHome()
-    push(com.airwave.wallet.session.HomeDestination.Accounts)
+    push(HomeDestination.Accounts)
 }
 
 fun WalletModel.appendCombinedMembers(incoming: List<String>) {

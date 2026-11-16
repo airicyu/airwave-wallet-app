@@ -2,9 +2,12 @@
  * Draws the wallet account list so the user can switch, rename, or delete an account.
  * The add-account chooser and inner forms live in AddAccountChooser.kt and AddAccountForms.kt.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.account
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.CopyIcon
+import com.airwave.wallet.ui.AirwavePrimaryButton
 import com.airwave.wallet.session.WalletModel
-import com.airwave.wallet.session.HomeDestination
+import com.airwave.wallet.shell.HomeDestination
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -57,10 +60,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airwave.wallet.R
-import com.airwave.wallet.removeAccount
-import com.airwave.wallet.renameAccount
-import com.airwave.wallet.reorderAccounts
-import com.airwave.wallet.setActiveAccountId
+import com.airwave.wallet.account.removeAccount
+import com.airwave.wallet.account.renameAccount
+import com.airwave.wallet.account.reorderAccounts
+import com.airwave.wallet.account.setActiveAccountId
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.AccountKind
 import com.airwave.wallet.vault.BurnerKeys

@@ -2,9 +2,13 @@
  * Draws the settings hub and its sub-screens from the home menu stack.
  * It does not own RPC endpoint editing or the home shell tabs.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.settings
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.PickRow
+import com.airwave.wallet.ui.SecretFieldId
+import com.airwave.wallet.ui.SecretKeyField
 import com.airwave.wallet.session.WalletModel
-import com.airwave.wallet.session.HomeDestination
+import com.airwave.wallet.shell.HomeDestination
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,13 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.beginSecretEdit
-import com.airwave.wallet.confirmSecret
-import com.airwave.wallet.discardSecret
-import com.airwave.wallet.setLocale
-import com.airwave.wallet.toggleReveal
-import com.airwave.wallet.updateSecretDraft
-import com.airwave.wallet.updateSettings
+import com.airwave.wallet.settings.beginSecretEdit
+import com.airwave.wallet.settings.confirmSecret
+import com.airwave.wallet.settings.discardSecret
+import com.airwave.wallet.settings.setLocale
+import com.airwave.wallet.settings.toggleReveal
+import com.airwave.wallet.settings.updateSecretDraft
+import com.airwave.wallet.settings.updateSettings
 import com.airwave.wallet.settings.AirwaveSettings
 import com.airwave.wallet.settings.LocaleTag
 import com.airwave.wallet.settings.ModelMode

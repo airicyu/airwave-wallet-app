@@ -29,6 +29,7 @@ Versions proceed one named INDEX at a time. Do not open the next number unless t
 | [0.7.0](./0.7.0/INDEX.md) | shipped | MWA `sign_transactions`: legacy, v0, and v1 approval; no submit; no AI |
 | [0.8.0](./0.8.0/INDEX.md) | shipped | Combined wallet account UI, matching the local web create and manage flow |
 | [0.9.0](./0.9.0/INDEX.md) | shipped | MWA `sign_and_send_transactions`: same approval as 0.7.0, then submit |
+| [0.10.0](./0.10.0/INDEX.md) | shipped | Source structure: split oversized files and group packages. No behavior change |
 
 **Patch** (`0.1.1`, …) = bugfix for the current minor only. **Minor** (`0.2.0`, …) = new scheduled features.
 

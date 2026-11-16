@@ -3,9 +3,10 @@
  * It does not decrypt the vault. Unlock and lock stay on WalletModel.
  */
 package com.airwave.wallet.session
+import com.airwave.wallet.shell.Route
 
 import androidx.lifecycle.viewModelScope
-import com.airwave.wallet.activeAccount
+import com.airwave.wallet.account.activeAccount
 import com.airwave.wallet.mwa.MwaPayloads
 import com.airwave.wallet.settings.RpcResolver
 import com.airwave.wallet.solana.LegacyTransaction

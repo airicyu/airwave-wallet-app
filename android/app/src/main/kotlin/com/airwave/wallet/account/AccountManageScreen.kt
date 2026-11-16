@@ -2,7 +2,10 @@
  * Manage page for a signing or watch account: full address, reveal, and remove.
  * Combined accounts use CombinedManageScreen. This file does not encrypt the vault.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.account
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.CopyIcon
+import com.airwave.wallet.ui.AirwavePrimaryButton
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,9 +39,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airwave.wallet.exportAccountSecret
-import com.airwave.wallet.removeAccount
-import com.airwave.wallet.session.HomeDestination
+import com.airwave.wallet.account.exportAccountSecret
+import com.airwave.wallet.account.removeAccount
+import com.airwave.wallet.shell.HomeDestination
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.AccountKind

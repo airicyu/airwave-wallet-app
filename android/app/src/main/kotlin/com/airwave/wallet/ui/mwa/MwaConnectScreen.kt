@@ -39,7 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airwave.wallet.activeAccount
+import com.airwave.wallet.account.activeAccount
 import com.airwave.wallet.R
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.BurnerKeys

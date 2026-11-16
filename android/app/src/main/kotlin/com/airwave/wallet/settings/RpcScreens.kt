@@ -2,7 +2,11 @@
  * Draws the RPC endpoint list and URL draft rows on the settings stack.
  * It does not own cluster selection or the settings hub.
  */
-package com.airwave.wallet.ui
+package com.airwave.wallet.settings
+import com.airwave.wallet.shell.SubTopBar
+import com.airwave.wallet.ui.ConfirmDiscardActions
+import com.airwave.wallet.ui.RpcRadioGutter
+import com.airwave.wallet.ui.TrailingInlineActionsWidth
 import com.airwave.wallet.session.WalletModel
 
 import androidx.compose.foundation.background
@@ -42,11 +46,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.airwave.wallet.addRpcEndpoint
-import com.airwave.wallet.isRpcEndpointActive
-import com.airwave.wallet.removeRpcEndpoint
-import com.airwave.wallet.replaceRpcEndpoint
-import com.airwave.wallet.selectRpcEndpoint
+import com.airwave.wallet.settings.addRpcEndpoint
+import com.airwave.wallet.settings.isRpcEndpointActive
+import com.airwave.wallet.settings.removeRpcEndpoint
+import com.airwave.wallet.settings.replaceRpcEndpoint
+import com.airwave.wallet.settings.selectRpcEndpoint
 import com.airwave.wallet.settings.Cluster
 import com.airwave.wallet.settings.RpcResolver
 import com.airwave.wallet.theme.AirwaveColors
