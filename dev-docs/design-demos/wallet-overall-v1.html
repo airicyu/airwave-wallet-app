@@ -634,6 +634,10 @@
     font: inherit; font-weight: 650; cursor: default; text-align: left;
   }
   .manage-action-row:disabled { opacity: 0.45; }
+  .manage-action-row.on { border-color: var(--accent); background: #1a2838; }
+  .manage-action-row.danger { color: var(--danger, #f07178); }
+  .manage-name { margin: 8px 0 4px; font-weight: 650; }
+  .manage-addr { margin: 0 0 16px; font-family: var(--mono); font-size: 13px; color: var(--text-muted); }
   .main-wallet { margin: 12px 0; }
   .main-wallet-label { font-size: 12px; color: var(--text-muted); font-weight: 650; margin-bottom: 8px; }
   .main-pick {
@@ -690,7 +694,8 @@
     <button type="button" data-screen="add-combined-local">聚合 — 本機帳戶</button>
     <button type="button" data-screen="account-rename">重新命名</button>
     <button type="button" data-screen="account-switch">切換主錢包</button>
-    <button type="button" data-screen="account-manage">管理聚合</button>
+    <button type="button" data-screen="account-manage">管理帳戶（聚合選單）</button>
+    <button type="button" data-screen="account-combined-manage">管理聚合錢包帳戶</button>
     <button type="button" data-screen="account-manage-add">管理 — 加入成員</button>
     <button type="button" data-screen="account-manage-paste">管理 — 貼上地址</button>
     <button type="button" data-screen="account-manage-local">管理 — 本機帳戶</button>
@@ -720,8 +725,11 @@
     </div>
 
     <div class="remark" data-screen="account-manage">
-      <p><strong>Ship:</strong> 管理聚合：主錢包卡＋成員可編輯（選主／拖曳／刪／+／外部成員可 rename）。</p>
-      <p><strong>Note:</strong> 非聚合帳戶的 manage（顯示私鑰／移除）見 <code>account-reveal-key</code>；本頁畫 combined。</p>
+      <p><strong>Ship:</strong> 聚合帳戶的 kebab 進這頁：名稱、主錢包短地址、一列「管理聚合錢包帳戶」、一列「移除聚合錢包帳戶」。移除不二次確認。成員表在 <code>account-combined-manage</code>。</p>
+    </div>
+
+    <div class="remark" data-screen="account-combined-manage">
+      <p><strong>Ship:</strong> 管理聚合錢包帳戶：主錢包卡＋成員可編輯（選主／拖曳／刪／+／外部成員可 rename）。</p>
     </div>
 
     <div class="remark" data-screen="account-switch">
@@ -733,7 +741,7 @@
     </div>
 
     <div class="remark" data-screen="add-combined-local">
-      <p><strong>Ship:</strong> 本機簽名／觀察帳戶列表；已加入列 disabled。</p>
+      <p><strong>Ship:</strong> 點列只是暫選（accent 框）。底部確認才寫進草稿並回到建立頁。返回不改草稿。已在草稿的列維持停用。</p>
     </div>
 
     <div class="remark" data-screen="add-combined-paste">
@@ -1411,11 +1419,13 @@
           <span style="width:44px"></span>
         </div>
         <div class="pick-list">
-          <button type="button" class="manage-action-row">demo · JCLh…1KWj</button>
+          <button type="button" class="manage-action-row on">demo · JCLh…1KWj</button>
           <button type="button" class="manage-action-row">Account 2 · 3uEc…5nfn</button>
           <button type="button" class="manage-action-row" disabled>watch 1 · 7CoH…c2yh · 已加入</button>
           <button type="button" class="manage-action-row">watch 2 · buwa…9XsS</button>
         </div>
+        <div class="grow"></div>
+        <button class="btn primary" type="button">確認</button>
       </div>
     </section>
 
@@ -1479,7 +1489,7 @@
       </div>
     </section>
 
-    <section class="screen" id="account-manage">
+    <section class="screen" id="account-combined-manage">
       <div class="pad">
         <div class="sub-top">
           <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -1521,6 +1531,22 @@
               <button class="trash" type="button" aria-label="移除"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="account-manage">
+      <div class="pad">
+        <div class="sub-top">
+          <button class="icon-btn-ghost" type="button" aria-label="返回"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="title">管理帳戶</div>
+          <span style="width:44px"></span>
+        </div>
+        <p class="manage-name">combined</p>
+        <p class="manage-addr">7CoH…c2yh</p>
+        <div class="manage-actions">
+          <button type="button" class="manage-action-row">管理聚合錢包帳戶</button>
+          <button type="button" class="manage-action-row danger">移除聚合錢包帳戶</button>
         </div>
       </div>
     </section>

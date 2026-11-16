@@ -30,7 +30,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,11 +46,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,6 +60,7 @@ import com.airwave.wallet.mwa.tx.SignTxIx
 import com.airwave.wallet.mwa.tx.SignTxMath
 import com.airwave.wallet.mwa.tx.SignTxUi
 import com.airwave.wallet.mwa.tx.SignTxWire
+import com.airwave.wallet.ui.CopyIcon
 import com.airwave.wallet.ui.HoldingShield
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.vault.BurnerKeys
@@ -76,7 +74,6 @@ internal fun SignTxBody(model: WalletModel, pending: WalletOperationRequest, ses
     var openFail by remember { mutableStateOf(true) }
     var limitDraft by remember(ui?.cuLimit) { mutableStateOf(ui?.cuLimit.orEmpty()) }
     var secondDraft by remember(ui?.secondField) { mutableStateOf(ui?.secondField.orEmpty()) }
-    val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     val mismatch = ui?.mismatch
     Column(Modifier.fillMaxSize()) {
@@ -137,9 +134,12 @@ internal fun SignTxBody(model: WalletModel, pending: WalletOperationRequest, ses
                                     color = AirwaveColors.TextMuted,
                                     modifier = Modifier.weight(1f).clickable { openFail = !openFail },
                                 )
-                                IconButton(onClick = { clipboard.setText(AnnotatedString(ui.failureReason.orEmpty())) }) {
-                                    Icon(painterResource(R.drawable.ic_stroke_copy), model.t("accounts.copy"), tint = AirwaveColors.Text)
-                                }
+                                CopyIcon(
+                                    text = ui.failureReason.orEmpty(),
+                                    idleLabel = model.t("accounts.copy"),
+                                    copiedLabel = model.t("copy.copied"),
+                                    idleTint = AirwaveColors.Text,
+                                )
                             }
                             if (openFail) {
                                 Text(ui.failureReason.orEmpty(), color = AirwaveColors.TextMuted, modifier = Modifier.heightIn(max = 320.dp))

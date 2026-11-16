@@ -5,9 +5,6 @@
 package com.airwave.wallet.ui
 import com.airwave.wallet.session.WalletModel
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearEasing
@@ -46,7 +43,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -304,8 +300,7 @@ private fun WordCell(
 }
 
 @Composable
-internal fun PubkeyRow(label: String, copyLabel: String, address: String) {
-    val context = LocalContext.current
+internal fun PubkeyRow(label: String, copyLabel: String, copiedLabel: String, address: String) {
     Text(label, color = AirwaveColors.TextMuted, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -316,16 +311,11 @@ internal fun PubkeyRow(label: String, copyLabel: String, address: String) {
             modifier = Modifier.weight(1f),
         )
         if (address.isNotEmpty()) {
-            Icon(
-                painter = painterResource(R.drawable.ic_copy_addr),
-                contentDescription = copyLabel,
-                tint = AirwaveColors.TextMuted,
-                modifier = Modifier
-                    .size(18.dp)
-                    .clickable {
-                        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        cm.setPrimaryClip(ClipData.newPlainText("address", address))
-                    },
+            CopyIcon(
+                text = address,
+                idleLabel = copyLabel,
+                copiedLabel = copiedLabel,
+                size = 18.dp,
             )
         }
     }

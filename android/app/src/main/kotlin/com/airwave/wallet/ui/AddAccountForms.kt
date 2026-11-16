@@ -57,7 +57,7 @@ internal fun AddBurnerScreen(model: WalletModel) {
             model.preview?.zero()
             model.preview = BurnerKeys.generate()
         }
-        PubkeyRow(model.t("accounts.pubkey"), model.t("accounts.copy"), key?.address.orEmpty())
+        PubkeyRow(model.t("accounts.pubkey"), model.t("accounts.copy"), model.t("copy.copied"), key?.address.orEmpty())
     }
 }
 
@@ -102,7 +102,7 @@ internal fun GenerateSeedScreen(model: WalletModel) {
             }
         }
         WordGrid(padded, readOnly = true) { }
-        PubkeyRow(model.t("accounts.pubkey"), model.t("accounts.copy"), previewAddress)
+        PubkeyRow(model.t("accounts.pubkey"), model.t("accounts.copy"), model.t("copy.copied"), previewAddress)
     }
 }
 

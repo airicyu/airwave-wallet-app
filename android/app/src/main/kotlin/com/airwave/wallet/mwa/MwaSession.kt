@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import com.airwave.wallet.activeAccount
-import com.airwave.wallet.vault.AccountKind
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.ReauthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.SignMessagesRequest
@@ -170,7 +169,7 @@ class MwaSession {
 
     private fun showConnect(request: WalletOperationRequest) {
         val model = wallet ?: return
-        if (model.activeAccount()?.kind == AccountKind.Watch) {
+        if (model.activeAccount()?.canSign() == false) {
             request.finish(ApprovalResult.Rejected)
             step = MwaStep.WatchBlocked(model.t("mwa.watchAccount"))
             return
@@ -193,7 +192,7 @@ class MwaSession {
             step = MwaStep.Waiting
             return
         }
-        if (model.activeAccount()?.kind == AccountKind.Watch) {
+        if (model.activeAccount()?.canSign() == false) {
             request.finish(ApprovalResult.Rejected)
             step = MwaStep.WatchBlocked(model.t("mwa.watchAccount"))
             return
@@ -205,7 +204,7 @@ class MwaSession {
 
     private fun showSignTx(request: WalletOperationRequest) {
         val model = wallet ?: return
-        if (model.activeAccount()?.kind == AccountKind.Watch) {
+        if (model.activeAccount()?.canSign() == false) {
             request.finish(ApprovalResult.Rejected)
             step = MwaStep.WatchBlocked(model.t("mwa.watchAccount"))
             return

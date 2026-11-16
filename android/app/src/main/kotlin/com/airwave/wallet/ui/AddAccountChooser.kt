@@ -1,10 +1,11 @@
 /**
  * Draws the add-account chooser, with five StrokeIcon rows and the import sub-chooser.
- * It does not write vault rows. Combined-later still writes nothing.
+ * It does not write vault rows.
  */
 package com.airwave.wallet.ui
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.session.HomeDestination
+import com.airwave.wallet.beginCombinedCreate
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -77,7 +78,10 @@ internal fun AddAccountScreen(model: WalletModel) {
             icon = R.drawable.ic_stroke_layers,
             title = model.t("accounts.chooser.combinedTitle"),
             subtitle = model.t("accounts.chooser.combinedSub"),
-        ) { model.push(HomeDestination.CombinedLater) }
+        ) {
+            model.beginCombinedCreate()
+            model.push(HomeDestination.CombinedCreate)
+        }
     }
 }
 
@@ -93,21 +97,6 @@ internal fun ImportChooserScreen(model: WalletModel) {
         SubTopBar(model, "accounts.chooser.importTitle", showMenu = false)
         ImportKindRow(model.t("accounts.importMnemonic")) { model.push(HomeDestination.ImportMnemonic) }
         ImportKindRow(model.t("accounts.importSecret")) { model.push(HomeDestination.ImportSecret) }
-    }
-}
-
-@Composable
-internal fun CombinedLaterScreen(model: WalletModel) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(AirwaveColors.Bg)
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        SubTopBar(model, "accounts.combined", showMenu = false)
-        Text(model.t("accounts.combinedLater"), color = AirwaveColors.TextMuted, modifier = Modifier.padding(top = 24.dp))
     }
 }
 

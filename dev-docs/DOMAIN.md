@@ -76,7 +76,16 @@ Do not use: …      (easy to confuse, or retired)
 - **Definition:** One on-device account the user treats as theirs. From 0.4.0 the vault holds a list of accounts; settings remember which id is **active**. Home assets and signing follow the active account. Kinds: **seed** (BIP39 mnemonic), **burner** (random 32-byte), **secret** (imported key), **watch** (address only, cannot sign).
 - **Code:** Plaintext `accounts` array inside `airwave.vault.v1`; `activeAccountId` in `airwave.settings.v1`.
 - **Alias:** account
-- **Do not use:** combined wallet, member address, main wallet, connected site
+- **Do not use:** connected site as a wallet account
+
+### Combined wallet account
+
+- **Chinese:** 聚合錢包帳戶
+- **English:** combined wallet account
+- **Definition:** From 0.8.0, one vault row that lists member addresses and one current-wallet address among them. It does not hold a signing key. Home still shows one account's assets until a later version.
+- **Code:** `kind` `combined` on an `accounts` row. `address` is the current wallet. `members` is the address list.
+- **Alias:** combined account
+- **Do not use:** as a signer; as a merged balance on Home in 0.8.0
 
 ### Pending approval
 
@@ -92,6 +101,7 @@ Do not use: …      (easy to confuse, or retired)
 
 These extension terms are not this app's model. Do not implement them because the extension DOMAIN defines them. An INDEX that wants one must write the entry here first.
 
-- Combined wallet account, member address, main wallet
+- Main wallet
+- Connected site, Wallet Standard account
 - Connected site, Wallet Standard account
 - Extension package (`wallet/` in the other repo)

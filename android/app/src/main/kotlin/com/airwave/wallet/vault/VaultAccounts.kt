@@ -72,6 +72,7 @@ object VaultAccounts {
                 val phrase = record.mnemonic ?: return null
                 Bip39.deriveSolanaSeed(resources, phrase, record.pathKind, record.pathIndex)
             }
+            AccountKind.Combined -> null
         }
     }
 
@@ -104,6 +105,12 @@ object VaultAccounts {
                     pathIndex = obj.optInt("pathIndex", 0),
                 )
             }
+            AccountKind.Combined -> {
+                val raw = obj.optJSONArray("members") ?: return null
+                val members = (0 until raw.length()).map { raw.optString(it) }.filter { it.isNotBlank() }
+                if (members.isEmpty() || address !in members) return null
+                AccountRecord(id, kind, label, address, members = members)
+            }
         }
     }
 
@@ -120,6 +127,11 @@ object VaultAccounts {
                 obj.put("mnemonic", record.mnemonic)
                 obj.put("pathKind", record.pathKind.wire)
                 obj.put("pathIndex", record.pathIndex)
+            }
+            AccountKind.Combined -> {
+                val members = JSONArray()
+                record.members.forEach { members.put(it) }
+                obj.put("members", members)
             }
         }
         return obj

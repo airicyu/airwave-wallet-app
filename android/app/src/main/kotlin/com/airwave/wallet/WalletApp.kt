@@ -6,9 +6,6 @@ package com.airwave.wallet
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.session.Route
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -30,7 +27,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,10 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -215,21 +208,10 @@ private fun GenerateScreen(model: WalletModel) {
         Text("Solana address", color = AirwaveColors.TextMuted)
         Row {
             Text(BurnerKeys.short(address), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f), color = AirwaveColors.Text)
-            CopyButton(address)
+            com.airwave.wallet.ui.CopyIcon(address, "Copy", "Copied")
         }
         OutlinedButton(onClick = { model.roll() }) { Text("Roll again") }
         AirwavePrimaryButton("Generate", { model.commitGenerate() })
     }
 }
 
-@Composable
-private fun CopyButton(text: String) {
-    val context = LocalContext.current
-    TextButton(
-        onClick = {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("address", text))
-        },
-        modifier = Modifier.semantics { contentDescription = "Copy address" },
-    ) { Text("Copy", color = AirwaveColors.Accent) }
-}

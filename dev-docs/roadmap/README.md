@@ -27,6 +27,7 @@ Versions proceed one named INDEX at a time. Do not open the next number unless t
 | [0.5.0](./0.5.0/INDEX.md) | shipped | MWA connect on `MwaActivity`; unlock stays on that session; sign methods decline |
 | [0.6.0](./0.6.0/INDEX.md) | shipped | MWA `sign_messages` on `MwaActivity`; no off-chain message format |
 | [0.7.0](./0.7.0/INDEX.md) | shipped | MWA `sign_transactions`: legacy, v0, and v1 approval; no submit; no AI |
+| [0.8.0](./0.8.0/INDEX.md) | shipped | Combined wallet account UI, matching the local web create and manage flow |
 
 **Patch** (`0.1.1`, …) = bugfix for the current minor only. **Minor** (`0.2.0`, …) = new scheduled features.
 

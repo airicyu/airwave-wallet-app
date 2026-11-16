@@ -20,6 +20,7 @@ import com.airwave.wallet.ui.SecretFieldId
 import com.airwave.wallet.ui.SecretFieldState
 import com.airwave.wallet.vault.AccountKind
 import com.airwave.wallet.vault.AccountRecord
+import com.airwave.wallet.CombinedDraft
 import com.airwave.wallet.vault.BurnerKey
 import com.airwave.wallet.vault.BurnerKeys
 import com.airwave.wallet.vault.ImportPathKind
@@ -81,6 +82,8 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     var importMnemonicDraft by mutableStateOf<String?>(null)
     var importSecretDraft by mutableStateOf<String?>(null)
     var watchDraft by mutableStateOf<String?>(null)
+    var combinedDraft by mutableStateOf<CombinedDraft?>(null)
+    var combinedEditId by mutableStateOf<String?>(null)
     var importPathKind by mutableStateOf(ImportPathKind.Phantom)
     var importPathIndex by mutableStateOf(0)
 
@@ -219,6 +222,8 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun pop() {
+        val leaving = homeStack.lastOrNull()
+        if (leaving == HomeDestination.CombinedCreate) combinedDraft = null
         homeStack = if (homeStack.isEmpty()) homeStack else homeStack.dropLast(1)
         if (homeStack.isEmpty()) syncHoldings(refresh = false)
     }

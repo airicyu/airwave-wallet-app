@@ -6,13 +6,9 @@ package com.airwave.wallet.ui
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.session.HomeDestination
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -29,18 +25,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.ripple
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -56,7 +47,6 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.res.painterResource
@@ -122,6 +112,7 @@ internal fun AccountsScreen(model: WalletModel) {
                     label = row.label,
                     address = row.address,
                     watch = row.kind == AccountKind.Watch,
+                    combined = row.kind == AccountKind.Combined,
                     active = model.settings.activeAccountId == row.id,
                     renaming = renamingId == row.id,
                     renameDraft = renameDraft,
@@ -138,7 +129,13 @@ internal fun AccountsScreen(model: WalletModel) {
                         model.renameAccount(row.id, renameDraft)
                         renamingId = null
                     },
-                    onDelete = { model.removeAccount(row.id) },
+                    onManage = {
+                        model.combinedEditId = row.id
+                        model.push(
+                            if (row.kind == AccountKind.Combined) HomeDestination.CombinedManage
+                            else HomeDestination.AccountManage,
+                        )
+                    },
                     dragging = dragging,
                     dropBefore = dropLine?.id == row.id && dropLine?.before == true,
                     dropAfter = dropLine?.id == row.id && dropLine?.before == false,
@@ -175,6 +172,7 @@ private fun AccountListRow(
     label: String,
     address: String,
     watch: Boolean,
+    combined: Boolean,
     active: Boolean,
     renaming: Boolean,
     renameDraft: String,
@@ -182,7 +180,7 @@ private fun AccountListRow(
     onSelect: () -> Unit,
     onStartRename: () -> Unit,
     onConfirmRename: () -> Unit,
-    onDelete: () -> Unit,
+    onManage: () -> Unit,
     dragging: Boolean,
     dropBefore: Boolean,
     dropAfter: Boolean,
@@ -191,18 +189,17 @@ private fun AccountListRow(
     onDrag: (Float) -> Unit,
     onDragEnd: () -> Unit,
 ) {
-    val context = LocalContext.current
-    var copied by remember { mutableStateOf(false) }
-    LaunchedEffect(copied) {
-        if (copied) {
-            kotlinx.coroutines.delay(1200)
-            copied = false
-        }
-    }
-    var menuOpen by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(12.dp)
-    val mark = if (watch) R.drawable.ic_stroke_eye else R.drawable.ic_stroke_key
-    val tint = if (watch) Color(0xFF6CB4E8) else Color(0xFFD08B5B)
+    val mark = when {
+        combined -> R.drawable.ic_stroke_layers
+        watch -> R.drawable.ic_stroke_eye
+        else -> R.drawable.ic_stroke_key
+    }
+    val tint = when {
+        combined -> Color(0xFFC084FC)
+        watch -> Color(0xFF6CB4E8)
+        else -> Color(0xFFD08B5B)
+    }
     Column(Modifier.fillMaxWidth().zIndex(if (dragging) 1f else 0f)) {
         if (dropBefore) AccountDropLine()
         Column(
@@ -261,22 +258,11 @@ private fun AccountListRow(
                 description = model.t("accounts.rename"),
                 onClick = onStartRename,
             )
-            Box {
-                AccountSideButton(
-                    icon = painterResource(R.drawable.ic_kebab),
-                    description = model.t("accounts.delete"),
-                    onClick = { menuOpen = true },
-                )
-                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                    DropdownMenuItem(
-                        text = { Text(model.t("accounts.delete"), color = AirwaveColors.Danger) },
-                        onClick = {
-                            menuOpen = false
-                            onDelete()
-                        },
-                    )
-                }
-            }
+            AccountSideButton(
+                icon = painterResource(R.drawable.ic_kebab),
+                description = model.t("accounts.manage"),
+                onClick = onManage,
+            )
         }
         Row(
             Modifier.padding(top = 4.dp),
@@ -288,32 +274,13 @@ private fun AccountListRow(
                 fontFamily = FontFamily.Monospace,
                 style = MaterialTheme.typography.bodySmall,
             )
-            if (copied) {
-                Icon(
-                    Icons.Default.Check,
-                    contentDescription = model.t("accounts.copy"),
-                    tint = AirwaveColors.Ok,
-                    modifier = Modifier.padding(start = 6.dp).size(14.dp),
-                )
-            } else {
-                Icon(
-                    painterResource(R.drawable.ic_stroke_copy),
-                    contentDescription = model.t("accounts.copy"),
-                    tint = AirwaveColors.TextMuted,
-                    modifier = Modifier
-                        .padding(start = 6.dp)
-                        .size(14.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = ripple(bounded = false, radius = 12.dp),
-                            onClick = {
-                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboard.setPrimaryClip(ClipData.newPlainText("address", address))
-                                copied = true
-                            },
-                        ),
-                )
-            }
+            CopyIcon(
+                text = address,
+                idleLabel = model.t("accounts.copy"),
+                copiedLabel = model.t("copy.copied"),
+                modifier = Modifier.padding(start = 6.dp),
+                size = 14.dp,
+            )
         }
             }
         }

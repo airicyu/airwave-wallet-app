@@ -19,6 +19,8 @@ import com.airwave.wallet.vault.BurnerKeys
 import com.airwave.wallet.vault.ImportPathKind
 import com.airwave.wallet.vault.VaultAccounts
 import java.util.UUID
+import javax.crypto.AEADBadTagException
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 
 internal fun WalletModel.activeAccount(): AccountRecord? =
     accountRows.firstOrNull { it.id == settings.activeAccountId }
@@ -52,6 +54,14 @@ fun WalletModel.removeAccount(id: String): Boolean {
     val signingLeft = accountRows.filter { it.id != id && it.canSign() }
     if (row.canSign() && signingLeft.isEmpty()) return false
     val next = accountRows.filterNot { it.id == id }
+    if (next.isEmpty()) {
+        accountRows = emptyList()
+        updateSettings { it.copy(activeAccountId = "") }
+        address = null
+        persistVault()
+        syncHoldings(refresh = false)
+        return true
+    }
     accountRows = next
     if (settings.activeAccountId == id) {
         val pick = signingLeft.firstOrNull() ?: next.first()
@@ -203,6 +213,27 @@ internal fun WalletModel.persistVaultAfterFrame() {
     }
 }
 
+/** Returns the 64-byte secret as Base58 after the password opens the vault. A wrong password returns null. */
+internal fun WalletModel.exportAccountSecret(accountId: String, password: String): String? {
+    val file = store.read() ?: return null
+    val chars = password.toCharArray()
+    try {
+        cipher.open(chars, file)
+    } catch (_: AEADBadTagException) {
+        chars.fill('\u0000')
+        return null
+    }
+    chars.fill('\u0000')
+    val row = accountRows.firstOrNull { it.id == accountId && it.canSign() } ?: return null
+    val seed = VaultAccounts.signingSeed(row, getApplication<android.app.Application>().resources) ?: return null
+    val pub = Ed25519PrivateKeyParameters(seed, 0).generatePublicKey().encoded
+    val secret = seed + pub
+    val text = BurnerKeys.base58(secret)
+    seed.fill(0)
+    secret.fill(0)
+    return text
+}
+
 internal fun WalletModel.persistVault() {
     val chars = passwordChars ?: return
     val bytes = VaultAccounts.toJsonBytes(accountRows)
@@ -218,6 +249,8 @@ internal fun WalletModel.clearSigningMaterial() {
     importMnemonicDraft = null
     importSecretDraft = null
     watchDraft = null
+    combinedDraft = null
+    combinedEditId = null
 }
 
 private fun WalletModel.resolvedLabel(label: String, kind: AccountKind): String {
@@ -232,5 +265,6 @@ private fun WalletModel.defaultLabel(kind: AccountKind): String {
         AccountKind.Burner -> "${t("accounts.kindBurner")} $n"
         AccountKind.Secret -> "${t("accounts.kindSecret")} $n"
         AccountKind.Watch -> "${t("accounts.kindWatch")} $n"
+        AccountKind.Combined -> "Combined"
     }
 }

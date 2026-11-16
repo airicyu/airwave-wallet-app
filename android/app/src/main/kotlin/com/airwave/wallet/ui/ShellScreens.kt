@@ -38,9 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.airwave.wallet.R
@@ -78,7 +76,14 @@ fun HomeShell(model: WalletModel) {
             HomeDestination.ImportMnemonic -> ImportMnemonicScreen(model)
             HomeDestination.ImportSecret -> ImportSecretScreen(model)
             HomeDestination.WatchAddress -> WatchAddressScreen(model)
-            HomeDestination.CombinedLater -> CombinedLaterScreen(model)
+            HomeDestination.CombinedCreate -> CombinedCreateScreen(model)
+            HomeDestination.CombinedAdd -> CombinedAddScreen(model)
+            HomeDestination.CombinedPaste -> CombinedPasteScreen(model)
+            HomeDestination.CombinedLocal -> CombinedLocalScreen(model)
+            HomeDestination.CombinedManage -> CombinedManageScreen(model)
+            HomeDestination.AccountManage -> AccountManageScreen(model)
+            HomeDestination.AccountReveal -> AccountRevealScreen(model)
+            HomeDestination.CombinedMembers -> CombinedMembersScreen(model)
             HomeDestination.EmptyAddressBook -> EmptyScreen(model, "menu.addressBook", "empty.addressBook")
             HomeDestination.EmptyConnected -> EmptyScreen(model, "menu.connectedSites", "empty.connectedSites")
             HomeDestination.EmptyAbout -> EmptyScreen(model, "menu.about", "empty.about")
@@ -167,12 +172,19 @@ private fun HomeTabs(model: WalletModel) {
 
 @Composable
 private fun HomeAccountPill(model: WalletModel) {
-    val clipboard = LocalClipboardManager.current
     val account = model.activeAccount()
     val address = model.address.orEmpty()
     val name = account?.label?.ifBlank { null } ?: address.take(4)
-    val mark = if (account?.kind == AccountKind.Watch) R.drawable.ic_stroke_eye else R.drawable.ic_stroke_key
-    val tint = if (account?.kind == AccountKind.Watch) Color(0xFF6CB4E8) else Color(0xFFD08B5B)
+    val mark = when (account?.kind) {
+        AccountKind.Watch -> R.drawable.ic_stroke_eye
+        AccountKind.Combined -> R.drawable.ic_stroke_layers
+        else -> R.drawable.ic_stroke_key
+    }
+    val tint = when (account?.kind) {
+        AccountKind.Watch -> Color(0xFF6CB4E8)
+        AccountKind.Combined -> Color(0xFFC084FC)
+        else -> Color(0xFFD08B5B)
+    }
     Row(
         Modifier
             .clip(RoundedCornerShape(999.dp))
@@ -198,13 +210,10 @@ private fun HomeAccountPill(model: WalletModel) {
             modifier = Modifier.padding(horizontal = 8.dp),
         )
         if (address.isNotEmpty()) {
-            Icon(
-                painterResource(R.drawable.ic_stroke_copy),
-                contentDescription = model.t("accounts.copy"),
-                tint = AirwaveColors.TextMuted,
-                modifier = Modifier
-                    .size(16.dp)
-                    .clickable { clipboard.setText(AnnotatedString(address)) },
+            CopyIcon(
+                text = address,
+                idleLabel = model.t("accounts.copy"),
+                copiedLabel = model.t("copy.copied"),
             )
         }
     }

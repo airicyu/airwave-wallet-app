@@ -10,7 +10,6 @@ import com.airwave.wallet.mwa.MwaPayloads
 import com.airwave.wallet.settings.RpcResolver
 import com.airwave.wallet.solana.LegacyTransaction
 import com.airwave.wallet.solana.SolanaJsonRpc
-import com.airwave.wallet.vault.AccountKind
 import com.airwave.wallet.vault.BurnerKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +17,7 @@ import kotlinx.coroutines.withContext
 
 fun WalletModel.offer(request: WalletOperationRequest) {
     if (approvalSettled) dropSessionChrome()
-    val watch = activeAccount()?.kind == AccountKind.Watch
+    val watch = activeAccount()?.canSign() == false
     if (MwaPayloads.failBeforeOffer(walletOperationRequest != null, watch)) {
         if (watch) {
             mwaError = t("mwa.watchAccount")

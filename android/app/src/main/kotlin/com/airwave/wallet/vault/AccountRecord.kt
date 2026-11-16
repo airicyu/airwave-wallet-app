@@ -6,6 +6,7 @@ enum class AccountKind(val wire: String) {
     Burner("burner"),
     Secret("secret"),
     Watch("watch"),
+    Combined("combined"),
     ;
 
     companion object {
@@ -40,6 +41,7 @@ data class AccountRecord(
     val mnemonic: String? = null,
     val pathKind: ImportPathKind = ImportPathKind.Phantom,
     val pathIndex: Int = 0,
+    val members: List<String> = emptyList(),
 ) {
-    fun canSign(): Boolean = kind != AccountKind.Watch
+    fun canSign(): Boolean = kind != AccountKind.Watch && kind != AccountKind.Combined
 }

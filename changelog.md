@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.8.0 — 2026-11-16
+
+Combined wallet account UI follows the local web wallet. Creating one stages local accounts until Confirm, then returns to the create screen. Leaving that picker without Confirm does not change the draft. A combined account's overflow opens the same manage page shape as other accounts: manage the members, or remove the combined account with no second confirmation.
+
+The reveal-key screen matches the web wallet: title Reveal key, a masked secret card, the password label above the field, and an eye button.
+
+Removing a signing or watch account from its manage page asks "Remove this wallet account?" in a dialog. Cancel leaves the account.
+
+The overflow on a signing or watch account opens the manage page: the full address, Reveal private key, and Remove wallet account. It does not open a small menu.
+
+A combined wallet account uses the stacked-layers mark in the account list, the same mark as the web wallet.
+
+Removing a member from a combined wallet account happens on the trash tap, with no confirmation.
+
+Every copy icon turns into a green check for 1.6 seconds after a tap, matching the web wallet.
+
+The main-wallet card label is Main wallet. Its copy control, and each member's copy control, sit on the address line. The member check is a 34dp circle, the trash is a filled danger square, and the grip uses the account-list 2×6 dots.
+
+Adding members follows the web wallet after 0.59.0. The local list is a checkbox row with the name on the left and the short address on the right, under a line that asks which accounts to add. Pasted text splits on whitespace, commas, and line breaks.
+
 ## 0.7.0 — 2026-11-11
 
 MWA `sign_transactions` approval for one legacy, v0, or v1 payload. The wallet simulates, can edit compute budget on an unsigned transaction, and returns signed bytes. It does not submit. No AI card. `sign_and_send_transactions` still declines. The approval chrome follows the web wallet sign-transaction popout: copy on the account and site, the simulation card, the fee editor, and decoded instruction details.

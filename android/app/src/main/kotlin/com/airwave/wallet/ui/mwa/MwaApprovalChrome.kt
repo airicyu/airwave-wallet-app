@@ -23,8 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.airwave.wallet.R
 import com.airwave.wallet.theme.AirwaveColors
 import com.airwave.wallet.ui.AirwavePrimaryButton
+import com.airwave.wallet.ui.CopyIcon
 
 @Composable
 internal fun ApprovalTop(
@@ -78,7 +77,6 @@ internal fun LockButton(label: String, onLock: () -> Unit) {
 
 @Composable
 internal fun AccountChip(model: WalletModel, pending: WalletOperationRequest, modifier: Modifier = Modifier) {
-    val clipboard = LocalClipboardManager.current
     val address = model.address.orEmpty()
     Row(
         modifier
@@ -102,16 +100,17 @@ internal fun AccountChip(model: WalletModel, pending: WalletOperationRequest, mo
             modifier = Modifier.padding(horizontal = 8.dp),
         )
         if (address.isNotEmpty()) {
-            IconButton(onClick = { clipboard.setText(AnnotatedString(address)) }, modifier = Modifier.size(32.dp)) {
-                Icon(painterResource(R.drawable.ic_stroke_copy), model.t("accounts.copy"), tint = AirwaveColors.TextMuted, modifier = Modifier.size(16.dp))
-            }
+            CopyIcon(
+                text = address,
+                idleLabel = model.t("accounts.copy"),
+                copiedLabel = model.t("copy.copied"),
+            )
         }
     }
 }
 
 @Composable
 internal fun SiteLine(model: WalletModel, pending: WalletOperationRequest) {
-    val clipboard = LocalClipboardManager.current
     val site = pending.identityUri.ifBlank { pending.identityName }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
         Row(
@@ -128,9 +127,11 @@ internal fun SiteLine(model: WalletModel, pending: WalletOperationRequest) {
             Text(site, color = AirwaveColors.Text, fontSize = 13.sp, maxLines = 1)
         }
         if (site.isNotEmpty()) {
-            IconButton(onClick = { clipboard.setText(AnnotatedString(site)) }, modifier = Modifier.size(34.dp)) {
-                Icon(painterResource(R.drawable.ic_stroke_copy), model.t("accounts.copy"), tint = AirwaveColors.TextMuted, modifier = Modifier.size(16.dp))
-            }
+            CopyIcon(
+                text = site,
+                idleLabel = model.t("accounts.copy"),
+                copiedLabel = model.t("copy.copied"),
+            )
         }
     }
 }
