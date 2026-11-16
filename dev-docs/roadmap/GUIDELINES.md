@@ -138,7 +138,7 @@ The status table in [`README.md`](README.md) is the **source of truth**. Each ve
 
 **Push.** The user pushes by hand. Shipping, editing, and committing do not include `git push`. Do not push unless the user asks.
 
-Update [`README.md`](README.md) when a version is added or its status changes. [`changelog.md`](../../changelog.md) records what shipped. It does not replace `INDEX.md`.
+Update [`README.md`](README.md) when a version is added or its status changes. [`changelog.md`](../../changelog.md) records what shipped. It does not replace `INDEX.md`. Under a version heading, give each feature its own title and one paragraph of complete sentences under that title. Put a horizontal rule between versions. Do not pack the whole version into one block.
 
 ### Ship files
 
@@ -146,7 +146,7 @@ Update [`README.md`](README.md) when a version is added or its status changes. [
 |------|---------|
 | [`version.md`](../../version.md) | The shipped version, one line. After the first ship this file equals the latest `shipped` row |
 | [`pubspec.yaml`](../../pubspec.yaml) | The version name matches `version.md`. Bump `+build` only when that INDEX says so |
-| [`changelog.md`](../../changelog.md) | A paragraph under that version, with the date. `Next` has no sentence that still belongs to this version |
+| [`changelog.md`](../../changelog.md) | Under that version heading and date, each feature has its own title and one paragraph. A horizontal rule separates versions. `Next` has no sentence that still belongs to this version |
 | [`dev-docs/roadmap/README.md`](README.md) | This table's row is `shipped` |
 | That version's `INDEX.md` | `Status: shipped` |
 | Repo-root [`README.md`](../../README.md) | Keeps linking `version.md`. Do not paste a second copy of the number |

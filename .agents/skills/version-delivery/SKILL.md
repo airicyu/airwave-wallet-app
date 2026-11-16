@@ -183,7 +183,7 @@ If implementation review finds the **design contract** still diverges: return to
 - [ ] Agreed MEDIUM items are fixed or marked non-blocking
 - [ ] INDEX **acceptance** is fully checked (or implementation-review passes each item)
 - [ ] This version's tests or manual checks passed, and the UI flow was walked on a device (or the report says why it could not be walked)
-- [ ] Root `changelog.md` records this version, and `Next` has no sentence that still belongs to this version
+- [ ] Root `changelog.md` records this version: each feature has its own title and one paragraph, a horizontal rule separates versions, and `Next` has no sentence that still belongs to this version
 - [ ] `version.md` and the version name in `pubspec.yaml` are `X.Y.Z`. Change `+build` only when that version's INDEX says so. After the first ship, `version.md` equals the latest `shipped` row in the README table
 - [ ] That row in [`dev-docs/roadmap/README.md`](../../../dev-docs/roadmap/README.md) is `shipped`. That table is the status source. The INDEX status matches it
 - [ ] Storage, custody, or screen paths added or changed in this version are written in the INDEX

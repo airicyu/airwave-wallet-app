@@ -83,7 +83,7 @@ Version status lives in the table in [`dev-docs/roadmap/README.md`](dev-docs/roa
 
 Until the first version is `shipped`, [`version.md`](version.md) is the version name being built, and it matches the version name in [`pubspec.yaml`](pubspec.yaml). After the first ship, `version.md` equals the latest `shipped` row in that table, and the `pubspec.yaml` version name matches it.
 
-A version proceeds by stating the work, writing it into that version's proposal (INDEX), then changing code. While that happens the version is `in progress`. Only after the user explicitly says ship: mark that README row `shipped`, match the INDEX, and check that [`changelog.md`](changelog.md) has a paragraph for that version. Do not mark shipped, and do not open the next version number, unless the user says ship.
+A version proceeds by stating the work, writing it into that version's proposal (INDEX), then changing code. While that happens the version is `in progress`. Only after the user explicitly says ship: mark that README row `shipped`, match the INDEX, and check that [`changelog.md`](changelog.md) records that version with one title and paragraph per feature, and a horizontal rule between versions. Do not mark shipped, and do not open the next version number, unless the user says ship.
 
 If the previous version is not `shipped`, do not open a new version. This is a soft rule: remind the user, do not hard-block. If they still want it opened, open it.
 
