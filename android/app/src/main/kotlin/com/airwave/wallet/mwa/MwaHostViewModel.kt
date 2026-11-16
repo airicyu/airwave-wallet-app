@@ -69,7 +69,7 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
                 10,
                 arrayOf<Any>(MobileWalletAdapterConfig.LEGACY_TRANSACTION_VERSION, 0, 1),
                 LOW_POWER_NO_CONNECTION_TIMEOUT_MS,
-                arrayOf("solana:signMessages", "solana:signTransactions"),
+                arrayOf("solana:signMessages", "solana:signTransactions", "solana:signAndSendTransaction"),
             ),
             AuthIssuerConfig("Airwave"),
             Callbacks(),
@@ -130,7 +130,7 @@ class MwaHostViewModel(application: Application) : AndroidViewModel(application)
         }
 
         override fun onSignAndSendTransactionsRequest(request: SignAndSendTransactionsRequest) {
-            request.completeWithDecline()
+            viewModelScope.launch(Dispatchers.Main) { screen.offerSignAndSend(request) }
         }
 
         override fun onDeauthorizedEvent(event: DeauthorizedEvent) {

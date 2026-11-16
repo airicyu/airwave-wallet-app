@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 — 2026-11-16
+
+MWA `sign_and_send_transactions` uses the 0.7.0 approval screen, then submits and returns one signature. `sign_transactions` still does not submit.
+
+The unlock screen focuses the password field and opens the keyboard.
+
 ## 0.8.0 — 2026-11-16
 
 Combined wallet account UI follows the local web wallet. Creating one stages local accounts until Confirm, then returns to the create screen. Leaving that picker without Confirm does not change the draft. A combined account's overflow opens the same manage page shape as other accounts: manage the members, or remove the combined account with no second confirmation.

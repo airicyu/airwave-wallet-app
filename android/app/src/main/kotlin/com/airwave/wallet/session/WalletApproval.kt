@@ -38,7 +38,8 @@ fun WalletModel.offer(request: WalletOperationRequest) {
         request.kind == WalletOperationKind.Authorize ||
             request.kind == WalletOperationKind.Reauthorize ||
             request.kind == WalletOperationKind.SignMessage ||
-            request.kind == WalletOperationKind.SignTransaction -> Route.Home
+            request.kind == WalletOperationKind.SignTransaction ||
+            request.kind == WalletOperationKind.SignAndSend -> Route.Home
         else -> Route.Approval
     }
 }
@@ -61,6 +62,10 @@ fun WalletModel.approve() {
     viewModelScope.launch {
         val result = withContext(Dispatchers.IO) { request.approve(secret) }
         approving = false
+        if (result is ApprovalResult.SendFailed) {
+            onSendFailed?.invoke(result.reason)
+            return@launch
+        }
         finishApproval(request, result)
     }
 }
@@ -71,7 +76,8 @@ private fun WalletModel.finishApproval(request: WalletOperationRequest, result: 
     if (request.kind == WalletOperationKind.Authorize ||
         request.kind == WalletOperationKind.Reauthorize ||
         request.kind == WalletOperationKind.SignMessage ||
-        request.kind == WalletOperationKind.SignTransaction
+        request.kind == WalletOperationKind.SignTransaction ||
+        request.kind == WalletOperationKind.SignAndSend
     ) return
     if (address != null) route = Route.Home
     syncHoldings(refresh = false)
@@ -81,7 +87,8 @@ fun WalletModel.reject() {
     if (walletOperationRequest?.kind == WalletOperationKind.Authorize ||
         walletOperationRequest?.kind == WalletOperationKind.Reauthorize ||
         walletOperationRequest?.kind == WalletOperationKind.SignMessage ||
-        walletOperationRequest?.kind == WalletOperationKind.SignTransaction
+        walletOperationRequest?.kind == WalletOperationKind.SignTransaction ||
+        walletOperationRequest?.kind == WalletOperationKind.SignAndSend
     ) {
         if (approvalSettled) return
         approvalSettled = true
@@ -144,7 +151,7 @@ fun WalletModel.rpcForSubmit(chain: String?): String? =
 
 fun WalletModel.signAndSend(payload: ByteArray, rpcUrl: String, secret: ByteArray): ApprovalResult {
     val signed = LegacyTransaction.sign(payload, secret) ?: return ApprovalResult.Failed
-    val signatureB64 = SolanaJsonRpc.sendTransaction(rpcUrl, signed) ?: return ApprovalResult.Failed
+    val signatureB64 = SolanaJsonRpc.sendTransaction(rpcUrl, signed).signature ?: return ApprovalResult.Failed
     return try {
         val sigBytes = BurnerKeys.base58Decode(signatureB64)
         ApprovalResult.Signatures(arrayOf(sigBytes))

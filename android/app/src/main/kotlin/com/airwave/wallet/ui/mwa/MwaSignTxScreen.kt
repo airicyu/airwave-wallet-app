@@ -6,6 +6,7 @@ package com.airwave.wallet.ui.mwa
 import com.airwave.wallet.session.WalletModel
 import com.airwave.wallet.session.approve
 import com.airwave.wallet.session.reject
+import com.airwave.wallet.session.WalletOperationKind
 import com.airwave.wallet.session.WalletOperationRequest
 
 import androidx.compose.foundation.background
@@ -97,7 +98,7 @@ internal fun SignTxBody(model: WalletModel, pending: WalletOperationRequest, ses
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SiteLine(model, pending)
             Text(
-                model.t("mwa.signTx.title"),
+                model.t(if (pending.kind == WalletOperationKind.SignAndSend) "mwa.signSend.title" else "mwa.signTx.title"),
                 color = AirwaveColors.Text,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -105,10 +106,19 @@ internal fun SignTxBody(model: WalletModel, pending: WalletOperationRequest, ses
                 modifier = Modifier.fillMaxWidth(),
             )
             if (mismatch != null) {
-                val parts = mismatch.split(":")
+                val chainMismatch = mismatch.startsWith("chain:")
+                val parts = mismatch.removePrefix("chain:").split(":")
                 Text(model.t("mwa.signTx.mismatchTitle"), color = AirwaveColors.Text, fontWeight = FontWeight.SemiBold)
                 Text(
-                    model.t("mwa.signTx.mismatchBody").replace("{wallet}", parts.getOrElse(0) { "" }).replace("{other}", parts.getOrElse(1) { "" }),
+                    if (chainMismatch) {
+                        model.t("mwa.signSend.clusterMismatch")
+                            .replace("{0}", parts.getOrElse(0) { "" })
+                            .replace("{1}", parts.getOrElse(1) { "" })
+                    } else {
+                        model.t("mwa.signTx.mismatchBody")
+                            .replace("{wallet}", parts.getOrElse(0) { "" })
+                            .replace("{other}", parts.getOrElse(1) { "" })
+                    },
                     color = AirwaveColors.TextMuted,
                 )
             } else {
@@ -124,9 +134,15 @@ internal fun SignTxBody(model: WalletModel, pending: WalletOperationRequest, ses
                         }
                     }
                     when {
+                        model.approving && pending.kind == WalletOperationKind.SignAndSend ->
+                            Text(model.t("mwa.signSend.sending"), color = AirwaveColors.TextMuted)
                         ui == null || ui.loading -> Text(model.t("mwa.signTx.estimating"), color = AirwaveColors.TextMuted)
                         ui.failureTitle -> {
-                            Text(model.t("mwa.signTx.failTitle"), color = AirwaveColors.Danger, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                model.t(if (ui.sendFailure) "mwa.signSend.sendFail" else "mwa.signTx.failTitle"),
+                                color = AirwaveColors.Danger,
+                                fontWeight = FontWeight.SemiBold,
+                            )
                             Text(ui.failureReason.orEmpty(), color = AirwaveColors.Text)
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(

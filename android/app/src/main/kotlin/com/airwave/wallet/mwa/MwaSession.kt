@@ -5,9 +5,11 @@ import com.airwave.wallet.session.detachOperation
 import com.airwave.wallet.session.dropSessionChrome
 import com.airwave.wallet.session.offer
 import com.airwave.wallet.session.ApprovalResult
+import com.airwave.wallet.mwa.tx.SignAndSendGate
 import com.airwave.wallet.mwa.tx.SignTxBytes
 import com.airwave.wallet.mwa.tx.SignTxRun
 import com.airwave.wallet.mwa.tx.SignTxUi
+import com.airwave.wallet.settings.Cluster
 import com.airwave.wallet.session.WalletOperationRequest
 
 import androidx.compose.runtime.getValue
@@ -22,6 +24,7 @@ import java.math.BigInteger
 import com.airwave.wallet.activeAccount
 import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizeRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.ReauthorizeRequest
+import com.solana.mobilewalletadapter.walletlib.scenario.SignAndSendTransactionsRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.SignMessagesRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.SignTransactionsRequest
 
@@ -128,12 +131,28 @@ class MwaSession {
         showSignTx(operation)
     }
 
+    fun offerSignAndSend(request: SignAndSendTransactionsRequest) {
+        val model = wallet
+        if (model == null || operationInProgress()) {
+            request.completeWithDecline()
+            return
+        }
+        val operation = MwaOffers.signAndSend(request, model, signBytes) ?: return
+        model.onSendFailed = { reason -> showSendFailure(reason) }
+        if (needsUnlock(model)) {
+            step = MwaStep.UnlockSignAndSend(operation)
+            return
+        }
+        showSignAndSend(operation)
+    }
+
     private fun advanceAfterUnlock() {
         when (val current = step) {
             is MwaStep.UnlockConnect -> showConnect(current.request)
             is MwaStep.UnlockReauthorize -> finishReauthorize(current.request)
             is MwaStep.UnlockSignMessage -> showSign(current.request)
             is MwaStep.UnlockSignTransaction -> showSignTx(current.request)
+            is MwaStep.UnlockSignAndSend -> showSignAndSend(current.request)
             else -> Unit
         }
     }
@@ -147,6 +166,8 @@ class MwaSession {
             is MwaStep.SignMessageApproval -> current.request
             is MwaStep.UnlockSignTransaction -> current.request
             is MwaStep.SignTransactionApproval -> current.request
+            is MwaStep.UnlockSignAndSend -> current.request
+            is MwaStep.SignAndSendApproval -> current.request
             else -> null
         }
         parkedSign = null
@@ -215,8 +236,72 @@ class MwaSession {
         refreshSignTx(null, null, null)
     }
 
+    private fun showSignAndSend(request: WalletOperationRequest) {
+        val model = wallet ?: return
+        if (model.activeAccount()?.canSign() == false) {
+            request.finish(ApprovalResult.Rejected)
+            step = MwaStep.WatchBlocked(model.t("mwa.watchAccount"))
+            return
+        }
+        model.offer(request)
+        if (model.walletOperationRequest == null) return
+        step = MwaStep.SignAndSendApproval(request)
+        val gate = SignAndSendGate.offer(request.chain, model.settings)
+        if (gate is SignAndSendGate.Offer.Open && gate.clusterMismatch) {
+            signUi = chainMismatch(gate.wallet, gate.request)
+            return
+        }
+        refreshSignTx(null, null, null)
+    }
+
+    private fun chainMismatch(walletCluster: Cluster, requestCluster: Cluster): SignTxUi =
+        SignTxUi(
+            loading = false,
+            mismatch = "chain:" + walletCluster.name + ":" + requestCluster.name,
+            devnetStrip = walletCluster == Cluster.Devnet,
+            failureTitle = false,
+            failureReason = null,
+            deltas = emptyList(),
+            feeTotal = null,
+            signatureFee = null,
+            priorityFee = null,
+            cuLimit = "",
+            secondField = "",
+            v1 = false,
+            editable = false,
+            cuWriteError = false,
+            instructions = emptyList(),
+        )
+
+    private fun showSendFailure(reason: String?) {
+        val current = signUi
+        signUi = (current ?: chainMismatch(Cluster.Mainnet, Cluster.Mainnet)).copy(
+            loading = false,
+            mismatch = null,
+            failureTitle = true,
+            failureReason = reason,
+            sendFailure = true,
+            deltas = emptyList(),
+            editable = false,
+        )
+    }
+
     fun refreshSignTx(userLimit: Long?, userPrice: Long?, userPriority: BigInteger?) {
         val model = wallet ?: return
+        if (signBytes.sealed != null) {
+            val ticket = ++signGen
+            signJob?.cancel()
+            signUi = signUi?.copy(loading = true, deltas = emptyList(), failureTitle = false, sendFailure = false)
+            val sealed = signBytes.sealed ?: return
+            signJob = scope?.launch(Dispatchers.IO) {
+                val (_, ui) = SignTxRun.load(sealed, model.settings, model.address, null, null, null)
+                withContext(Dispatchers.Main) {
+                    if (ticket != signGen) return@withContext
+                    signUi = ui.copy(editable = false)
+                }
+            }
+            return
+        }
         val ticket = ++signGen
         signJob?.cancel()
         signUi = signUi?.copy(loading = true, deltas = emptyList(), failureTitle = false)

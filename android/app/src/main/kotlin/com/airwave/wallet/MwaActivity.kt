@@ -59,12 +59,17 @@ class MwaActivity : ComponentActivity() {
                         is MwaStep.UnlockReauthorize,
                         is MwaStep.UnlockSignMessage,
                         is MwaStep.UnlockSignTransaction,
+                        is MwaStep.UnlockSignAndSend,
                         -> UnlockScreen(wallet)
                         is MwaStep.ConnectApproval ->
                             ConnectBody(wallet, step.request)
                         is MwaStep.SignMessageApproval ->
                             SignMessageBody(wallet, step.request)
                         is MwaStep.SignTransactionApproval -> {
+                            BackHandler { wallet.reject() }
+                            SignTxBody(wallet, step.request, session.screen)
+                        }
+                        is MwaStep.SignAndSendApproval -> {
                             BackHandler { wallet.reject() }
                             SignTxBody(wallet, step.request, session.screen)
                         }

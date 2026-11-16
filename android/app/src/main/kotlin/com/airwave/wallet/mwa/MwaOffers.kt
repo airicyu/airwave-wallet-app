@@ -11,6 +11,9 @@ import com.solana.mobilewalletadapter.walletlib.scenario.AuthorizedAccount
 import com.solana.mobilewalletadapter.walletlib.scenario.ReauthorizeRequest
 import com.airwave.wallet.mwa.tx.SignTxBytes
 import com.airwave.wallet.mwa.tx.SignTxWire
+import com.airwave.wallet.solana.SolanaJsonRpc
+import com.airwave.wallet.mwa.tx.SignAndSendGate
+import com.solana.mobilewalletadapter.walletlib.scenario.SignAndSendTransactionsRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.SignMessagesRequest
 import com.solana.mobilewalletadapter.walletlib.scenario.SignTransactionsRequest
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
@@ -120,6 +123,7 @@ object MwaOffers {
         }
         bytes.original = original
         bytes.working = original
+        bytes.sealed = null
         val account = model.activeAccount()
         return WalletOperationRequest(
             kind = WalletOperationKind.SignTransaction,
@@ -139,6 +143,58 @@ object MwaOffers {
                 }
             },
         )
+    }
+
+    /** Null when the payload or chain must be declined before offer. The protocol request is already completed. */
+    fun signAndSend(
+        request: SignAndSendTransactionsRequest,
+        model: WalletModel,
+        bytes: SignTxBytes,
+    ): WalletOperationRequest? {
+        val payloads = request.payloads
+        if (SignAndSendGate.declinePayload(payloads) || SignTxWire.inspect(payloads[0]) == null) {
+            request.completeWithDecline()
+            return null
+        }
+        val gate = SignAndSendGate.offer(request.chain, model.settings)
+        if (gate !is SignAndSendGate.Offer.Open) {
+            request.completeWithDecline()
+            return null
+        }
+        val original = payloads[0]
+        bytes.original = original
+        bytes.working = original
+        bytes.sealed = null
+        val minContextSlot = request.minContextSlot
+        val account = model.activeAccount()
+        return WalletOperationRequest(
+            kind = WalletOperationKind.SignAndSend,
+            identityName = request.identityName.orEmpty(),
+            identityUri = request.identityUri?.toString().orEmpty(),
+            chain = request.chain.orEmpty(),
+            accountLabel = account?.label.orEmpty(),
+            accountShort = BurnerKeys.short(model.address.orEmpty()),
+            approve = { secret -> submit(bytes, secret, gate.rpcUrl, minContextSlot) },
+            finish = { result ->
+                when (result) {
+                    is ApprovalResult.Signatures -> request.completeWithSignatures(result.value)
+                    is ApprovalResult.SendFailed -> Unit
+                    else -> request.completeWithDecline()
+                }
+            },
+        )
+    }
+
+    private fun submit(bytes: SignTxBytes, secret: ByteArray, rpcUrl: String, minContextSlot: Int?): ApprovalResult {
+        val signed = bytes.sealed ?: SignTxWire.partialSign(bytes.working, secret) ?: return ApprovalResult.Failed
+        bytes.sealed = signed
+        val pub = publicKey(secret)
+        val slot = SignTxWire.signerSlot(signed, pub) ?: return ApprovalResult.SendFailed(null)
+        val sent = SolanaJsonRpc.sendTransaction(rpcUrl, signed, minContextSlot)
+        if (sent.signature != null && SignAndSendGate.signatureMatches(sent.signature, slot)) {
+            return ApprovalResult.Signatures(arrayOf(slot))
+        }
+        return ApprovalResult.SendFailed(sent.errorMessage)
     }
 
     fun addressesAllow(request: SignMessagesRequest, activeAddress: String?): Boolean {

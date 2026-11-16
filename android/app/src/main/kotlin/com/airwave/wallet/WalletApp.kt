@@ -28,12 +28,17 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -150,6 +155,12 @@ private fun SetupScreen(model: WalletModel) {
 internal fun UnlockScreen(model: WalletModel) {
     var password by rememberSaveable { mutableStateOf("") }
     val fieldColors = airwaveUnlockFieldColors()
+    val focus = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    LaunchedEffect(Unit) {
+        focus.requestFocus()
+        keyboard?.show()
+    }
     Box(Modifier.fillMaxSize()) {
         AirwaveUnlockBackdrop {
             BrandMarkImage()
@@ -173,7 +184,7 @@ internal fun UnlockScreen(model: WalletModel) {
                 password,
                 { password = it },
                 placeholder = { Text(model.t("unlock.password")) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().focusRequester(focus),
                 shape = RoundedCornerShape(10.dp),
                 colors = fieldColors,
                 visualTransformation = PasswordVisualTransformation(),

@@ -113,6 +113,21 @@ object SignTxWire {
         null
     }
 
+    /** The 64-byte signature in this public key's slot, or null when that slot is absent. */
+    fun signerSlot(bytes: ByteArray, pub: ByteArray): ByteArray? = try {
+        val parsed = if (versionOf(bytes) == TxVersion.V1) {
+            val v1 = parseV1(bytes)
+            v1.keys.indexOfFirst { it.contentEquals(pub) } to v1.signatures
+        } else {
+            val legacy = parseLegacy(bytes)
+            legacy.keys.indexOfFirst { it.contentEquals(pub) } to legacy.signatures
+        }
+        val index = parsed.first
+        if (index < 0) null else parsed.second.getOrNull(index)
+    } catch (_: Exception) {
+        null
+    }
+
     fun builtinCount(programs: List<String>): Pair<Int, Int> {
         val builtin = programs.count { it in BUILTINS }
         return builtin to (programs.size - builtin)

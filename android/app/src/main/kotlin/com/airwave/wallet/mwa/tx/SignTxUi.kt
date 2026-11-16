@@ -6,6 +6,8 @@ import java.math.BigInteger
 class SignTxBytes {
     @Volatile var original: ByteArray = byteArrayOf()
     @Volatile var working: ByteArray = byteArrayOf()
+    /** Set after a successful partial sign. Later Approve sends these bytes again. */
+    @Volatile var sealed: ByteArray? = null
 }
 
 /** One expected balance row on the sign-transaction screen. */
@@ -40,4 +42,5 @@ data class SignTxUi(
     val editable: Boolean,
     val cuWriteError: Boolean,
     val instructions: List<String>,
+    val sendFailure: Boolean = false,
 )

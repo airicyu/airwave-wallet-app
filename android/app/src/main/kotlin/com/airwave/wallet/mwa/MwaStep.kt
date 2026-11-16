@@ -43,6 +43,12 @@ sealed interface MwaStep {
     /** Sign transaction is waiting for the user to approve or reject. */
     data class SignTransactionApproval(val request: WalletOperationRequest) : MwaStep
 
+    /** Sign and send is waiting for the vault to decrypt the signing key. */
+    data class UnlockSignAndSend(val request: WalletOperationRequest) : MwaStep
+
+    /** Sign and send is waiting for the user to approve or reject. */
+    data class SignAndSendApproval(val request: WalletOperationRequest) : MwaStep
+
     /** The account cannot sign. The activity shows this one sentence until teardown. */
     data class WatchBlocked(val message: String) : MwaStep
 

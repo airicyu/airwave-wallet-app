@@ -10,6 +10,8 @@ sealed class ApprovalResult {
     data object Rejected : ApprovalResult()
     /** Signing or submitting failed after the user approved. */
     data object Failed : ApprovalResult()
+    /** Submit failed. The protocol request stays open so the same bytes can be sent again. */
+    data class SendFailed(val reason: String?) : ApprovalResult()
 }
 
 /** Names the approval chrome the MWA screens should draw for the current walletOperationRequest. */

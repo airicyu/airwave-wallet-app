@@ -73,6 +73,8 @@ class WalletModel(app: Application) : AndroidViewModel(app) {
         private set
     var approving by mutableStateOf(false)
         internal set
+    /** Sign-and-send stays on the screen when submit fails. The session paints the failure. */
+    var onSendFailed: ((String?) -> Unit)? = null
     var approvalSettled by mutableStateOf(false)
         internal set
     var accountRows by mutableStateOf<List<AccountRecord>>(emptyList())
