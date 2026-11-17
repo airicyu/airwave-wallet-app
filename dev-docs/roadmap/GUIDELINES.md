@@ -136,6 +136,8 @@ The status table in [`README.md`](README.md) is the **source of truth**. Each ve
 
 **More changes while a version is `in progress`.** Append that version's `INDEX` and its changelog heading. Do not open another version.
 
+**Branches.** Do not pre-open a version branch named `vX.Y.Z`. Develop on `main`, or on a feature branch when the work should land later. Commit only when the user asks. Merge a feature branch into `main` only when the user asks. When a version is ready, the user creates the git tag by hand (for example `vX.Y.Z`). Do not create that tag, and do not push, unless the user asks. Open a merge request only when the user asks.
+
 **Push.** The user pushes by hand. Shipping, editing, and committing do not include `git push`. Do not push unless the user asks.
 
 Update [`README.md`](README.md) when a version is added or its status changes. [`changelog.md`](../../changelog.md) records what shipped. It does not replace `INDEX.md`. Under a version heading, give each feature its own title and one paragraph of complete sentences under that title. Put a horizontal rule between versions. Do not pack the whole version into one block.
